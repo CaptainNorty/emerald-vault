@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.15)
+project(emerald_emulator C CXX)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+foreach(feature BUILD_QT BUILD_SDL BUILD_GL BUILD_GLES2 BUILD_GLES3 BUILD_SHARED
+        BUILD_PYTHON USE_DEBUGGERS USE_FFMPEG USE_MINIZIP USE_LIBZIP USE_SQLITE3
+        USE_ELF USE_LUA USE_LZMA USE_DISCORD_RPC USE_EPOXY M_CORE_GB)
+    set(${feature} OFF CACHE BOOL "" FORCE)
+endforeach()
+set(BUILD_STATIC ON CACHE BOOL "" FORCE)
+set(USE_PNG ON CACHE BOOL "" FORCE)
+set(USE_ZLIB ON CACHE BOOL "" FORCE)
+add_subdirectory("${MGBA_SOURCE}" mgba)
+add_executable(emerald-emulator runner.c)
+target_link_libraries(emerald-emulator PRIVATE mgba)
+target_compile_options(emerald-emulator PRIVATE -Wall -Wextra -Werror)

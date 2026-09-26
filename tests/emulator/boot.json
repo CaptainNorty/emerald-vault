@@ -1,0 +1,15 @@
+{
+  "name": "Fresh boot to Birch introduction",
+  "steps": [
+    {"action": "wait_task", "task": "Task_TitleScreenPhase3", "timeout_frames": 6000},
+    {"action": "screenshot", "name": "01-title"},
+    {"action": "run", "frames": 2, "keys": ["START"]},
+    {"action": "wait_task", "task": "Task_HandleMainMenuInput", "timeout_frames": 1200},
+    {"action": "screenshot", "name": "02-new-game-menu"},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "wait_task", "task": "Task_NewGameBirchSpeech_ThisIsAPokemon", "timeout_frames": 1200},
+    {"action": "run", "frames": 180},
+    {"action": "assert_task", "task": "Task_NewGameBirchSpeech_ThisIsAPokemon"},
+    {"action": "screenshot", "name": "03-birch-introduction"}
+  ]
+}
