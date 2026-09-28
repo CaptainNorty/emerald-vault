@@ -5,6 +5,7 @@ An economy-focused Pokémon Emerald ROM hack, built on
 
 This starting point contains the original Emerald game and a Mac build and
 automated emulator testing workflow. Economy gameplay changes are not implemented yet.
+For the game's goals and design direction, see [the vision doc](docs/VISION.md).
 
 The unchanged baseline builds the following ROM:
 
