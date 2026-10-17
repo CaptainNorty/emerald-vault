@@ -2,49 +2,104 @@
 
 ## The pitch
 
-Emerald Vault makes **earning money** a core focus of Pokémon Emerald. After you
-beat a trainer, you can hire them. You give your hired trainers Pokémon to
-battle with, and they earn money for you over time. Key steps in the game's
-progression cost money, so building up an income is how you move forward.
+Emerald Vault makes **earning money** a core focus of Pokémon Emerald. Your home
+town, Littleroot, is surrounded by ruined buildings. You rebuild them as
+**businesses** that earn money as you walk, staffed by Pokémon you assign. The
+better suited and stronger the Pokémon, the more the business earns. Key steps
+in the game's progression cost money, so building up your town's income is how
+you move forward.
 
-> A home-town building direction is under consideration and could change this
-> pitch. See "New direction under consideration" below.
+Ideas that were explored and set aside are kept in
+[UNUSED_IDEAS.md](UNUSED_IDEAS.md).
 
-## Core mechanic: hiring trainers
+## Core loop
 
-1. **Hire:** After beating a trainer in battle, you can hire them.
-2. **Staff:** A hired trainer needs Pokémon to battle with, and you provide them.
-3. **Earn:** Once a hired trainer has Pokémon, they build up money over time.
-4. **Collect:** You go back to the trainer to collect what they've earned.
-5. **Reclaim:** You can take back Pokémon you've given to a hired trainer at any
-   time.
+1. **Rebuild:** Pay money and contribute one or more relevant Pokémon to rebuild
+   a ruined plot as a business.
+2. **Staff:** Assign Pokémon to the business. Their species, type and level set
+   its **efficiency**.
+3. **Earn:** The business sells its product and earns money based on the
+   **steps you take**.
+4. **Check in:** Each business has a **manager** who reports how it's going:
+   - "Business is going great! I've sold 73 evolution stones for a profit of
+     $12,683."
+   - "Hey boss, we've sold 892 Cheri Berries for $26,984."
+   - "Yo! We've caught a total of 18 Pokémon and sold them for $4,802."
+5. **Collect:** Collect the earnings and spend them on progression and more
+   buildings.
 
-### Collecting earnings
-- **Early game:** You have to visit each hired trainer in person to collect.
-- **Later:** You can pay to unlock a building where you collect earnings from,
-  and manage, all your hires in one place. This is one of the investments that
-  pays off by saving you time.
+Training a Pokémon now has two uses: your team, or a business. Choosing between
+them is part of the game.
 
-### Time is measured in steps
-Hired trainers earn money based on **steps you take**. The game already counts
-steps (`GAME_STAT_STEPS`, incremented in `src/field_control_avatar.c`), so each
-hire can store the step count from their last collection, and their earnings are
-worked out from how many steps have passed since then.
+## Efficiency from assigned Pokémon
 
-### Earning rates
-- Early-game trainers earn a little over time, and late-game trainers earn more.
-- The game decides **whether a hired trainer wins, and how often**, based on the
-  quality of the Pokémon you gave them. Better Pokémon mean more wins and more
-  income.
+How well a business runs depends on the Pokémon you assign. Examples:
+
+- A level 3 Seedot runs the Greenhouse very slowly. A level 40 Ludicolo runs it
+  at 10× the efficiency.
+- A level 3 Skitty barely powers the Generator (0.3×). A leveled-up Manectric
+  gets a 15× return.
+
+Draft formula: **type fit × level factor × specialist bonus**.
+
+| Pokémon | Type fit | Level factor | Specialist bonus | Result |
+|---|---|---|---|---|
+| Skitty, Lv 3, at the Generator | 0.5× (Normal) | 0.6× | none | **0.3×** |
+| Manectric, Lv 40, at the Generator | 2× (Electric) | 4× | ~2× | **~15×** |
+
+A specialist bonus for a few ideal species per building (for example, Ludicolo
+for the Greenhouse) rewards players who hunt for the right Pokémon. Exact numbers
+are for tuning.
+
+## The town
+
+Littleroot has 9 ruined plots south of the original town (built on the
+`town-ruins` branch). The original three buildings stay as they are.
+
+- **Any order:** Like the Community Center bundles in Stardew Valley, some
+  buildings are cheap and easy to rebuild and others are expensive or need rare
+  Pokémon. The player chooses what to rebuild first.
+- **Requirements:** Any mix of money, specific Pokémon, items, or a minimum
+  badge count.
+- **Size variety:** Buildings come in different sizes, so the town isn't a
+  uniform grid. The plot layout will be redone once the lineup is settled.
+
+### Building lineup (draft)
+
+Each building is a business with a product and a preferred type.
+
+| Building | Sells | Preferred type |
+|---|---|---|
+| Greenhouse | Berries | Grass |
+| Quarry | Evolution stones | Rock / Ground |
+| Generator | Power | Electric |
+| Fishery | Caught Pokémon | Water |
+| Nursery | Eggs | Any (Ditto as specialist) |
+| Dojo | Training services | Fighting |
+| Forge | Crafted items | Fire / Steel |
+| Café | Moomoo Milk and food | Normal (Miltank as specialist) |
+| Weather Stabilizer | Capstone | — |
+
+The **Weather Stabilizer** (the "Environmental Balance Machine") is the big goal
+that needs most of the other businesses. In Emerald, Team Magma awakens Groudon
+and Team Aqua awakens Kyogre. Their clash causes extreme weather around
+Sootopolis, and the player calls Rayquaza from Sky Pillar to calm them. The
+Weather Stabilizer could replace or support that ending.
 
 ## Progression gated by money
 
-Core progression events are blocked until you pay for them. That gives you the
-reason to hire trainers and build income.
+Key progression events are blocked until you pay. That gives you the reason to
+build income.
 
-### HMs for sale (idea)
+- **Gym entry fees:** For example, $3,000 to enter the first Gym, $10,000 for
+  the second, and so on.
+- **Paid passage:** A person blocks the entrance to the next area and asks for,
+  say, $50,000. Once paid, they leave.
+
+### HMs for sale (option)
 All the HMs you need could be for sale in the first city, with costs that rise
-exponentially. This teaches you what the game is about right away. Draft prices:
+exponentially. This would teach you what the game is about right away. Draft
+prices:
 
 | HM         | Price      |
 |------------|------------|
@@ -65,76 +120,6 @@ exponentially. This teaches you what the game is about right away. Draft prices:
 - **Many valid strategies:** Some strategies should make more money than others,
   but you should always have several options.
 
-## Other income sources (candidates)
-
-Hiring trainers is the core, but there could be 5–10 other ways to earn money.
-Current ideas:
-
-- **Training contracts:** An NPC pays a lump sum for training a Pokémon to a
-  certain level.
-- **Pokémon sales:** An NPC buys specific Pokémon from you.
-- **Building repair:** You repair buildings so they start generating income.
-- **Gym ownership:** You buy the rights to a Gym.
-
-## New direction under consideration: building your home town
-
-These ideas came later and could reshape the core loop. They aren't settled.
-See "Decisions this direction forces" below.
-
-### Breeding and selling Pokémon, Factorio-style
-- You can exchange Pokémon for money.
-- Like Factorio, you start out doing it by hand and gradually **automate** it as
-  you progress.
-- Instead of (or alongside) hiring trainers, you place **Day Cares in your home
-  town**, raise Pokémon, and breed them in large numbers.
-- Story framing: for example, "Professor Oak needs you to repopulate the
-  region."
-
-### Your home town as a farm
-- Like the farm in Stardew Valley, your home town is a large, nearly empty area.
-- You arrive on day one and are in charge of turning it into a thriving city.
-- Your goal could be attracting trainers, breeding lots of Pokémon, or both.
-
-### Buildings that need specific Pokémon
-Building up the town takes specific Pokémon, sometimes with specific moves.
-Examples:
-
-- An **Electrode** powers the generator.
-- The generator is needed to open the home **Pokémon Center**.
-- A **Chansey** (or another healing Pokémon) runs the Pokémon Center.
-- A **Magnemite** helps build metal buildings or decorations.
-
-### Story goal tied to the town
-- The town builds toward one big goal, for example: "To stop Team Aqua or Team
-  Magma, you have to build the Environmental Balance Machine."
-- Building requirements are placed **between Gyms**. You still progress through
-  the game as normal, but you can't rush through it. You also have to collect
-  the right Pokémon so your town meets the requirements for the next build.
-
-### Decisions this direction forces
-- **What is the core loop?** Hiring trainers for money, building the town with
-  Pokémon, or both, with one feeding the other? If the town is the core, Pokémon
-  become the main resource and money becomes one of several.
-- **Map changes:** A big, empty home town that fills in over time needs a new or
-  heavily changed map, which conflicts with the "few or no map changes"
-  non-goal. That non-goal may need to change.
-
-### Technical notes for this direction
-- **Changing the town as you build:** GBA maps are fixed layouts, but scripts can
-  swap individual tiles based on story flags (`setmetatile`, used about 600 times
-  in vanilla map scripts). Secret Bases and their decorations are an existing
-  example of a player-customized space. Pre-built "stages" of the town, unlocked
-  by flags, are the simplest approach.
-- **Breeding at scale:** The vanilla Day Care holds only 2 Pokémon
-  (`DAYCARE_MON_COUNT`), and PC storage is 14 boxes of 30. A full Pokémon takes
-  80 bytes of save space, so "tons" of bred Pokémon can't all be real Pokémon.
-  Automated output should probably be stored as **counts** (for example, "47
-  Zigzagoon ready to sell"), with real Pokémon created only when you take one.
-- **Requiring a Pokémon for a building:** Checking whether your party has a
-  given species or move is straightforward, since vanilla already does this for
-  HM field moves. If the Pokémon is assigned to the building permanently, it
-  needs save space, like Pokémon lent to hired trainers.
-
 ## Non-goals
 
 The economy systems are a big enough job on their own, so to keep the project
@@ -142,38 +127,57 @@ manageable:
 
 - No new Pokémon
 - No changes to music or sprites
-- Few or no map changes
+- Map changes limited to Littleroot Town and what money gates need
 
 ## Milestones
 
 ### First playable
-- Hire trainers after beating them.
-- Give hired trainers Pokémon.
-- Come back to collect their earnings.
+- One business can be rebuilt with money and a Pokémon.
+- Assign Pokémon; efficiency depends on them.
+- The business earns money per step.
+- The manager reports totals, and you can collect the earnings.
 - Progression doesn't have to be gated by money yet.
 
 ### First release
-- Everything in the first playable version.
-- Progression gated by money (for example, the HM shop).
+- The full building lineup.
+- Progression gated by money (Gym fees, paid passage, possibly the HM shop).
 
 ## Open questions & technical notes
 
-- **Money cap:** Vanilla Emerald caps money at **$999,999** (`MAX_MONEY` in
+- **Where assigned Pokémon live:** Reserve one PC box as a locked "town box,"
+  with each building's Pokémon in a fixed slot. This needs no new save space,
+  keeps the Pokémon real (stats, nature), and lets you take them back. A real
+  Pokémon takes 80 bytes, and the save file is nearly full: about 120 bytes free
+  in the main save block, about 84 in the player block, and about 2 KB in the PC
+  storage block.
+- **Per-building save data:** Step count at last collection, items sold, and
+  money earned. A few bytes per building, which fits in the PC storage block's
+  free space.
+- **Steps:** The game already counts steps (`GAME_STAT_STEPS`, incremented in
+  `src/field_control_avatar.c`). Each business stores the step count from its
+  last collection, and earnings are worked out from the difference.
+- **Step farming:** Earning per step invites players to ride their bike in
+  circles. A stockroom cap per building handles it ("Boss, the stockroom's full,
+  come collect!").
+- **Collecting:** Visit each manager in person early on, and later unlock one
+  central place to collect from all of them?
+- **Who the managers are:** Possibly trainers you've beaten and hired (see
+  [UNUSED_IDEAS.md](UNUSED_IDEAS.md)).
+- **Manager dialogue:** Scripts can already insert numbers and item names into
+  text, so the reports are formatted messages.
+- **Money gates:** Vanilla already has NPCs who block a path until a flag is
+  set. Paying one is: check money, show the money box, take the payment, set a
+  flag, remove the NPC.
+- **Money cap:** Vanilla caps money at **$999,999** (`MAX_MONEY` in
   `src/money.c`). Money is already saved as a 32-bit number, so raising the cap
   is a small, save-compatible change, mostly to the displays that assume 6
   digits (the money box and the trainer card). Standard Poké Mart prices are
-  16-bit (max $65,535), so expensive purchases like the HM shop should use
-  scripted purchases, which already handle 32-bit amounts.
-- **HMs still need badges:** Vanilla checks badges before letting you use HM
-  field moves (`src/party_menu.c`, `src/field_control_avatar.c`). If HMs are
-  bought instead, decide whether those badge checks go away.
-- **Waterfall** isn't in the HM price list yet.
-- **Step farming:** Earning per step invites players to ride their bike in
-  circles. Consider capping how much a hire can hold before you collect
-  (like a full container in Stardew Valley).
-- **How a hired trainer's win rate is calculated:** What makes a Pokémon
-  "better"? Level, stats, type matchups against the trainer's opponents, or a
-  mix?
-- **Storing lent Pokémon:** Lent Pokémon have to be kept in the save file,
-  which has limited space. How many hires, and how many Pokémon each, can the
-  save hold? Do lent Pokémon gain experience while they're hired out?
+  16-bit (max $65,535), so expensive purchases should use scripted purchases,
+  which already handle 32-bit amounts.
+- **If HMs are sold:** Vanilla checks badges before letting you use HM field
+  moves (`src/party_menu.c`, `src/field_control_avatar.c`). Decide whether those
+  checks go away. Waterfall isn't in the HM price list yet.
+- **Changing the town as you rebuild:** Scripts can swap individual map tiles
+  based on story flags (`setmetatile`, used about 600 times in vanilla map
+  scripts). Pre-built stages unlocked by flags are the simplest approach.
+  Buildings with interiors need new interior maps.
