@@ -111,6 +111,10 @@ A minimum badge count can still be one of a building's requirements.*
 | Workshop (item duplicator) | Put in one item; it slowly produces more. | Easy to exploit (Rare Candy, Master Ball) unless the accepted items are tightly limited. |
 | Game Corner | A casino in town. | Mauville already has one. Vanilla's `src/slot_machine.c` and `src/roulette.c` could be reused if wanted. |
 | Barn (Miltank) | Like the Miltank barn in Gold/Silver. | Could return as the Café, selling Moomoo Milk (already an item). |
+| Café | Moomoo Milk and food (Normal / Ice). | Felt like a theme park rather than part of the push toward the Weather Stabilizer. Replaced by the Delivery Service and the Ice Dome. Note: Miltank isn't catchable in Hoenn. |
+| Haunted House | Tickets to a spooky attraction (Ghost / Dark). | Same reason. Replaced by the Spirit Sanctum, which feeds the Weather Stabilizer. |
+| Nursery | Eggs, with Ditto as the specialist. | Didn't make the 9. Could return as an upgrade or a post-Elite Four building. |
+| Dojo | Training services (Fighting). | Didn't make the 9. Fighting is covered by the Forge. |
 | Greenhouse (planting real berries) | Plant collected berries and harvest more. | Kept as a business that sells berries instead. Technical note: vanilla has 128 berry tree save slots and uses 88; vanilla berries grow on the real-time clock, not steps. |
 
 ## Other income sources

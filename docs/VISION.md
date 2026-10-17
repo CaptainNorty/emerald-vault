@@ -53,38 +53,78 @@ are for tuning.
 
 ## The town
 
-Littleroot has 9 ruined plots south of the original town (built on the
-`town-ruins` branch). The original three buildings stay as they are.
+The farm sits on the **east side of Littleroot**, right next to the Route 101
+entrance, so it's the first thing you see coming home. The original town (both
+houses and Birch's Lab) stays exactly where it is on the west side, so none of
+the story's triggers or events move. The open area south of Birch's Lab is
+reserved for possible post-Elite Four buildings.
 
 - **Any order:** Like the Community Center bundles in Stardew Valley, some
   buildings are cheap and easy to rebuild and others are expensive or need rare
-  Pokémon. The player chooses what to rebuild first.
-- **Requirements:** Any mix of money, specific Pokémon, items, or a minimum
-  badge count.
-- **Size variety:** Buildings come in different sizes, so the town isn't a
-  uniform grid. The plot layout will be redone once the lineup is settled.
+  Pokémon. The player chooses what to rebuild first, within each building's
+  requirements.
+- **Requirements:** Any mix of money, specific Pokémon, items, badges, or
+  having visited a place.
+- **Operational** means rebuilt with at least one Pokémon assigned.
 
-### Building lineup (draft)
+### Layout
 
-Each building is a business with a product and a preferred type.
+The Weather Stabilizer is in the center. The four buildings north, east, south
+and west of it are **feeders** that power it. The four corner buildings are
+independent businesses.
 
-| Building | Sells | Preferred type |
-|---|---|---|
-| Greenhouse | Berries | Grass |
-| Quarry | Evolution stones | Rock / Ground |
-| Generator | Power | Electric |
-| Fishery | Caught Pokémon | Water |
-| Nursery | Eggs | Any (Ditto as specialist) |
-| Dojo | Training services | Fighting |
-| Forge | Crafted items | Fire / Steel |
-| Café | Moomoo Milk and food | Normal (Miltank as specialist) |
-| Weather Stabilizer | Capstone | — |
+```
+ Delivery Service  |      Forge         |  Greenhouse
+   (NW)            |   (N, feeder)      |    (NE)
+-------------------+--------------------+------------------
+   Ice Dome        | WEATHER STABILIZER |   Generator
+  (W, feeder)      |     (center)       |  (E, feeder)
+-------------------+--------------------+------------------
+    Fishery        |  Spirit Sanctum    |    Quarry
+   (SW)            |   (S, feeder)      |    (SE)
+```
 
-The **Weather Stabilizer** (the "Environmental Balance Machine") is the big goal
-that needs most of the other businesses. In Emerald, Team Magma awakens Groudon
-and Team Aqua awakens Kyogre. Their clash causes extreme weather around
-Sootopolis, and the player calls Rayquaza from Sky Pillar to calm them. The
-Weather Stabilizer could replace or support that ending.
+The feeders pair with the Groudon/Kyogre conflict: the Forge provides heat
+against Kyogre's endless rain, the Ice Dome provides cold against Groudon's
+drought, the Generator provides power, and the Spirit Sanctum provides soul
+energy. Mt. Pyre is Hoenn's resting place for Pokémon souls and where the Red
+and Blue Orbs are kept, so the Sanctum ties into the main story.
+
+### Building lineup
+
+Two or more types per business, so all 17 types have a home.
+
+| Position | Building | Types | Sells | Requires (besides money) | Specialist |
+|---|---|---|---|---|---|
+| Center | Weather Stabilizer | Dragon | Capstone | Rain Badge (8th Gym) and all four feeders operational | Castform, Altaria, Flygon, Salamence |
+| N (feeder) | Forge | Fire / Fighting | Poké Balls, held items | Heat Badge (4th Gym) | Blaziken |
+| E (feeder) | Generator | Electric / Steel | Power | Dynamo Badge (3rd Gym) | Magneton |
+| W (feeder) | Ice Dome | Ice | Ice, cold storage | An Ice-type Pokémon | Glalie |
+| S (feeder) | Spirit Sanctum | Ghost / Psychic / Poison | Remedies, blessings | Having visited Mt. Pyre | Dusclops, Claydol |
+| NW | Delivery Service | Flying / Normal | Deliveries | Nothing (early) | Swellow |
+| NE | Greenhouse | Grass / Bug | Berries | Nothing (early) | Ludicolo |
+| SW | Fishery | Water / Dark | Caught Pokémon | Old Rod (from Dewford) | Sharpedo |
+| SE | Quarry | Rock / Ground | Evolution stones | Stone Badge (1st Gym) | Golem |
+
+All specialists can be caught or obtained in Hoenn. Hoenn's Ice types (Snorunt,
+Spheal) live in Shoal Cave, which needs Surf, so the Ice Dome naturally comes
+late.
+
+### Delivery Service flights
+Once built, the Delivery Service flies you **from anywhere back to
+Littleroot**, and **from Littleroot to any city you've visited**, even before
+you have the Fly HM. It doesn't replace Fly, which still matters for travel
+between other cities, and it gives a strong reason to build it early.
+
+Technically: flying home is a key item with a Fly-style warp, usable outdoors
+and reusing an existing item icon. Flying out reuses vanilla's Fly map screen,
+opened from the Delivery Service manager's dialogue.
+
+### Story note
+In Emerald, Team Magma awakens Groudon and Team Aqua awakens Kyogre. Their clash
+causes extreme weather around Sootopolis, and the player calls Rayquaza from Sky
+Pillar to calm them. The Weather Stabilizer could replace or support that
+ending. To be decided later.
 
 ## Progression gated by money
 

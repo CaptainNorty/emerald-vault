@@ -121,9 +121,12 @@ boot. The normal `pokeemerald.gba` is not affected.
 A scenario uses it by adding `"build": "test_start"` (the default is
 `"normal"`). To try it by hand: `open -a mGBA pokeemerald_teststart.gba`.
 
-`tests/emulator/town_ruins.json` uses this build to walk past all 9 ruined
-plots, read a plot's sign, check that a plot blocks movement, and take a
-screenshot at each stop:
+`tests/emulator/town_ruins.json` uses this build to walk from the player's
+house to each of the 9 ruined plots on the farm east of the old town, read the
+Weather Stabilizer's sign, check that a plot blocks movement, visit the open
+area south of Birch's Lab, and take a screenshot at each stop. Its walking
+routes avoid wandering NPCs and the trigger tiles active at the start of the
+game; if the map changes, the routes and stops need updating:
 
 ```sh
 bash scripts/test-rom.sh --scenario tests/emulator/town_ruins.json

@@ -379,40 +379,40 @@ LittlerootTown_EventScript_TownSign::
 	msgbox LittlerootTown_Text_TownSign, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign1::
-	msgbox LittlerootTown_Text_RuinSign1, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_DeliveryService::
+	msgbox LittlerootTown_Text_RuinsSign_DeliveryService, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign2::
-	msgbox LittlerootTown_Text_RuinSign2, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_Forge::
+	msgbox LittlerootTown_Text_RuinsSign_Forge, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign3::
-	msgbox LittlerootTown_Text_RuinSign3, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_Greenhouse::
+	msgbox LittlerootTown_Text_RuinsSign_Greenhouse, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign4::
-	msgbox LittlerootTown_Text_RuinSign4, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_IceDome::
+	msgbox LittlerootTown_Text_RuinsSign_IceDome, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign5::
-	msgbox LittlerootTown_Text_RuinSign5, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_WeatherStabilizer::
+	msgbox LittlerootTown_Text_RuinsSign_WeatherStabilizer, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign6::
-	msgbox LittlerootTown_Text_RuinSign6, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_Generator::
+	msgbox LittlerootTown_Text_RuinsSign_Generator, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign7::
-	msgbox LittlerootTown_Text_RuinSign7, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_Fishery::
+	msgbox LittlerootTown_Text_RuinsSign_Fishery, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign8::
-	msgbox LittlerootTown_Text_RuinSign8, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_SpiritSanctum::
+	msgbox LittlerootTown_Text_RuinsSign_SpiritSanctum, MSGBOX_SIGN
 	end
 
-LittlerootTown_EventScript_RuinSign9::
-	msgbox LittlerootTown_Text_RuinSign9, MSGBOX_SIGN
+LittlerootTown_EventScript_RuinsSign_Quarry::
+	msgbox LittlerootTown_Text_RuinsSign_Quarry, MSGBOX_SIGN
 	end
 
 LittlerootTown_EventScript_BirchsLabSign::
@@ -996,38 +996,38 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 	.string "I have something to show you.\n"
 	.string "Let's go to my LAB.$"
 
-LittlerootTown_Text_RuinSign1:
-	.string "RUINED BUILDING 1\n"
+LittlerootTown_Text_RuinsSign_DeliveryService:
+	.string "DELIVERY SERVICE (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign2:
-	.string "RUINED BUILDING 2\n"
+LittlerootTown_Text_RuinsSign_Forge:
+	.string "FORGE (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign3:
-	.string "RUINED BUILDING 3\n"
+LittlerootTown_Text_RuinsSign_Greenhouse:
+	.string "GREENHOUSE (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign4:
-	.string "RUINED BUILDING 4\n"
+LittlerootTown_Text_RuinsSign_IceDome:
+	.string "ICE DOME (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign5:
-	.string "RUINED BUILDING 5\n"
+LittlerootTown_Text_RuinsSign_WeatherStabilizer:
+	.string "WEATHER STABILIZER (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign6:
-	.string "RUINED BUILDING 6\n"
+LittlerootTown_Text_RuinsSign_Generator:
+	.string "GENERATOR (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign7:
-	.string "RUINED BUILDING 7\n"
+LittlerootTown_Text_RuinsSign_Fishery:
+	.string "FISHERY (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign8:
-	.string "RUINED BUILDING 8\n"
+LittlerootTown_Text_RuinsSign_SpiritSanctum:
+	.string "SPIRIT SANCTUM (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
-LittlerootTown_Text_RuinSign9:
-	.string "RUINED BUILDING 9\n"
+LittlerootTown_Text_RuinsSign_Quarry:
+	.string "QUARRY (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
