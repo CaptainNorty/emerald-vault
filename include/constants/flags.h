@@ -44,26 +44,26 @@
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
 
 #define FLAG_DELIVERY_SERVICE_BUILT           0x20 // Emerald Vault
-#define FLAG_DELIVERY_SERVICE_STAFFED         0x21 // Emerald Vault: has had a worker at least once
+#define FLAG_UNUSED_0x021                     0x21 // Unused Flag (was Delivery Service staffed; now in town save data)
 #define FLAG_RECEIVED_BIRD_WHISTLE           0x22 // Emerald Vault
 #define FLAG_HIDE_LITTLEROOT_DELIVERY_MANAGER 0x23 // Emerald Vault
 #define FLAG_HIDE_OLDALE_BUILDERS_ASSISTANT   0x24 // Emerald Vault
 #define FLAG_MET_BUILDER                      0x25 // Emerald Vault
-#define FLAG_UNUSED_0x026    0x26 // Unused Flag
-#define FLAG_UNUSED_0x027    0x27 // Unused Flag
-#define FLAG_UNUSED_0x028    0x28 // Unused Flag
-#define FLAG_UNUSED_0x029    0x29 // Unused Flag
-#define FLAG_UNUSED_0x02A    0x2A // Unused Flag
-#define FLAG_UNUSED_0x02B    0x2B // Unused Flag
-#define FLAG_UNUSED_0x02C    0x2C // Unused Flag
-#define FLAG_UNUSED_0x02D    0x2D // Unused Flag
-#define FLAG_UNUSED_0x02E    0x2E // Unused Flag
-#define FLAG_UNUSED_0x02F    0x2F // Unused Flag
-#define FLAG_UNUSED_0x030    0x30 // Unused Flag
-#define FLAG_UNUSED_0x031    0x31 // Unused Flag
-#define FLAG_UNUSED_0x032    0x32 // Unused Flag
-#define FLAG_UNUSED_0x033    0x33 // Unused Flag
-#define FLAG_UNUSED_0x034    0x34 // Unused Flag
+#define FLAG_GREENHOUSE_BUILT                 0x26 // Emerald Vault
+#define FLAG_QUARRY_BUILT                     0x27 // Emerald Vault
+#define FLAG_FISHERY_BUILT                    0x28 // Emerald Vault
+#define FLAG_GENERATOR_BUILT                  0x29 // Emerald Vault
+#define FLAG_FORGE_BUILT                      0x2A // Emerald Vault
+#define FLAG_SPIRIT_SANCTUM_BUILT             0x2B // Emerald Vault
+#define FLAG_ICE_DOME_BUILT                   0x2C // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_GREENHOUSE_MANAGER     0x2D // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_QUARRY_MANAGER         0x2E // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_FISHERY_MANAGER        0x2F // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_GENERATOR_MANAGER      0x30 // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_FORGE_MANAGER          0x31 // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_MANAGER 0x32 // Emerald Vault
+#define FLAG_HIDE_LITTLEROOT_ICE_DOME_MANAGER       0x33 // Emerald Vault
+#define FLAG_VISITED_MT_PYRE                  0x34 // Emerald Vault
 #define FLAG_UNUSED_0x035    0x35 // Unused Flag
 #define FLAG_UNUSED_0x036    0x36 // Unused Flag
 #define FLAG_UNUSED_0x037    0x37 // Unused Flag

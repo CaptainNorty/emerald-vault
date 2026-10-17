@@ -1,5 +1,11 @@
 MtPyre_1F_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, MtPyre_1F_OnTransition
 	.byte 0
+
+@ Emerald Vault: visiting Mt. Pyre unlocks the Spirit Sanctum.
+MtPyre_1F_OnTransition:
+	setflag FLAG_VISITED_MT_PYRE
+	end
 
 MtPyre_1F_EventScript_CleanseTagWoman::
 	lock

@@ -22,8 +22,137 @@ DIRECTIONS = {"UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0)}
 # Built ROMs: "normal" is the real game; "test_start" (make TEST_START=1) boots
 # straight into Littleroot Town.
 BUILDS = {"normal": "pokeemerald", "test_start": "pokeemerald_teststart"}
-# Starting setups for the test-only ROM: TEST_PRESET_* in include/constants/vault_town.h.
-PRESETS = {"new_game": 0, "no_flying_type": 1, "has_flying_type": 2, "oldale_no_balls": 3}
+# gTestStartConfig layout: keep in sync with include/constants/test_start.h.
+CONFIG = {"ready": 0, "has_location": 1, "map_group": 2, "map_num": 3, "x": 4, "y": 5,
+          "money_lo": 6, "money_hi": 7, "set_money": 8, "flag_count": 9, "var_count": 10,
+          "party_count": 11, "item_count": 12, "worker_count": 13,
+          "flags": 32, "vars": 96, "party": 128, "items": 144, "workers": 176}
+LIMITS = {"flags": 64, "vars": 16, "party": 6, "items": 16, "workers": 9}
+CLEAR_FLAG = 0x8000
+
+# Named starting points a scenario's "setup" can build on with "base".
+BASES = {
+    # Just received the Pokédex and Running Shoes from Birch, with a Mudkip. A
+    # long Repel keeps wild Pokémon from interrupting tests.
+    "after_pokedex": {
+        "flags": ["FLAG_SYS_POKEMON_GET", "FLAG_SYS_POKEDEX_GET", "FLAG_ADVENTURE_STARTED",
+                  "FLAG_RESCUED_BIRCH", "FLAG_RECEIVED_RUNNING_SHOES", "FLAG_SYS_B_DASH",
+                  "FLAG_VISITED_LITTLEROOT_TOWN", "FLAG_VISITED_OLDALE_TOWN"],
+        "vars": {"VAR_LITTLEROOT_TOWN_STATE": 4, "VAR_REPEL_STEP_COUNT": 1000},
+        "party": [["MUDKIP", 5]],
+    },
+    # As above, with the Delivery Service rebuilt and run by a Wingull; the
+    # Builder has moved to the yard.
+    "delivery_service_running": {
+        "base": "after_pokedex",
+        "flags": ["FLAG_MET_BUILDER", "FLAG_DELIVERY_SERVICE_BUILT", "FLAG_RECEIVED_BIRD_WHISTLE"],
+        "items": [["BIRD_WHISTLE", 1]],
+        "workers": {"DELIVERY_SERVICE": ["WINGULL", 5]},
+    },
+}
+
+
+def merge_setup(setup):
+    # Expand "base" recursively: lists are combined, everything else overrides.
+    base = setup.get("base")
+    merged = merge_setup(BASES[base]) if base else {}
+    for key, value in setup.items():
+        if key == "base":
+            continue
+        if isinstance(value, list):
+            merged[key] = merged.get(key, []) + value
+        elif isinstance(value, dict):
+            merged[key] = {**merged.get(key, {}), **value}
+        else:
+            merged[key] = value
+    return merged
+
+
+class Constants:
+    # Resolves names such as FLAG_BADGE01_GET or SPECIES_WINGULL with the C
+    # preprocessor, so values defined in terms of other constants work too.
+    HEADERS = ["constants/flags.h", "constants/vars.h", "constants/species.h", "constants/vault_town.h"]
+
+    def __init__(self, devkitarm):
+        self.cpp = str(devkitarm / "bin/arm-none-eabi-cpp")
+        self.items = {}
+        text = (ROOT / "include/constants/items.h").read_text()
+        body = text[text.index("enum {") + 6:text.index("ITEMS_COUNT")]
+        index = 0
+        for name in re.findall(r"^\s*(ITEM_\w+)\s*,", body, re.M):
+            self.items[name] = index
+            index += 1
+
+    def resolve(self, names):
+        names = list(dict.fromkeys(names))
+        if not names:
+            return {}
+        source = "".join(f'#include "{header}"\n' for header in self.HEADERS)
+        source += "".join(f"@@{index}@@ {name}\n" for index, name in enumerate(names))
+        out = subprocess.run([self.cpp, "-P", "-undef", "-iquote", str(ROOT / "include"), "-I", str(ROOT / "include")],
+                             input=source, capture_output=True, text=True, check=True).stdout
+        values = {}
+        for index, expr in re.findall(r"@@(\d+)@@ (.*)", out):
+            name = names[int(index)]
+            expr = re.sub(r"//.*", "", expr).strip()
+            if re.search(r"[A-Za-z_]\w*", re.sub(r"0[xX][0-9a-fA-F]+", "", expr)):
+                raise ValueError(f"Unknown constant {name}")
+            values[name] = eval(expr, {"__builtins__": {}})
+        return values
+
+    def item(self, name):
+        full = name if name.startswith("ITEM_") else "ITEM_" + name
+        if full not in self.items:
+            raise ValueError(f"Unknown item {name}")
+        return self.items[full]
+
+
+def build_config(setup, constants, map_ids):
+    """Return {index: value} writes for gTestStartConfig from a scenario setup."""
+    setup = merge_setup(setup)
+    species = lambda name: name if name.startswith("SPECIES_") else "SPECIES_" + name
+    building = lambda name: name if name.startswith("TOWN_") else "TOWN_" + name
+    names = (setup.get("flags", []) + setup.get("clear_flags", []) + list(setup.get("vars", {}))
+             + [species(mon) for mon, _ in setup.get("party", [])]
+             + [species(mon) for mon, _ in setup.get("workers", {}).values()]
+             + [building(name) for name in setup.get("workers", {})])
+    values = constants.resolve(names)
+    writes = {}
+
+    def put_list(key, entries):
+        if len(entries) > LIMITS[key]:
+            raise ValueError(f"Too many {key} in setup (max {LIMITS[key]})")
+        width = len(entries[0]) if entries else 1
+        for i, entry in enumerate(entries):
+            for j, value in enumerate(entry):
+                writes[CONFIG[key] + i * width + j] = value
+
+    flags = [values[name] for name in setup.get("flags", [])]
+    flags += [values[name] | CLEAR_FLAG for name in setup.get("clear_flags", [])]
+    put_list("flags", [[flag] for flag in flags])
+    writes[CONFIG["flag_count"]] = len(flags)
+    variables = [[values[name], value] for name, value in setup.get("vars", {}).items()]
+    put_list("vars", variables)
+    writes[CONFIG["var_count"]] = len(variables)
+    party = [[values[species(mon)], level] for mon, level in setup.get("party", [])]
+    put_list("party", party)
+    writes[CONFIG["party_count"]] = len(party)
+    items = [[constants.item(item), count] for item, count in setup.get("items", [])]
+    put_list("items", items)
+    writes[CONFIG["item_count"]] = len(items)
+    workers = [[values[building(name)], values[species(mon)], level]
+               for name, (mon, level) in setup.get("workers", {}).items()]
+    put_list("workers", workers)
+    writes[CONFIG["worker_count"]] = len(workers)
+    if "money" in setup:
+        writes[CONFIG["money_lo"]] = setup["money"] & 0xFFFF
+        writes[CONFIG["money_hi"]] = setup["money"] >> 16
+        writes[CONFIG["set_money"]] = 1
+    if "location" in setup:
+        group, num = map_ids[setup["location"]["map"]]
+        writes.update({CONFIG["has_location"]: 1, CONFIG["map_group"]: group, CONFIG["map_num"]: num,
+                       CONFIG["x"]: setup["location"]["x"], CONFIG["y"]: setup["location"]["y"]})
+    return writes
 MAP_OFFSET = 7  # include/fieldmap.h: object coordinates include this border.
 
 
@@ -138,13 +267,15 @@ class Emulator:
         save2 = self.read(self.symbols["gSaveBlock2Ptr"])
         return self.read(save1 + 0x490) ^ self.read(save2 + 0xAC)
 
-    def choose_test_preset(self, preset):
+    def apply_setup(self, writes):
         # The test-only ROM waits briefly at boot (src/test_start.c) for these writes.
         waiting = self.symbols["CB2_TestStartWaitForHarness"] & ~1
         for _ in range(600):
             if self.read(self.symbols["gMain"] + 4) & ~1 == waiting:
-                self.write(self.symbols["gTestStartPreset"], preset)
-                self.write(self.symbols["gTestStartHarnessReady"], 1)
+                base = self.symbols["gTestStartConfig"]
+                for index, value in sorted(writes.items()):
+                    self.write(base + index * 2, value, 16)
+                self.write(base + CONFIG["ready"] * 2, 1, 16)
                 return
             self.run(1)
         raise AssertionError("Test-only ROM never waited for the harness at boot")
@@ -287,9 +418,9 @@ def main():
     build = scenario.get("build", "normal")
     if build not in BUILDS:
         parser.error(f"Unknown build {build!r}; expected one of {', '.join(BUILDS)}")
-    preset = scenario.get("preset")
-    if preset is not None and (build != "test_start" or preset not in PRESETS):
-        parser.error(f"preset needs the test_start build and one of {', '.join(PRESETS)}")
+    setup = scenario.get("setup")
+    if setup is not None and build != "test_start":
+        parser.error("setup needs the test_start build")
     rom = ROOT / (BUILDS[build] + ".gba")
     elf = ROOT / (BUILDS[build] + ".elf")
     if not rom.is_file() or not elf.is_file():
@@ -297,6 +428,7 @@ def main():
     map_ids = load_map_ids()
     maps = Maps(map_ids)
     devkitarm = Path(os.environ.get("DEVKITARM", "/opt/devkitpro/devkitARM"))
+    setup_writes = build_config(setup, Constants(devkitarm), map_ids) if setup is not None else None
     nm = subprocess.check_output([str(devkitarm / "bin/arm-none-eabi-nm"), "-n", str(elf)], text=True)
     symbols = {}
     for line in nm.splitlines():
@@ -318,9 +450,9 @@ def main():
     print(f"Test artifacts: {output}", flush=True)
     try:
         emulator = Emulator(test_rom, output, symbols)
-        if preset is not None:
-            emulator.choose_test_preset(PRESETS[preset])
-            result["preset"] = preset
+        if setup_writes is not None:
+            emulator.apply_setup(setup_writes)
+            result["setup"] = merge_setup(setup)
         saved_money = None
         for step in scenario["steps"]:
             action = step["action"]
@@ -421,6 +553,12 @@ def main():
                 saved_money = emulator.money()
                 result["checks"].append({"money": saved_money, "frame": emulator.frame})
                 print(f"Money: ${saved_money}", flush=True)
+            elif action == "assert_money":
+                money = emulator.money()
+                if money != step["equals"]:
+                    raise AssertionError(f"Money is ${money}; expected ${step['equals']}")
+                result["checks"].append({"money": money, "frame": emulator.frame})
+                print(f"PASS: money is ${money}", flush=True)
             elif action == "assert_money_gained":
                 if saved_money is None:
                     raise ValueError("assert_money_gained needs an earlier remember_money")

@@ -1,7 +1,7 @@
 {
   "name": "Oldale's west road stays closed until the Delivery Service is rebuilt",
   "build": "test_start",
-  "preset": "oldale_no_balls",
+  "setup": {"base": "after_pokedex", "location": {"map": "MAP_OLDALE_TOWN", "x": 5, "y": 10}},
   "steps": [
     {"action": "wait_overworld", "timeout_frames": 3000},
     {"action": "assert_position", "x": 5, "y": 10, "map": "MAP_OLDALE_TOWN"},

@@ -795,6 +795,13 @@ static const struct MenuAction MultichoiceList_DeliveryService[] =
     {gText_Exit},
 };
 
+static const struct MenuAction MultichoiceList_TownManager[] =
+{
+    {sText_DeliveryServiceChangeWorker},
+    {sText_DeliveryServiceTakeBack},
+    {gText_Exit},
+};
+
 static const struct MultichoiceListStruct sMultichoiceLists[] =
 {
     [MULTI_BRINEY_ON_DEWFORD]          = MULTICHOICE(MultichoiceList_BrineyOnDewford),
@@ -912,6 +919,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
     [MULTI_DELIVERY_SERVICE]           = MULTICHOICE(MultichoiceList_DeliveryService),
+    [MULTI_TOWN_MANAGER]               = MULTICHOICE(MultichoiceList_TownManager),
 };
 
 const u8 *const gStdStrings[] =

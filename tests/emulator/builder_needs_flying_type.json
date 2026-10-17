@@ -1,7 +1,7 @@
 {
   "name": "Builder asks for a Flying-type before rebuilding the Delivery Service",
   "build": "test_start",
-  "preset": "no_flying_type",
+  "setup": {"base": "after_pokedex", "items": [["POKE_BALL", 5]]},
   "steps": [
     {"action": "wait_overworld", "timeout_frames": 3000},
     {"action": "walk_to", "x": 25, "y": 11},

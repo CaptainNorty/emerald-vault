@@ -122,19 +122,34 @@ A scenario uses it by adding `"build": "test_start"` (the default is
 `"normal"`). To try it by hand: `open -a mGBA pokeemerald_teststart.gba`.
 
 The test ROM uses fast text speed. At boot it waits half a second for the test
-harness to pick a starting setup with `"preset"` (`src/test_start.c`,
-`TEST_PRESET_*` in `include/constants/vault_town.h`); played by hand, it starts
-with `new_game`:
+harness to fill in a starting `"setup"` (`src/test_start.c`, layout in
+`include/constants/test_start.h`); played by hand, it starts a plain new game.
+Names are looked up in the game's headers, so use the same names as the code:
 
-| Preset | Setup |
+```json
+"setup": {
+  "base": "delivery_service_running",
+  "flags": ["FLAG_BADGE01_GET"],
+  "clear_flags": [],
+  "vars": {"VAR_LITTLEROOT_TOWN_STATE": 4},
+  "money": 15000,
+  "party": [["GEODUDE", 12]],
+  "items": [["POKE_BALL", 5]],
+  "location": {"map": "MAP_OLDALE_TOWN", "x": 5, "y": 10},
+  "workers": {"GREENHOUSE": ["LOTAD", 5]}
+}
+```
+
+Every field is optional. `base` starts from a named setup in
+`tools/emulator/test_rom.py`; lists add to the base's lists:
+
+| Base | Setup |
 | --- | --- |
-| `new_game` | Start of the game, no Pokémon, outside Brendan's house. |
-| `no_flying_type` | Has the Pokédex and Running Shoes; Mudkip; 5 Poké Balls; outside Brendan's house. |
-| `has_flying_type` | Same, plus a Wingull. |
-| `oldale_no_balls` | Has the Pokédex; Mudkip; no Poké Balls; in Oldale Town. |
+| `after_pokedex` | Just received the Pokédex and Running Shoes; Mudkip; a long Repel so wild Pokémon don't interrupt tests. |
+| `delivery_service_running` | As above, with the Delivery Service rebuilt, run by a level 5 Wingull, the Bird Whistle in the bag, and the Builder in the yard. |
 
-Every preset except `new_game` also sets a long Repel so wild Pokémon don't
-interrupt tests.
+Up to 64 flags, 16 variables, 6 party Pokémon, 16 items and one worker per
+business.
 
 `tests/emulator/town_ruins.json` uses this build to walk from the player's
 house to each of the 9 ruined plots on the farm east of the old town, read the
@@ -156,6 +171,17 @@ Delivery Service tests (all use the test-only ROM):
 - `oldale_delivery_gate.json`: Oldale's west road is closed until the Delivery
   Service is rebuilt, and the Builder's assistant hands out Poké Balls to a
   player who has none.
+
+Builder tests (each starts with the Delivery Service running):
+
+- `unlock_0_nothing_before_badge.json`: with the Greenhouse built and no
+  badges, the Builder has nothing to offer, even with ₽9,999,999.
+- `unlock_1_greenhouse.json`: buy the Greenhouse for ₽5,000, staff it with
+  Lotad, walk 200 steps and collect ₽240.
+- `unlock_2_quarry.json` to `unlock_7_ice_dome.json`: at each building's
+  unlock point, with every cheaper building already built and exactly its
+  price in hand, the Builder offers it, sells it, and its manager takes a
+  first worker.
 
 ## Adding tests
 
@@ -183,6 +209,7 @@ Actions currently supported:
 | `press_until_task` | `task`, optional `key` (default A), `timeout_frames` | Keep pressing a button until a game task is active, such as `Task_HandleChooseMonInput` for the party menu. |
 | `walk_to` | `x`, `y` | Walk to a tile on the current map, routing around walls, NPCs and trigger tiles. |
 | `remember_money` | | Record the player's money. |
+| `assert_money` | `equals` | Fail unless the player has exactly that much money. |
 | `assert_money_gained` | optional `min` (default 1), `max` | Fail unless money rose by that much since `remember_money`. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons

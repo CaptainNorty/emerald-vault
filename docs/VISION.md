@@ -92,19 +92,36 @@ and Blue Orbs are kept, so the Sanctum ties into the main story.
 
 ### Building lineup
 
-Two or more types per business, so all 17 types have a home.
+Two or more types per business, so all 17 types have a home. Prices rise
+exponentially. Earnings per step start at the Delivery Service's rate, double
+for the Greenhouse, then scale with price (to be tuned).
 
-| Position | Building | Types | Sells | Requires (besides money) | Specialist |
-|---|---|---|---|---|---|
-| Center | Weather Stabilizer | Dragon | Capstone | Rain Badge (8th Gym) and all four feeders operational | Castform, Altaria, Flygon, Salamence |
-| N (feeder) | Forge | Fire / Fighting | Poké Balls, held items | Heat Badge (4th Gym) | Blaziken |
-| E (feeder) | Generator | Electric / Steel | Power | Dynamo Badge (3rd Gym) | Magneton |
-| W (feeder) | Ice Dome | Ice | Ice, cold storage | An Ice-type Pokémon | Glalie |
-| S (feeder) | Spirit Sanctum | Ghost / Psychic / Poison | Remedies, blessings | Having visited Mt. Pyre | Dusclops, Claydol |
-| NW | Delivery Service | Flying / Normal | Deliveries | Nothing (early) | Swellow |
-| NE | Greenhouse | Grass / Bug | Berries | Nothing (early) | Ludicolo |
-| SW | Fishery | Water / Dark | Caught Pokémon | Old Rod (from Dewford) | Sharpedo |
-| SE | Quarry | Rock / Ground | Evolution stones | Stone Badge (1st Gym) | Golem |
+| Position | Building | Types | Sells | Price | Per 20 steps at 1.0x | Requires (besides money) | Specialist |
+|---|---|---|---|---|---|---|---|
+| Center | Weather Stabilizer | Dragon | Capstone | Not set | — | Rain Badge (8th Gym) and all four feeders operational | Castform, Altaria, Flygon, Salamence |
+| N (feeder) | Forge | Fire / Fighting | Poké Balls | ₽250,000 | ₽1,200 | Heat Badge (4th Gym) | Blaziken |
+| E (feeder) | Generator | Electric / Steel | Power cells | ₽80,000 | ₽384 | Dynamo Badge (3rd Gym) | Magneton |
+| W (feeder) | Ice Dome | Ice | Ice blocks | ₽1,500,000 | ₽7,200 | An Ice-type Pokémon | Glalie |
+| S (feeder) | Spirit Sanctum | Ghost / Psychic / Poison | Charms | ₽750,000 | ₽3,600 | Having visited Mt. Pyre | Dusclops, Claydol |
+| NW | Delivery Service | Flying (Normal 1.5x) | Deliveries | Free | ₽12 | A Flying-type | Swellow |
+| NE | Greenhouse | Grass / Bug | Berries | ₽5,000 | ₽24 | Nothing | Ludicolo |
+| SW | Fishery | Water / Dark | Caught Pokémon | ₽45,000 | ₽216 | Old Rod (from Dewford) | Sharpedo |
+| SE | Quarry | Rock / Ground | Evolution stones | ₽15,000 | ₽72 | Stone Badge (1st Gym) | Golem |
+
+Every business also needs a Pokémon of one of its types in the party before the
+Builder will rebuild it; that Pokémon becomes its first worker. After that,
+anyone can work there, but those types earn 2x, others 0.5x, scaled by level /
+10, doubled for a specialist. Up to 100 uncollected sales pile up per business.
+
+### The Builder and the managers (built)
+After the free Delivery Service, the Builder stands in the yard and lists the
+businesses whose requirements you've met, cheapest first, with prices. He takes
+the money (shown in a money box), rebuilds the plot with placeholder tiles
+(existing house, Lab, Pokémon Center and Mart tiles; a pond and a quarry pit),
+and its manager appears. Each manager takes the first worker, reports and pays
+out earnings, and can change or return the worker. Code: `src/vault_town.c`
+(one table, `sBusinesses`, describes every business) and
+`src/data/vault_town_buildings.h` (the placeholder tiles).
 
 All specialists can be caught or obtained in Hoenn. Hoenn's Ice types (Snorunt,
 Spheal) live in Shoal Cave, which needs Surf, so the Ice Dome naturally comes
@@ -231,12 +248,11 @@ manageable:
 - **Money gates:** Vanilla already has NPCs who block a path until a flag is
   set. Paying one is: check money, show the money box, take the payment, set a
   flag, remove the NPC.
-- **Money cap:** Vanilla caps money at **$999,999** (`MAX_MONEY` in
-  `src/money.c`). Money is already saved as a 32-bit number, so raising the cap
-  is a small, save-compatible change, mostly to the displays that assume 6
-  digits (the money box and the trainer card). Standard Poké Mart prices are
-  16-bit (max $65,535), so expensive purchases should use scripted purchases,
-  which already handle 32-bit amounts.
+- **Money cap:** Raised from vanilla's ₽999,999 to **₽9,999,999**
+  (`MAX_MONEY` in `src/money.c`); money boxes and the trainer card show 7
+  digits. Standard Poké Mart prices are 16-bit (max ₽65,535), so expensive
+  purchases use scripted purchases, like the Builder's. Late-game earnings may
+  hit the cap quickly at high efficiency; tune when balancing.
 - **If HMs are sold:** Vanilla checks badges before letting you use HM field
   moves (`src/party_menu.c`, `src/field_control_avatar.c`). Decide whether those
   checks go away. Waterfall isn't in the HM price list yet.

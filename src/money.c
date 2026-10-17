@@ -10,7 +10,9 @@
 #include "strings.h"
 #include "decompress.h"
 
-#define MAX_MONEY 999999
+// Emerald Vault: 10x vanilla's 999999, so late-game buildings can be afforded.
+#define MAX_MONEY 9999999
+#define MONEY_DIGITS 7
 
 EWRAM_DATA static u8 sMoneyBoxWindowId = 0;
 EWRAM_DATA static u8 sMoneyLabelSpriteId = 0;
@@ -132,7 +134,8 @@ void SubtractMoneyFromVar0x8005(void)
 
 void PrintMoneyAmountInMoneyBox(u8 windowId, int amount, u8 speed)
 {
-    PrintMoneyAmount(windowId, 38, 1, amount, speed);
+    // 6 pixels further left than vanilla to fit a 7th digit; the MONEY label ends well before this.
+    PrintMoneyAmount(windowId, 32, 1, amount, speed);
 }
 
 void PrintMoneyAmount(u8 windowId, u8 x, u8 y, int amount, u8 speed)
@@ -140,9 +143,9 @@ void PrintMoneyAmount(u8 windowId, u8 x, u8 y, int amount, u8 speed)
     u8 *txtPtr;
     s32 strLength;
 
-    ConvertIntToDecimalStringN(gStringVar1, amount, STR_CONV_MODE_LEFT_ALIGN, 6);
+    ConvertIntToDecimalStringN(gStringVar1, amount, STR_CONV_MODE_LEFT_ALIGN, MONEY_DIGITS);
 
-    strLength = 6 - StringLength(gStringVar1);
+    strLength = MONEY_DIGITS - StringLength(gStringVar1);
     txtPtr = gStringVar4;
 
     while (strLength-- > 0)

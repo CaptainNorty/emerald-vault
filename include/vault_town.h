@@ -14,7 +14,7 @@ struct TownBuilding
     u32 totalMoney;
     u16 pendingSales;
     bool8 hasWorker;
-    u8 padding;
+    bool8 everStaffed; // Has had a worker at least once
     struct BoxPokemon worker;
 };
 
@@ -25,5 +25,6 @@ struct TownSaveData
 
 void ResetTownData(void);
 void SetDeliveryServiceFlightHome(void);
+void Town_SetWorkerForTest(u8 building, u16 species, u8 level);
 
 #endif // GUARD_VAULT_TOWN_H

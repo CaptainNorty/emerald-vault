@@ -22,10 +22,8 @@
 #define TOWN_ASSIGN_EGG         2
 #define TOWN_ASSIGN_LAST_MON    3
 
-// Test-only ROM (TEST_START=1): starting setups the emulator test harness can pick.
-#define TEST_PRESET_NEW_GAME          0 // No Pokémon, start of the game, outside home
-#define TEST_PRESET_NO_FLYING_TYPE    1 // Has the Pokédex; Mudkip only; outside home
-#define TEST_PRESET_HAS_FLYING_TYPE   2 // Has the Pokédex; Mudkip and Wingull; outside home
-#define TEST_PRESET_OLDALE_NO_BALLS   3 // Has the Pokédex; Mudkip only; no Poké Balls; in Oldale
+// VAR_RESULT from Town_ShowBuilderMenu, besides a building
+#define TOWN_MENU_CANCELLED     0xFF
+#define TOWN_MENU_EMPTY         0xFE
 
 #endif // GUARD_CONSTANTS_VAULT_TOWN_H

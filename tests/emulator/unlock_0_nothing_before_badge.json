@@ -1,0 +1,18 @@
+{
+  "name": "With the Greenhouse built and no badges, the Builder has nothing to offer",
+  "build": "test_start",
+  "setup": {"base": "delivery_service_running", "flags": ["FLAG_GREENHOUSE_BUILT"], "money": 9999999},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "walk_to", "x": 22, "y": 12},
+    {"action": "run", "frames": 2, "keys": ["LEFT"]},
+    {"action": "run", "frames": 20},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "next_message", "times": 0},
+    {"action": "screenshot", "name": "01-nothing-to-rebuild"},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "02-come-back-later"},
+    {"action": "dismiss_text"},
+    {"action": "assert_money", "equals": 9999999}
+  ]
+}

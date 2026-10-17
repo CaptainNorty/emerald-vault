@@ -1,7 +1,7 @@
 {
   "name": "Rebuild and staff the Delivery Service, earn, fly out and whistle home",
   "build": "test_start",
-  "preset": "has_flying_type",
+  "setup": {"base": "after_pokedex", "party": [["WINGULL", 5]], "items": [["POKE_BALL", 5]]},
   "steps": [
     {"action": "wait_overworld", "timeout_frames": 3000},
     {"action": "screenshot", "name": "01-ruins-with-wingull-in-party"},
@@ -45,7 +45,7 @@
     {"action": "next_message"},
     {"action": "screenshot", "name": "11-manager-reports-earnings"},
     {"action": "assert_money_gained", "min": 120, "max": 132},
-    {"action": "next_message", "times": 2},
+    {"action": "next_message", "times": 3},
     {"action": "run", "frames": 20},
     {"action": "screenshot", "name": "12-manager-menu"},
     {"action": "run", "frames": 2, "keys": ["A"]},
