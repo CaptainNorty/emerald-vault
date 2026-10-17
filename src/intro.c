@@ -24,6 +24,8 @@
 #include "util.h"
 #include "title_screen.h"
 #include "constants/rgb.h"
+#include "overworld.h"
+#include "string_util.h"
 #include "constants/battle_anim.h"
 
 /*
@@ -1144,6 +1146,20 @@ static u8 SetUpCopyrightScreen(void)
     return 1;
 }
 
+#if TEST_START
+static const u8 sTestStartPlayerName[] = _("TEST");
+
+// Test-only ROM: skip the intro, title screen, Birch's speech and the truck,
+// and start a new game as a boy standing in Littleroot Town.
+static void StartTestGame(void)
+{
+    ResetTasks();
+    gSaveBlock2Ptr->playerGender = MALE;
+    StringCopy(gSaveBlock2Ptr->playerName, sTestStartPlayerName);
+    SetMainCallback2(CB2_NewGame);
+}
+#endif
+
 void CB2_InitCopyrightScreenAfterBootup(void)
 {
     if (!SetUpCopyrightScreen())
@@ -1156,6 +1172,9 @@ void CB2_InitCopyrightScreenAfterBootup(void)
             Sav2_ClearSetDefault();
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);
+#if TEST_START
+        StartTestGame();
+#endif
     }
 }
 

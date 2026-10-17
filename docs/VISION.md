@@ -7,6 +7,9 @@ beat a trainer, you can hire them. You give your hired trainers Pokémon to
 battle with, and they earn money for you over time. Key steps in the game's
 progression cost money, so building up an income is how you move forward.
 
+> A home-town building direction is under consideration and could change this
+> pitch. See "New direction under consideration" below.
+
 ## Core mechanic: hiring trainers
 
 1. **Hire:** After beating a trainer in battle, you can hire them.
@@ -72,6 +75,65 @@ Current ideas:
 - **Pokémon sales:** An NPC buys specific Pokémon from you.
 - **Building repair:** You repair buildings so they start generating income.
 - **Gym ownership:** You buy the rights to a Gym.
+
+## New direction under consideration: building your home town
+
+These ideas came later and could reshape the core loop. They aren't settled.
+See "Decisions this direction forces" below.
+
+### Breeding and selling Pokémon, Factorio-style
+- You can exchange Pokémon for money.
+- Like Factorio, you start out doing it by hand and gradually **automate** it as
+  you progress.
+- Instead of (or alongside) hiring trainers, you place **Day Cares in your home
+  town**, raise Pokémon, and breed them in large numbers.
+- Story framing: for example, "Professor Oak needs you to repopulate the
+  region."
+
+### Your home town as a farm
+- Like the farm in Stardew Valley, your home town is a large, nearly empty area.
+- You arrive on day one and are in charge of turning it into a thriving city.
+- Your goal could be attracting trainers, breeding lots of Pokémon, or both.
+
+### Buildings that need specific Pokémon
+Building up the town takes specific Pokémon, sometimes with specific moves.
+Examples:
+
+- An **Electrode** powers the generator.
+- The generator is needed to open the home **Pokémon Center**.
+- A **Chansey** (or another healing Pokémon) runs the Pokémon Center.
+- A **Magnemite** helps build metal buildings or decorations.
+
+### Story goal tied to the town
+- The town builds toward one big goal, for example: "To stop Team Aqua or Team
+  Magma, you have to build the Environmental Balance Machine."
+- Building requirements are placed **between Gyms**. You still progress through
+  the game as normal, but you can't rush through it. You also have to collect
+  the right Pokémon so your town meets the requirements for the next build.
+
+### Decisions this direction forces
+- **What is the core loop?** Hiring trainers for money, building the town with
+  Pokémon, or both, with one feeding the other? If the town is the core, Pokémon
+  become the main resource and money becomes one of several.
+- **Map changes:** A big, empty home town that fills in over time needs a new or
+  heavily changed map, which conflicts with the "few or no map changes"
+  non-goal. That non-goal may need to change.
+
+### Technical notes for this direction
+- **Changing the town as you build:** GBA maps are fixed layouts, but scripts can
+  swap individual tiles based on story flags (`setmetatile`, used about 600 times
+  in vanilla map scripts). Secret Bases and their decorations are an existing
+  example of a player-customized space. Pre-built "stages" of the town, unlocked
+  by flags, are the simplest approach.
+- **Breeding at scale:** The vanilla Day Care holds only 2 Pokémon
+  (`DAYCARE_MON_COUNT`), and PC storage is 14 boxes of 30. A full Pokémon takes
+  80 bytes of save space, so "tons" of bred Pokémon can't all be real Pokémon.
+  Automated output should probably be stored as **counts** (for example, "47
+  Zigzagoon ready to sell"), with real Pokémon created only when you take one.
+- **Requiring a Pokémon for a building:** Checking whether your party has a
+  given species or move is straightforward, since vanilla already does this for
+  HM field moves. If the Pokémon is assigned to the building permanently, it
+  needs save space, like Pokémon lent to hired trainers.
 
 ## Non-goals
 

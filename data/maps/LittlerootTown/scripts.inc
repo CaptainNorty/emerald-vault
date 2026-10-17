@@ -379,6 +379,42 @@ LittlerootTown_EventScript_TownSign::
 	msgbox LittlerootTown_Text_TownSign, MSGBOX_SIGN
 	end
 
+LittlerootTown_EventScript_RuinSign1::
+	msgbox LittlerootTown_Text_RuinSign1, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign2::
+	msgbox LittlerootTown_Text_RuinSign2, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign3::
+	msgbox LittlerootTown_Text_RuinSign3, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign4::
+	msgbox LittlerootTown_Text_RuinSign4, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign5::
+	msgbox LittlerootTown_Text_RuinSign5, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign6::
+	msgbox LittlerootTown_Text_RuinSign6, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign7::
+	msgbox LittlerootTown_Text_RuinSign7, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign8::
+	msgbox LittlerootTown_Text_RuinSign8, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_RuinSign9::
+	msgbox LittlerootTown_Text_RuinSign9, MSGBOX_SIGN
+	end
+
 LittlerootTown_EventScript_BirchsLabSign::
 	msgbox LittlerootTown_Text_ProfBirchsLab, MSGBOX_SIGN
 	end
@@ -960,3 +996,38 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 	.string "I have something to show you.\n"
 	.string "Let's go to my LAB.$"
 
+LittlerootTown_Text_RuinSign1:
+	.string "RUINED BUILDING 1\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign2:
+	.string "RUINED BUILDING 2\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign3:
+	.string "RUINED BUILDING 3\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign4:
+	.string "RUINED BUILDING 4\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign5:
+	.string "RUINED BUILDING 5\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign6:
+	.string "RUINED BUILDING 6\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign7:
+	.string "RUINED BUILDING 7\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign8:
+	.string "RUINED BUILDING 8\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_RuinSign9:
+	.string "RUINED BUILDING 9\n"
+	.string "Maybe it can be rebuilt someday.$"

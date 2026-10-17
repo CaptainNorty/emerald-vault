@@ -34,6 +34,12 @@
 #define LOG_HANDLER (LOG_HANDLER_MGBA_PRINT)
 #endif
 
+// Emerald Vault: set by `make TEST_START=1` for the test-only ROM that boots
+// straight into Littleroot Town. Never enabled in the normal ROM.
+#ifndef TEST_START
+#define TEST_START 0
+#endif
+
 #define ENGLISH
 
 #ifdef ENGLISH

@@ -109,6 +109,26 @@ loading `.zshrc`. Build parallelism defaults to eight jobs; override with `JOBS=
 For an unchanged baseline, `bash scripts/build-rom.sh compare` should report
 `pokeemerald.gba: OK`. That original-ROM checksum is expected to differ after edits.
 
+## Test-only ROM that starts in Littleroot Town
+
+`bash scripts/test-rom.sh` also builds `pokeemerald_teststart.gba`, a separate
+test-only ROM (`make TEST_START=1`, built in `build/teststart/`). It skips the
+intro, title screen, Birch's speech and the truck, and starts a new game as a
+boy named TEST standing outside Brendan's house (5, 9) in Littleroot Town,
+with the moving trucks hidden. The overworld is ready about 240 frames after
+boot. The normal `pokeemerald.gba` is not affected.
+
+A scenario uses it by adding `"build": "test_start"` (the default is
+`"normal"`). To try it by hand: `open -a mGBA pokeemerald_teststart.gba`.
+
+`tests/emulator/town_ruins.json` uses this build to walk past all 9 ruined
+plots, read a plot's sign, check that a plot blocks movement, and take a
+screenshot at each stop:
+
+```sh
+bash scripts/test-rom.sh --scenario tests/emulator/town_ruins.json
+```
+
 ## Adding tests
 
 Copy `tests/emulator/boot.json` and run the new scenario with:
@@ -125,6 +145,11 @@ Actions currently supported:
 | `wait_task` | `task`, optional `timeout_frames` | Run with no buttons until a named game task is active. |
 | `assert_task` | `task` | Fail immediately unless a named task is active. |
 | `screenshot` | `name` | Write a PNG into the current run directory. |
+| `wait_overworld` | optional `timeout_frames` | Run until the overworld is loaded, no fade or script is running, and the player can move. |
+| `walk` | `path`, e.g. `["DOWN 3", "RIGHT 2"]` | Walk tile by tile with the D-pad. Fails if the player is blocked. |
+| `assert_position` | `x`, `y`, optional `map` (e.g. `MAP_LITTLEROOT_TOWN`) | Fail unless the player is on that tile (and map). |
+| `assert_blocked` | `direction` | Hold a direction and fail if the player moves. |
+| `dismiss_text` | optional `timeout_frames` | Press A until the message box closes and the player can move. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons
 between presses to create another key-down event. Task checks follow

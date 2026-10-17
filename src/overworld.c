@@ -1539,7 +1539,11 @@ void CB2_NewGame(void)
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
+#if TEST_START
+    gFieldCallback = NULL; // Test-only ROM starts outside, not in the truck.
+#else
     gFieldCallback = ExecuteTruckSequence;
+#endif
     gFieldCallback2 = NULL;
     DoMapLoadLoop(&gMain.state);
     SetFieldVBlankCallback();
