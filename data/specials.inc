@@ -540,3 +540,14 @@ gSpecials::
 	def_special RemoveRecordsWindow
 	def_special CloseDeptStoreElevatorWindow
 	def_special TrySetBattleTowerLinkType
+
+	@ Emerald Vault: Littleroot farm businesses (src/vault_town.c)
+	def_special Town_DrawBuildings
+	def_special Town_CheckPartyForType
+	def_special Town_IsPartyMonType
+	def_special Town_HasWorker
+	def_special Town_BufferWorker
+	def_special Town_CollectEarnings
+	def_special Town_AssignWorker
+	def_special Town_TakeBackWorker
+	def_special Town_OpenFlyMap, waitstate=1

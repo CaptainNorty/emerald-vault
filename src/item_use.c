@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vault_town.h"
 #include "item_use.h"
 #include "battle.h"
 #include "battle_pyramid.h"
@@ -921,6 +922,27 @@ void ItemUseOutOfBattle_EscapeRope(u8 taskId)
     if (CanUseDigOrEscapeRopeOnCurMap() == TRUE)
     {
         sItemUseOnFieldCB = ItemUseOnFieldCB_EscapeRope;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+    }
+}
+
+// Emerald Vault: a Delivery Service bird flies the player back to Littleroot.
+static void ItemUseOnFieldCB_BirdWhistle(u8 taskId)
+{
+    DestroyTask(taskId);
+    SetDeliveryServiceFlightHome();
+    StartDeliveryServiceFlight();
+}
+
+void ItemUseOutOfBattle_BirdWhistle(u8 taskId)
+{
+    if (Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType) == TRUE)
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_BirdWhistle;
         SetUpItemUseOnFieldCallback(taskId);
     }
     else

@@ -409,6 +409,9 @@ enum {
     ITEM_MAGMA_EMBLEM,
     ITEM_OLD_SEA_MAP,
 
+    // Emerald Vault
+    ITEM_BIRD_WHISTLE,
+
     ITEMS_COUNT
 };
 

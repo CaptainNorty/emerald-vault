@@ -121,6 +121,21 @@ boot. The normal `pokeemerald.gba` is not affected.
 A scenario uses it by adding `"build": "test_start"` (the default is
 `"normal"`). To try it by hand: `open -a mGBA pokeemerald_teststart.gba`.
 
+The test ROM uses fast text speed. At boot it waits half a second for the test
+harness to pick a starting setup with `"preset"` (`src/test_start.c`,
+`TEST_PRESET_*` in `include/constants/vault_town.h`); played by hand, it starts
+with `new_game`:
+
+| Preset | Setup |
+| --- | --- |
+| `new_game` | Start of the game, no Pokémon, outside Brendan's house. |
+| `no_flying_type` | Has the Pokédex and Running Shoes; Mudkip; 5 Poké Balls; outside Brendan's house. |
+| `has_flying_type` | Same, plus a Wingull. |
+| `oldale_no_balls` | Has the Pokédex; Mudkip; no Poké Balls; in Oldale Town. |
+
+Every preset except `new_game` also sets a long Repel so wild Pokémon don't
+interrupt tests.
+
 `tests/emulator/town_ruins.json` uses this build to walk from the player's
 house to each of the 9 ruined plots on the farm east of the old town, read the
 Weather Stabilizer's sign, check that a plot blocks movement, visit the open
@@ -131,6 +146,16 @@ game; if the map changes, the routes and stops need updating:
 ```sh
 bash scripts/test-rom.sh --scenario tests/emulator/town_ruins.json
 ```
+
+Delivery Service tests (all use the test-only ROM):
+
+- `builder_needs_flying_type.json`: the Builder asks for a Flying-type.
+- `delivery_service.json`: rebuild it, assign Wingull, get the Bird Whistle,
+  walk 200 steps and collect ₽120, fly to Oldale from the manager, take the
+  opened road onto Route 102, and whistle home.
+- `oldale_delivery_gate.json`: Oldale's west road is closed until the Delivery
+  Service is rebuilt, and the Builder's assistant hands out Poké Balls to a
+  player who has none.
 
 ## Adding tests
 
@@ -153,6 +178,12 @@ Actions currently supported:
 | `assert_position` | `x`, `y`, optional `map` (e.g. `MAP_LITTLEROOT_TOWN`) | Fail unless the player is on that tile (and map). |
 | `assert_blocked` | `direction` | Hold a direction and fail if the player moves. |
 | `dismiss_text` | optional `timeout_frames` | Press A until the message box closes and the player can move. |
+| `next_message` | optional `times` (default 1), `wait` | Wait for the current text to finish, press A, and wait for the next text to finish. `times: 0` just waits. `wait` adds frames after each press for fades or fanfares. |
+| `press` | `key`, optional `times`, `wait` (default 30) | Press a button, waiting `wait` frames after each press. |
+| `press_until_task` | `task`, optional `key` (default A), `timeout_frames` | Keep pressing a button until a game task is active, such as `Task_HandleChooseMonInput` for the party menu. |
+| `walk_to` | `x`, `y` | Walk to a tile on the current map, routing around walls, NPCs and trigger tiles. |
+| `remember_money` | | Record the player's money. |
+| `assert_money_gained` | optional `min` (default 1), `max` | Fail unless money rose by that much since `remember_money`. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons
 between presses to create another key-down event. Task checks follow

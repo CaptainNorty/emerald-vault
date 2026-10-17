@@ -122,6 +122,13 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
+#define MULTI_DELIVERY_SERVICE             114 // Emerald Vault
+
+// Emerald Vault: Delivery Service manager selections
+#define DELIVERY_SERVICE_FLY            0
+#define DELIVERY_SERVICE_CHANGE_WORKER  1
+#define DELIVERY_SERVICE_TAKE_BACK      2
+#define DELIVERY_SERVICE_EXIT           3
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

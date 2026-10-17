@@ -2015,6 +2015,12 @@ static void CB_ExitFlyMap(void)
                 }
                 ReturnToFieldFromFlyMapSelect();
             }
+            else if (IsDeliveryServiceFlight())
+            {
+                // Opened from the Delivery Service: go back to its script.
+                CancelDeliveryServiceFlight();
+                SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+            }
             else
             {
                 SetMainCallback2(CB2_ReturnToPartyMenuFromFlyMap);

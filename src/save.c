@@ -48,6 +48,10 @@ static u8 HandleReplaceSector(u16, const struct SaveSectorLocation *);
     min(sizeof(structure) - chunkNum * SECTOR_DATA_SIZE, SECTOR_DATA_SIZE) : 0 \
 }
 
+// Emerald Vault adds town data to the end of PokemonStorage; it must still fit
+// in the save sectors reserved for PC storage.
+STATIC_ASSERT(sizeof(struct PokemonStorage) <= (SECTOR_ID_PKMN_STORAGE_END - SECTOR_ID_PKMN_STORAGE_START + 1) * SECTOR_DATA_SIZE, PokemonStorageFitsInSave);
+
 struct
 {
     u16 offset;

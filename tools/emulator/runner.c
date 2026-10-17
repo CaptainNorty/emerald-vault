@@ -47,6 +47,11 @@ int main(int argc, char** argv) {
             unsigned value = bits == 8 ? core->busRead8(core, address) :
                 bits == 16 ? core->busRead16(core, address) : core->busRead32(core, address);
             printf("VALUE %u\n", value);
+        } else if (sscanf(line, "write %u %x %u", &bits, &address, &frames) == 3 && (bits == 8 || bits == 16 || bits == 32)) {
+            if (bits == 8) core->busWrite8(core, address, frames);
+            else if (bits == 16) core->busWrite16(core, address, frames);
+            else core->busWrite32(core, address, frames);
+            puts("OK");
         } else if (!strncmp(line, "screenshot ", 11)) {
             char* path = line + 11;
             path[strcspn(path, "\r\n")] = 0;

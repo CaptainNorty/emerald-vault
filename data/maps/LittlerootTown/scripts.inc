@@ -1,4 +1,5 @@
 LittlerootTown_MapScripts::
+	map_script MAP_SCRIPT_ON_LOAD, LittlerootTown_OnLoad
 	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, LittlerootTown_OnFrame
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_OnWarp
@@ -34,8 +35,14 @@ LittlerootTown_MapScripts::
 	@ 4: Received Pokedex
 
 
+@ Emerald Vault: draw the rebuilt businesses over their ruined plots.
+LittlerootTown_OnLoad:
+	special Town_DrawBuildings
+	end
+
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
+	call_if_set FLAG_DELIVERY_SERVICE_BUILT, LittlerootTown_EventScript_SetBuilderInYard
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
 	call_if_unset FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_SetTwinPos
@@ -380,7 +387,12 @@ LittlerootTown_EventScript_TownSign::
 	end
 
 LittlerootTown_EventScript_RuinsSign_DeliveryService::
+	goto_if_set FLAG_DELIVERY_SERVICE_BUILT, LittlerootTown_EventScript_DeliveryServiceSign
 	msgbox LittlerootTown_Text_RuinsSign_DeliveryService, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_DeliveryServiceSign::
+	msgbox LittlerootTown_Text_DeliveryServiceSign, MSGBOX_SIGN
 	end
 
 LittlerootTown_EventScript_RuinsSign_Forge::
@@ -1031,3 +1043,286 @@ LittlerootTown_Text_RuinsSign_SpiritSanctum:
 LittlerootTown_Text_RuinsSign_Quarry:
 	.string "QUARRY (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
+
+@ ---------------------------------------------------------------------------
+@ Emerald Vault: the Builder and the Delivery Service
+@ ---------------------------------------------------------------------------
+
+@ After rebuilding the Delivery Service, the Builder stands in the yard
+@ between the old town and the farm.
+LittlerootTown_EventScript_SetBuilderInYard::
+	setobjectxyperm LOCALID_LITTLEROOT_BUILDER, 21, 12
+	setobjectmovementtype LOCALID_LITTLEROOT_BUILDER, MOVEMENT_TYPE_FACE_RIGHT
+	return
+
+LittlerootTown_EventScript_Builder::
+	lock
+	faceplayer
+	goto_if_set FLAG_DELIVERY_SERVICE_BUILT, LittlerootTown_EventScript_BuilderNothingToBuild
+	goto_if_set FLAG_MET_BUILDER, LittlerootTown_EventScript_BuilderCheckForFlyingType
+	msgbox LittlerootTown_Text_BuilderIntro, MSGBOX_DEFAULT
+	setflag FLAG_MET_BUILDER
+LittlerootTown_EventScript_BuilderCheckForFlyingType::
+	setvar VAR_0x8005, TYPE_FLYING
+	special Town_CheckPartyForType
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_BuilderNeedFlyingType
+	msgbox LittlerootTown_Text_BuilderSeesFlyingType, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	playse SE_M_STRENGTH
+	setflag FLAG_DELIVERY_SERVICE_BUILT
+	special Town_DrawBuildings
+	special DrawWholeMapView
+	clearflag FLAG_HIDE_LITTLEROOT_DELIVERY_MANAGER
+	addobject LOCALID_LITTLEROOT_DELIVERY_MANAGER
+	waitse
+	delay 30
+	fadescreen FADE_FROM_BLACK
+	msgbox LittlerootTown_Text_BuilderDone, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	call LittlerootTown_EventScript_SetBuilderInYard
+	setobjectxy LOCALID_LITTLEROOT_BUILDER, 21, 12
+	turnobject LOCALID_LITTLEROOT_BUILDER, DIR_EAST
+	fadescreen FADE_FROM_BLACK
+	release
+	end
+
+LittlerootTown_EventScript_BuilderNeedFlyingType::
+	msgbox LittlerootTown_Text_BuilderNeedFlyingType, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_BuilderNothingToBuild::
+	msgbox LittlerootTown_Text_BuilderNothingToBuild, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryManager::
+	lock
+	faceplayer
+	setvar VAR_0x8006, TOWN_DELIVERY_SERVICE
+	goto_if_unset FLAG_DELIVERY_SERVICE_STAFFED, LittlerootTown_EventScript_DeliveryFirstWorker
+	special Town_HasWorker
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DeliveryNoWorker
+	special Town_CollectEarnings
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DeliveryNoEarnings
+	playse SE_SHOP
+	msgbox LittlerootTown_Text_DeliveryEarnings, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_DeliveryMenu
+
+LittlerootTown_EventScript_DeliveryNoEarnings::
+	msgbox LittlerootTown_Text_DeliveryNoEarnings, MSGBOX_DEFAULT
+LittlerootTown_EventScript_DeliveryMenu::
+	special Town_BufferWorker
+	message LittlerootTown_Text_DeliveryWhatCanIDo
+	waitmessage
+	multichoice 16, 4, MULTI_DELIVERY_SERVICE, FALSE
+	switch VAR_RESULT
+	case DELIVERY_SERVICE_FLY, LittlerootTown_EventScript_DeliveryFly
+	case DELIVERY_SERVICE_CHANGE_WORKER, LittlerootTown_EventScript_DeliveryChooseWorker
+	case DELIVERY_SERVICE_TAKE_BACK, LittlerootTown_EventScript_DeliveryTakeBackWorker
+	goto LittlerootTown_EventScript_DeliveryGoodbye
+
+LittlerootTown_EventScript_DeliveryGoodbye::
+	msgbox LittlerootTown_Text_DeliveryGoodbye, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryFly::
+	msgbox LittlerootTown_Text_DeliveryWhereTo, MSGBOX_DEFAULT
+	closemessage
+	special Town_OpenFlyMap
+	goto LittlerootTown_EventScript_DeliveryGoodbye
+
+LittlerootTown_EventScript_DeliveryNoWorker::
+	msgbox LittlerootTown_Text_DeliveryNoWorker, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_EventScript_DeliveryGoodbye
+LittlerootTown_EventScript_DeliveryChooseWorker::
+	msgbox LittlerootTown_Text_DeliveryWhoShouldWork, MSGBOX_DEFAULT
+	closemessage
+	special ChoosePartyMon
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_DeliveryGoodbye
+	special Town_AssignWorker
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_EGG, LittlerootTown_EventScript_DeliveryCantUseEgg
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_DeliveryCantUseLastMon
+	special Town_BufferWorker
+	msgbox LittlerootTown_Text_DeliveryNewWorker, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryTakeBackWorker::
+	special Town_BufferWorker
+	special Town_TakeBackWorker
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DeliveryPartyFull
+	msgbox LittlerootTown_Text_DeliveryWorkerReturned, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryPartyFull::
+	msgbox LittlerootTown_Text_DeliveryPartyFull, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryCantUseEgg::
+	msgbox LittlerootTown_Text_DeliveryCantUseEgg, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryCantUseLastMon::
+	msgbox LittlerootTown_Text_DeliveryCantUseLastMon, MSGBOX_DEFAULT
+	release
+	end
+
+@ The first worker has to be a Flying-type. After that, anyone can work here,
+@ though Flying-types work best.
+LittlerootTown_EventScript_DeliveryFirstWorker::
+	msgbox LittlerootTown_Text_DeliveryNeedFirstWorker, MSGBOX_DEFAULT
+	closemessage
+	special ChoosePartyMon
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_DeliveryFirstWorkerLater
+	setvar VAR_0x8005, TYPE_FLYING
+	special Town_IsPartyMonType
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DeliveryFirstWorkerNotFlying
+	special Town_AssignWorker
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_DeliveryCantUseLastMon
+	setflag FLAG_DELIVERY_SERVICE_STAFFED
+	special Town_BufferWorker
+	msgbox LittlerootTown_Text_DeliveryFirstWorkerReady, MSGBOX_DEFAULT
+	goto_if_set FLAG_RECEIVED_BIRD_WHISTLE, LittlerootTown_EventScript_DeliveryGoodbye
+	msgbox LittlerootTown_Text_DeliveryTakeWhistle, MSGBOX_DEFAULT
+	giveitem ITEM_BIRD_WHISTLE
+	setflag FLAG_RECEIVED_BIRD_WHISTLE
+	msgbox LittlerootTown_Text_DeliveryExplainFlights, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryFirstWorkerLater::
+	msgbox LittlerootTown_Text_DeliveryFirstWorkerLater, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DeliveryFirstWorkerNotFlying::
+	msgbox LittlerootTown_Text_DeliveryFirstWorkerNotFlying, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_Text_BuilderIntro:
+	.string "Hey there! I'm the BUILDER.\p"
+	.string "All these ruins used to be\n"
+	.string "LITTLEROOT's businesses.\p"
+	.string "I can rebuild every one of them,\n"
+	.string "and the first one's on me!\p"
+	.string "Let's start with the DELIVERY\n"
+	.string "SERVICE. It needs a bird to run it.$"
+
+LittlerootTown_Text_BuilderNeedFlyingType:
+	.string "Bring me a FLYING-type POKéMON and\n"
+	.string "I'll rebuild the DELIVERY SERVICE.\p"
+	.string "I hear WINGULL nest in the grass\n"
+	.string "on ROUTE 103, north of OLDALE TOWN.$"
+
+LittlerootTown_Text_BuilderSeesFlyingType:
+	.string "Is that a FLYING-type POKéMON?\n"
+	.string "Perfect! Stand back…$"
+
+LittlerootTown_Text_BuilderDone:
+	.string "Ta-da! The DELIVERY SERVICE is\n"
+	.string "back in business!\p"
+	.string "Talk to its manager to put your\n"
+	.string "FLYING-type to work.\p"
+	.string "I'll set up in the yard by the old\n"
+	.string "town. Come see me when you want\l"
+	.string "to rebuild more!$"
+
+LittlerootTown_Text_BuilderNothingToBuild:
+	.string "Nothing else is ready to rebuild\n"
+	.string "just yet.\p"
+	.string "Keep earning BADGES and catching\n"
+	.string "POKéMON, and come back to see me!$"
+
+LittlerootTown_Text_DeliveryServiceSign:
+	.string "DELIVERY SERVICE\n"
+	.string "Wings for hire, all across HOENN!$"
+
+LittlerootTown_Text_DeliveryNeedFirstWorker:
+	.string "Hi, boss! I'm the manager of the\n"
+	.string "DELIVERY SERVICE.\p"
+	.string "We need a FLYING-type to make our\n"
+	.string "first deliveries. Who will it be?$"
+
+LittlerootTown_Text_DeliveryFirstWorkerLater:
+	.string "No rush. Come back when you're\n"
+	.string "ready to put a FLYING-type to work.$"
+
+LittlerootTown_Text_DeliveryFirstWorkerNotFlying:
+	.string "Hmm, that one can't fly.\n"
+	.string "Our first worker has to be\l"
+	.string "a FLYING-type!$"
+
+LittlerootTown_Text_DeliveryFirstWorkerReady:
+	.string "{STR_VAR_1} is ready to make deliveries!\p"
+	.string "The better suited and stronger\n"
+	.string "the worker, the faster we deliver.\p"
+	.string "We earn money as you walk, so\n"
+	.string "come back to collect it, boss!$"
+
+LittlerootTown_Text_DeliveryTakeWhistle:
+	.string "Oh, and take this. Blow it anywhere\n"
+	.string "outdoors, and one of our birds will\l"
+	.string "fly you right back here.$"
+
+LittlerootTown_Text_DeliveryExplainFlights:
+	.string "From here, our birds can also fly\n"
+	.string "you to any town you've visited.\l"
+	.string "Just ask!$"
+
+LittlerootTown_Text_DeliveryEarnings:
+	.string "Welcome back, boss!\p"
+	.string "Since your last visit, we made\n"
+	.string "{STR_VAR_1} deliveries for ¥{STR_VAR_2}!\p"
+	.string "That's ¥{STR_VAR_3} earned so far!$"
+
+LittlerootTown_Text_DeliveryNoEarnings:
+	.string "No deliveries since your last\n"
+	.string "visit. Business picks up as\l"
+	.string "you walk around, boss!$"
+
+LittlerootTown_Text_DeliveryWhatCanIDo:
+	.string "{STR_VAR_1} is delivering at {STR_VAR_3}x\n"
+	.string "speed. What can I do for you?$"
+
+LittlerootTown_Text_DeliveryGoodbye:
+	.string "Come back anytime, boss!$"
+
+LittlerootTown_Text_DeliveryWhereTo:
+	.string "Where to? Our birds can fly you to\n"
+	.string "any town you've visited.$"
+
+LittlerootTown_Text_DeliveryNoWorker:
+	.string "We've got nobody to make\n"
+	.string "deliveries, boss!\p"
+	.string "Want to put someone to work?$"
+
+LittlerootTown_Text_DeliveryWhoShouldWork:
+	.string "Who should make the deliveries?$"
+
+LittlerootTown_Text_DeliveryNewWorker:
+	.string "{STR_VAR_1} is on deliveries now!\n"
+	.string "It works at {STR_VAR_3}x speed.$"
+
+LittlerootTown_Text_DeliveryWorkerReturned:
+	.string "Here's {STR_VAR_1} back.\p"
+	.string "Without a worker, we can't make\n"
+	.string "any deliveries, boss.$"
+
+LittlerootTown_Text_DeliveryPartyFull:
+	.string "Your party is full, boss.\n"
+	.string "Make some room first!$"
+
+LittlerootTown_Text_DeliveryCantUseEgg:
+	.string "An EGG can't make deliveries!$"
+
+LittlerootTown_Text_DeliveryCantUseLastMon:
+	.string "That's your last POKéMON, boss!\n"
+	.string "You'll need it on your journey.$"

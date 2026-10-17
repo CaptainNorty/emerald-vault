@@ -1336,6 +1336,35 @@ static void SpriteCB_HallOfFameMonitor(struct Sprite *sprite)
 #undef sSpriteId
 #undef sEffectSpriteId
 
+// Emerald Vault: a Delivery Service bird flies the player, so no party
+// Pokémon is shown during the take-off.
+static EWRAM_DATA bool8 sDeliveryServiceFlight = FALSE;
+
+// The Fly map was opened by the Delivery Service rather than the party menu.
+void StartDeliveryServiceFlyMap(void)
+{
+    sDeliveryServiceFlight = TRUE;
+}
+
+bool8 IsDeliveryServiceFlight(void)
+{
+    return sDeliveryServiceFlight;
+}
+
+void CancelDeliveryServiceFlight(void)
+{
+    sDeliveryServiceFlight = FALSE;
+}
+
+// Fly from the field to the warp destination that has already been set.
+void StartDeliveryServiceFlight(void)
+{
+    sDeliveryServiceFlight = TRUE;
+    LockPlayerFieldControls();
+    FreezeObjectEvents();
+    CreateTask(Task_UseFly, 0);
+}
+
 void ReturnToFieldFromFlyMapSelect(void)
 {
     SetMainCallback2(CB2_ReturnToField);
@@ -1369,6 +1398,7 @@ static void Task_UseFly(u8 taskId)
     }
     if (!FieldEffectActiveListContains(FLDEFF_USE_FLY))
     {
+        sDeliveryServiceFlight = FALSE;
         Overworld_ResetStateAfterFly();
         WarpIntoMap();
         SetMainCallback2(CB2_LoadMap);
@@ -3204,6 +3234,8 @@ static void FlyOutFieldEffect_ShowMon(struct Task *task)
     if (ObjectEventClearHeldMovementIfFinished(objectEvent))
     {
         task->tState++;
+        if (sDeliveryServiceFlight)
+            return;
         gFieldEffectArguments[0] = task->tMonId;
         FieldEffectStart(FLDEFF_FIELD_MOVE_SHOW_MON_INIT);
     }

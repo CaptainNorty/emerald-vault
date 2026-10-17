@@ -120,6 +120,32 @@ Technically: flying home is a key item with a Fly-style warp, usable outdoors
 and reusing an existing item icon. Flying out reuses vanilla's Fly map screen,
 opened from the Delivery Service manager's dialogue.
 
+### Unlocking the Delivery Service (built)
+The Delivery Service is the first business and is introduced before the first
+Gym, so the player learns early that earnings depend on the Pokémon doing the
+work.
+
+- **The Builder** (a Black Belt) waits at the Delivery Service ruins from the
+  start of the game. The first building is free: he only needs to see a
+  Flying-type in the party. He then rebuilds it and moves to the yard between
+  the old town and the farm, where he'll offer future buildings.
+- **Oldale's west road is closed** after the player gets the Pokédex until the
+  Delivery Service is rebuilt. The Builder's assistant points the player to
+  Wingull on Route 103 (20% of encounters) and hands out 5 Poké Balls to anyone
+  who has none, so the player can't get stuck.
+- **The manager** handles staffing, reports and collection. The first worker
+  must be a Flying-type; after that, any Pokémon can work there, but it can be
+  swapped or taken back anytime. The manager also gives the **Bird Whistle**
+  (flies you back to Littleroot from anywhere outdoors) and can fly you to any
+  visited town.
+- **Earnings:** one delivery per 20 steps at 1.0x efficiency, ₽12 each, up to
+  100 uncollected. Efficiency is type fit (2x Flying, 1.5x Normal, 0.5x other)
+  x level / 10, doubled for Swellow. A level 5 Wingull runs at 1.0x.
+- **Code:** `src/vault_town.c` (businesses, earnings, workers, flights),
+  `include/constants/vault_town.h`, Littleroot and Oldale map scripts. Workers
+  and earnings are saved at the end of PC storage (`struct TownSaveData`, about
+  940 bytes of the ~2 KB free).
+
 ### Story note
 In Emerald, Team Magma awakens Groudon and Team Aqua awakens Kyogre. Their clash
 causes extreme weather around Sootopolis, and the player calls Rayquaza from Sky
@@ -184,12 +210,9 @@ manageable:
 
 ## Open questions & technical notes
 
-- **Where assigned Pokémon live:** Reserve one PC box as a locked "town box,"
-  with each building's Pokémon in a fixed slot. This needs no new save space,
-  keeps the Pokémon real (stats, nature), and lets you take them back. A real
-  Pokémon takes 80 bytes, and the save file is nearly full: about 120 bytes free
-  in the main save block, about 84 in the player block, and about 2 KB in the PC
-  storage block.
+- **Where assigned Pokémon live:** Each business stores its worker as a full
+  Pokémon (80 bytes) in its own save slot at the end of PC storage, so no PC box
+  had to be locked. Room is reserved for one worker per building.
 - **Per-building save data:** Step count at last collection, items sold, and
   money earned. A few bytes per building, which fits in the PC storage block's
   free space.

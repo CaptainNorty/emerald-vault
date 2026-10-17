@@ -1,0 +1,27 @@
+{
+  "name": "Oldale's west road stays closed until the Delivery Service is rebuilt",
+  "build": "test_start",
+  "preset": "oldale_no_balls",
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "assert_position", "x": 5, "y": 10, "map": "MAP_OLDALE_TOWN"},
+    {"action": "walk_to", "x": 1, "y": 10},
+    {"action": "screenshot", "name": "01-assistant-guards-west-road"},
+    {"action": "run", "frames": 20, "keys": ["LEFT"]},
+    {"action": "run", "frames": 30},
+    {"action": "next_message", "times": 0},
+    {"action": "screenshot", "name": "02-turned-back"},
+    {"action": "next_message", "times": 2},
+    {"action": "screenshot", "name": "03-needs-flying-type"},
+    {"action": "next_message", "times": 2},
+    {"action": "screenshot", "name": "04-try-route-103"},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "05-out-of-poke-balls"},
+    {"action": "next_message", "wait": 30},
+    {"action": "run", "frames": 150},
+    {"action": "screenshot", "name": "06-received-poke-balls"},
+    {"action": "dismiss_text"},
+    {"action": "assert_position", "x": 1, "y": 10, "map": "MAP_OLDALE_TOWN"},
+    {"action": "screenshot", "name": "07-still-in-oldale"}
+  ]
+}

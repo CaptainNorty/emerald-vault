@@ -8,11 +8,53 @@ OldaleTown_OnTransition:
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
+	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetUpDeliveryGate
 	end
 
 @ This script seems pointless because nothing uses VAR_OLDALE_TOWN_STATE
 OldaleTown_EventScript_SetOldaleState::
 	setvar VAR_OLDALE_TOWN_STATE, 1
+	return
+
+@ Emerald Vault: once the adventure starts, the Builder's assistant closes the
+@ road west (VAR_OLDALE_TOWN_STATE 2) until the Delivery Service is rebuilt.
+OldaleTown_EventScript_SetUpDeliveryGate::
+	goto_if_set FLAG_DELIVERY_SERVICE_BUILT, OldaleTown_EventScript_OpenDeliveryGate
+	setvar VAR_OLDALE_TOWN_STATE, 2
+	clearflag FLAG_HIDE_OLDALE_BUILDERS_ASSISTANT
+	return
+
+OldaleTown_EventScript_OpenDeliveryGate::
+	setflag FLAG_HIDE_OLDALE_BUILDERS_ASSISTANT
+	return
+
+OldaleTown_EventScript_DeliveryGateTrigger::
+	lockall
+	applymovement LOCALID_PLAYER, OldaleTown_Movement_PlayerStepBack
+	waitmovement 0
+	applymovement LOCALID_OLDALE_BUILDERS_ASSISTANT, Common_Movement_FacePlayer
+	waitmovement 0
+	call OldaleTown_EventScript_BuildersAssistantTalk
+	releaseall
+	end
+
+OldaleTown_EventScript_BuildersAssistant::
+	lock
+	faceplayer
+	call OldaleTown_EventScript_BuildersAssistantTalk
+	release
+	end
+
+@ Hands out Poké Balls if the player has none, so they can't get stuck here.
+OldaleTown_EventScript_BuildersAssistantTalk::
+	msgbox OldaleTown_Text_RoadClosedForDeliveryService, MSGBOX_DEFAULT
+	checkitem ITEM_POKE_BALL
+	call_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_GiveSparePokeBalls
+	return
+
+OldaleTown_EventScript_GiveSparePokeBalls::
+	msgbox OldaleTown_Text_OutOfPokeBalls, MSGBOX_DEFAULT
+	giveitem ITEM_POKE_BALL, 5
 	return
 
 OldaleTown_EventScript_BlockWestEntrance::
@@ -384,3 +426,16 @@ OldaleTown_Text_TownSign:
 	.string "OLDALE TOWN\n"
 	.string "“Where things start off scarce.”$"
 
+OldaleTown_Text_RoadClosedForDeliveryService:
+	.string "Sorry, the road west is closed!\p"
+	.string "The BUILDER in LITTLEROOT needs\n"
+	.string "a FLYING-type POKéMON to rebuild\l"
+	.string "the DELIVERY SERVICE.\p"
+	.string "I'll open the road once it's\n"
+	.string "up and running.\p"
+	.string "Try the grass on ROUTE 103,\n"
+	.string "just north of here!$"
+
+OldaleTown_Text_OutOfPokeBalls:
+	.string "Huh? You're out of POKé BALLS?\n"
+	.string "Here, take some of mine.$"

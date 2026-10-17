@@ -401,6 +401,8 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     // Emerald-only key items
     [ITEM_MAGMA_EMBLEM] = {gItemIcon_MagmaEmblem, gItemIconPalette_MagmaEmblem},
     [ITEM_OLD_SEA_MAP] = {gItemIcon_OldSeaMap, gItemIconPalette_OldSeaMap},
+    // Emerald Vault
+    [ITEM_BIRD_WHISTLE] = {gItemIcon_Flute, gItemIconPalette_WhiteFlute},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

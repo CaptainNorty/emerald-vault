@@ -4537,4 +4537,18 @@ const struct Item gItems[] =
         .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
+
+    // Emerald Vault
+    [ITEM_BIRD_WHISTLE] =
+    {
+        .name = _("BIRD WHISTLE"),
+        .itemId = ITEM_BIRD_WHISTLE,
+        .price = 0,
+        .description = sBirdWhistleDesc,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_BirdWhistle,
+    },
 };

@@ -1,0 +1,31 @@
+#ifndef GUARD_CONSTANTS_VAULT_TOWN_H
+#define GUARD_CONSTANTS_VAULT_TOWN_H
+
+// Emerald Vault: the businesses on Littleroot Town's farm, by plot.
+#define TOWN_DELIVERY_SERVICE    0
+#define TOWN_FORGE               1
+#define TOWN_GREENHOUSE          2
+#define TOWN_ICE_DOME            3
+#define TOWN_WEATHER_STABILIZER  4
+#define TOWN_GENERATOR           5
+#define TOWN_FISHERY             6
+#define TOWN_SPIRIT_SANCTUM      7
+#define TOWN_QUARRY              8
+#define TOWN_BUILDING_COUNT      9
+
+// Town specials take the building in VAR_0x8006, a party slot in VAR_0x8004
+// (as set by ChoosePartyMon) and a Pokémon type in VAR_0x8005.
+
+// VAR_RESULT from Town_AssignWorker
+#define TOWN_ASSIGN_OK          0
+#define TOWN_ASSIGN_CANCELLED   1
+#define TOWN_ASSIGN_EGG         2
+#define TOWN_ASSIGN_LAST_MON    3
+
+// Test-only ROM (TEST_START=1): starting setups the emulator test harness can pick.
+#define TEST_PRESET_NEW_GAME          0 // No Pokémon, start of the game, outside home
+#define TEST_PRESET_NO_FLYING_TYPE    1 // Has the Pokédex; Mudkip only; outside home
+#define TEST_PRESET_HAS_FLYING_TYPE   2 // Has the Pokédex; Mudkip and Wingull; outside home
+#define TEST_PRESET_OLDALE_NO_BALLS   3 // Has the Pokédex; Mudkip only; no Poké Balls; in Oldale
+
+#endif // GUARD_CONSTANTS_VAULT_TOWN_H

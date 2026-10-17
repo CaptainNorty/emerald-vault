@@ -1,0 +1,20 @@
+{
+  "name": "Builder asks for a Flying-type before rebuilding the Delivery Service",
+  "build": "test_start",
+  "preset": "no_flying_type",
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "walk_to", "x": 25, "y": 11},
+    {"action": "run", "frames": 2, "keys": ["UP"]},
+    {"action": "run", "frames": 20},
+    {"action": "screenshot", "name": "01-builder-at-the-ruins"},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "next_message", "times": 0},
+    {"action": "screenshot", "name": "02-builder-intro"},
+    {"action": "next_message", "times": 5},
+    {"action": "screenshot", "name": "03-builder-needs-flying-type"},
+    {"action": "dismiss_text"},
+    {"action": "assert_position", "x": 25, "y": 11, "map": "MAP_LITTLEROOT_TOWN"},
+    {"action": "screenshot", "name": "04-still-in-ruins"}
+  ]
+}

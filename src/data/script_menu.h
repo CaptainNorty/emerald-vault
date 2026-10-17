@@ -782,6 +782,19 @@ struct MultichoiceListStruct
     u8 count;
 };
 
+// Emerald Vault
+static const u8 sText_DeliveryServiceFly[] = _("FLY");
+static const u8 sText_DeliveryServiceChangeWorker[] = _("CHANGE WORKER");
+static const u8 sText_DeliveryServiceTakeBack[] = _("TAKE WORKER BACK");
+
+static const struct MenuAction MultichoiceList_DeliveryService[] =
+{
+    {sText_DeliveryServiceFly},
+    {sText_DeliveryServiceChangeWorker},
+    {sText_DeliveryServiceTakeBack},
+    {gText_Exit},
+};
+
 static const struct MultichoiceListStruct sMultichoiceLists[] =
 {
     [MULTI_BRINEY_ON_DEWFORD]          = MULTICHOICE(MultichoiceList_BrineyOnDewford),
@@ -898,6 +911,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_SLATEPORT_TENT_RULES]       = MULTICHOICE(MultichoiceList_SlateportTentRules),
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
+    [MULTI_DELIVERY_SERVICE]           = MULTICHOICE(MultichoiceList_DeliveryService),
 };
 
 const u8 *const gStdStrings[] =
