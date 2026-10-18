@@ -194,17 +194,18 @@ Three directions were considered:
 Marts, worker EXP, upgrades and the FARM box are built.
 
 - **Buildings produce items, not money (built).** Each building stocks
-  one item per 50 farm steps at 1.0x efficiency, rolled from its weighted item table
+  one item every `itemSteps` farm steps at 1.0x efficiency (each building has
+  its own speed; see the pricing pass below), rolled from its weighted item table
   (`sDeliveryServiceItems` and friends in `src/vault_town.c`), up to 30
   uncollected. Tier 1 tables:
 
   | Building | Items |
   |---|---|
   | Delivery Service | Potion, Poké Ball, Antidote, Repel, Escape Rope |
-  | Greenhouse | Oran, Pecha, Cheri, Rawst, Chesto, Aspear, Persim, Sitrus Berries |
+  | Greenhouse | Oran, Pecha, Cheri, Rawst, Chesto, Aspear Berries, Tiny Mushroom, Big Mushroom (rare) |
   | Quarry | Stardust, Hard Stone, Everstone, Soft Sand, Fire/Water/Thunder/Leaf Stones (rare) |
   | Fishery | Pearl, Shoal Salt, Shoal Shell, Heart Scale, Net Ball, Dive Ball, Big Pearl |
-  | Generator | Super Potion, Super Repel, Paralyze Heal, Awakening, Magnet, Thunder Stone |
+  | Generator | Power Cell (new), Thunder Stone, Super Potion, Super Repel, Magnet, Paralyze Heal |
   | Forge | Great Ball, Ultra Ball, Timer/Nest/Repeat Balls, Burn Heal, Charcoal |
   | Spirit Sanctum | Revive, Full Heal, Hyper Potion, Cleanse Tag, Spell Tag, Max Revive |
   | Ice Dome | Max Potion, Max Repel, Ice Heal, Full Restore, Ultra Ball, Never-Melt Ice |
@@ -267,7 +268,7 @@ Marts, worker EXP, upgrades and the FARM box are built.
    `art/building_kit/README.md`); eight to go.
 6. Next: rebalance the farm (below).
 
-## Rebalancing: make the farm a game (next)
+## Rebalancing: make the farm a game
 
 The second playtest (about 20 minutes) found the farm **far too generous and
 almost thoughtless**:
@@ -338,10 +339,138 @@ broadly: the game is too easy, and the farm is the main lever for fixing that.
 
 1. Items only (done), Marts reopened for selling (done, plus a Mart in
    Littleroot), steps count only outside Littleroot (done), slower production
-   (not yet: tune after a playtest). Playtest again before going further.
+   (not yet: tune with work orders). Playtested; see the third playtest below.
 2. Work orders.
 3. The Steven and Captain Stern trades.
 4. Processing and townspeople requests.
+
+## Third playtest: value, goals and donations (next)
+
+Step 1 of the rebalancing played well. Selling your own goods, with no prize
+money, made each collection feel like it mattered. Notes:
+
+- **Buildings aren't worth the same.** The Quarry was by far the best. Its
+  evolution stones sell for ₽1,050, and finding a few Star Pieces after a trip
+  was exciting. The Fishery was saved by the odd Big Pearl, but most of its
+  catch was Shoal Salt and Shoal Shell, which sell for ₽10. The Generator was
+  only worth it for Thunder Stones.
+- **Berries are worthless.** Every berry sells for ₽10, and they arrive in
+  piles, so collecting and selling them wastes time.
+- **The 30-item cap.** A short trip filled every building, and a long trip
+  earned no more than a short one. It works, but something is missing: being
+  full doesn't ask anything of you.
+- **Supplies pile up.** Ultra Balls, Hyper Potions and Max Repels were always
+  on hand. Work orders should fix this.
+- **No healing spot on the farm.** (Mom already heals you in your house; it's
+  easy to miss.)
+
+### Ideas from the playtest
+
+- **Pricing pass (built).** Even out what each building's average item sells for, so
+  the price of a building and its upgrades matches what it earns. Keep the
+  jackpots (Star Piece, Big Pearl), since rare finds are the fun part. Raise
+  sell prices that are too low (berries, Shoal items, Heart Scale, held items
+  like Magnet), and give the Generator its own product.
+- **New items.** The item table has 61 unused slots (`ITEM_034` and up), so
+  new items don't touch the save format. Each one needs a name (up to 14
+  characters), a price, a description, and a 24×24 icon (15 colors). First up:
+  a **Power Cell** from the Generator.
+- **Donating Pokémon.** Giving the farm a Pokémon unlocks something. The
+  Pokémon is gone for good (it still counts as caught in the Pokédex); the game
+  just sets a flag such as "Machop donated". You can't give away your last
+  Pokémon. Keeps the player catching a wide variety. Ideas:
+  - **Machop:** the Builder needs one before he can do upgrades.
+  - **Meowth:** an alternative to paying for the Mart, or it unlocks the
+    traveling seller (below).
+  - **Torkoal:** a hot spring that heals your party.
+  - **Snorunt or Spinda:** the café (turned down early in the story) opens
+    and heals you.
+- **A traveling seller.** An unlockable character walks from building to
+  building and sells what's there for you, for less than a Mart pays. It fits
+  with work orders: it sells finished orders or overflow, trading value for
+  convenience.
+- **Bulk deliveries.** Story goals that need lots of farm goods. A script can
+  count any number of an item in the bag and take some or all of them, and a
+  variable remembers what's still owed, so deliveries can be partial ("Thanks
+  for the 16! We still need 34.").
+  - **Weather Institute:** needs 50 Thunder Stones or Power Cells.
+  - **Weather Stabilizer** (the farm's center): needs 100 each of four items.
+  This turns stockpiling into a goal, and makes "sell it or save it?" a real
+  choice.
+- **A growing grass patch.** A patch of grass below Littleroot's Mart whose
+  wild Pokémon grow over time to include more and more of Generations 1 and 2.
+  All 386 species are already in the game. Encounters are picked from a list
+  that can change with progress (badges, donations). Before the National Dex,
+  the Pokédex records these Pokémon but only shows Hoenn's.
+- **Healing:** the café or hot spring above, unlocked by a donation.
+
+### The pricing pass (built)
+
+Sell prices (a Mart pays half the listed price) went up for:
+
+| Items | Sells for |
+|---|---|
+| Oran, Pecha, Cheri, Chesto, Rawst, Aspear, Persim Berries | ₽100 (was ₽10) |
+| Sitrus, Lum, Leppa Berries | ₽300 |
+| Liechi, Ganlon, Salac, Petaya, Apicot Berries | ₽1,000 |
+| Shoal Salt, Shoal Shell | ₽300 |
+| Heart Scale, Magnet, Mystic Water, Miracle Seed | ₽500 |
+| Metal Coat, Deep Sea Tooth, Deep Sea Scale | ₽1,000 |
+| Moon Stone | ₽1,050 (it was unsellable: price 0 in the original game) |
+
+The Greenhouse's tables add Tiny and Big Mushrooms (its jackpot) and Miracle
+Seeds. The Generator makes the new **Power Cell** (`ITEM_POWER_CELL`, in the
+old `ITEM_034` slot, sells for ₽1,000) about 35–40% of the time, plus more
+Thunder Stones; Lv. 2 and 3 add PP Ups and Metal Coat. It borrows the Yellow
+Shard's icon until it has its own.
+
+**Each building has its own speed** (`itemSteps`: farm steps per item at 1.0x):
+cheap goods come fast, valuable goods slowly.
+
+| Building | Steps per item | Avg. sale per item (Lv. 1 / 2 / 3) | ₽ per step at Lv. 1 |
+|---|---|---|---|
+| Greenhouse | 25 | ₽160 / 360 / 820 | 6.4 |
+| Delivery Service | 40 | ₽133 / 259 / 540 | 3.3 |
+| Fishery | 50 | ₽652 / 998 / 1,418 | 13.0 |
+| Generator | 55 | ₽742 / 1,085 / 1,388 | 13.5 |
+| Quarry | 75 | ₽568 / 815 / 2,015 | 7.6 |
+| Forge | 90 | ₽618 / 643 / 914 | 6.9 |
+| Spirit Sanctum | 120 | ₽535 / 580 / 1,250 | 4.5 |
+| Ice Dome | 120 | ₽725 / 1,006 / 2,038 | 6.0 |
+
+The Delivery Service is mostly for supplies you use, not sell. The Forge,
+Spirit Sanctum and Ice Dome cost ₽250k, ₽750k and ₽1.5M, prices set when
+buildings earned money per step; revisit them (and their tables) once a
+playtest reaches them.
+
+### Idea: specialists that sell for you
+
+Each building has a designated Pokémon (Pelipper for the Delivery Service,
+Ludicolo for the Greenhouse, and so on). Assigning it does more than speed the
+building up: it **automates selling**. Its goods are sold as they're made and
+the money waits at the terminal, so a full stockroom no longer stops the
+building. This could replace the traveling seller, or the seller could be
+Meowth's version that works for every building. To decide before work
+orders, since the two interact:
+- Does auto-selling pay the full Mart price, or less (a fee for the
+  convenience)?
+- Does it sell everything, or can you keep some kinds (say, keep Thunder
+  Stones for the Weather Institute, sell the rest)?
+- Which Pokémon for each building, and are they the same as today's speed
+  specialists (Swellow, Ludicolo, Golem, Sharpedo, Magneton, Blaziken,
+  Dusclops/Claydol, Glalie)?
+
+### Order
+
+1. Pricing pass, plus the Power Cell (done; the Power Cell needs an icon).
+2. Work orders (step 3 of the rebalancing plan).
+3. Donations: the flags, then Machop for the Builder and Meowth for the Mart
+   or the seller.
+4. Bulk deliveries: the Weather Institute, then the Weather Stabilizer.
+5. The grass patch.
+6. A healing spot unlocked by a donation.
+7. Then the Steven and Captain Stern trades, processing and townspeople
+   requests (from the rebalancing plan).
 
 ## Progression gated by money
 
@@ -382,7 +511,8 @@ prices:
 The economy systems are a big enough job on their own, so to keep the project
 manageable:
 
-- No new Pokémon
+- No new Pokémon, except possibly a few hand-drawn evolutions (starting with
+  one for Sableye; see `art/pokemon_kit/`)
 - No changes to music or sprites
 - Map changes limited to Littleroot Town and what money gates need
 

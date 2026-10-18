@@ -246,6 +246,11 @@ static const u8 sYellowShardDesc[] = _(
     "ancient item. Can\n"
     "be sold cheaply.");
 
+static const u8 sPowerCellDesc[] = _(
+    "A charged cell made\n"
+    "by the GENERATOR.\n"
+    "Sells for a lot.");
+
 static const u8 sGreenShardDesc[] = _(
     "A shard from an\n"
     "ancient item. Can\n"

@@ -63,7 +63,8 @@ struct Business
     const u8 *name;
     const u8 *workerTypes; // Shown to the player, e.g. "GRASS or BUG"
     u32 cost;
-    u16 itemSteps;         // Steps per item for a worker at 1.0x efficiency
+    u16 itemSteps;         // Steps per item for a worker at 1.0x efficiency: cheap goods
+                           // come fast (Greenhouse), valuable ones slowly
     const struct TownItem *items[TOWN_MAX_LEVEL]; // By level; up to TOWN_ITEM_KINDS, ending with ITEM_NONE
     u16 builtFlag;
     u16 unlockFlag;        // Needed besides money and a worker; 0 for none
@@ -119,11 +120,11 @@ static const struct TownItem sGreenhouseItems[] =
     {ITEM_ORAN_BERRY, 30},
     {ITEM_PECHA_BERRY, 15},
     {ITEM_CHERI_BERRY, 15},
-    {ITEM_RAWST_BERRY, 10},
     {ITEM_CHESTO_BERRY, 10},
+    {ITEM_RAWST_BERRY, 10},
     {ITEM_ASPEAR_BERRY, 10},
-    {ITEM_PERSIM_BERRY, 5},
-    {ITEM_SITRUS_BERRY, 5},
+    {ITEM_TINY_MUSHROOM, 8},
+    {ITEM_BIG_MUSHROOM, 2},
     {ITEM_NONE},
 };
 
@@ -154,12 +155,12 @@ static const struct TownItem sFisheryItems[] =
 
 static const struct TownItem sGeneratorItems[] =
 {
-    {ITEM_SUPER_POTION, 30},
-    {ITEM_SUPER_REPEL, 25},
-    {ITEM_PARALYZE_HEAL, 20},
-    {ITEM_AWAKENING, 15},
-    {ITEM_MAGNET, 5},
-    {ITEM_THUNDER_STONE, 5},
+    {ITEM_POWER_CELL, 40},
+    {ITEM_THUNDER_STONE, 20},
+    {ITEM_SUPER_POTION, 15},
+    {ITEM_SUPER_REPEL, 10},
+    {ITEM_MAGNET, 10},
+    {ITEM_PARALYZE_HEAL, 5},
     {ITEM_NONE},
 };
 
@@ -220,27 +221,27 @@ static const struct TownItem sDeliveryServiceItems3[] =
 
 static const struct TownItem sGreenhouseItems2[] =
 {
-    {ITEM_SITRUS_BERRY, 25},
-    {ITEM_ORAN_BERRY, 15},
+    {ITEM_SITRUS_BERRY, 20},
+    {ITEM_ORAN_BERRY, 20},
     {ITEM_LEPPA_BERRY, 15},
     {ITEM_LUM_BERRY, 10},
-    {ITEM_PECHA_BERRY, 10},
-    {ITEM_CHERI_BERRY, 10},
     {ITEM_PERSIM_BERRY, 10},
-    {ITEM_ASPEAR_BERRY, 5},
+    {ITEM_TINY_MUSHROOM, 12},
+    {ITEM_MIRACLE_SEED, 8},
+    {ITEM_BIG_MUSHROOM, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sGreenhouseItems3[] =
 {
     {ITEM_SITRUS_BERRY, 25},
-    {ITEM_LUM_BERRY, 20},
-    {ITEM_LEPPA_BERRY, 15},
-    {ITEM_LIECHI_BERRY, 8},
-    {ITEM_GANLON_BERRY, 8},
-    {ITEM_SALAC_BERRY, 8},
-    {ITEM_PETAYA_BERRY, 8},
-    {ITEM_APICOT_BERRY, 8},
+    {ITEM_LUM_BERRY, 15},
+    {ITEM_LIECHI_BERRY, 10},
+    {ITEM_GANLON_BERRY, 10},
+    {ITEM_SALAC_BERRY, 10},
+    {ITEM_PETAYA_BERRY, 10},
+    {ITEM_BIG_MUSHROOM, 10},
+    {ITEM_MIRACLE_SEED, 10},
     {ITEM_NONE},
 };
 
@@ -298,27 +299,24 @@ static const struct TownItem sFisheryItems3[] =
 
 static const struct TownItem sGeneratorItems2[] =
 {
-    {ITEM_SUPER_POTION, 20},
-    {ITEM_HYPER_POTION, 15},
-    {ITEM_SUPER_REPEL, 15},
-    {ITEM_PARALYZE_HEAL, 15},
-    {ITEM_MAX_REPEL, 10},
-    {ITEM_FULL_HEAL, 10},
+    {ITEM_POWER_CELL, 40},
+    {ITEM_THUNDER_STONE, 25},
+    {ITEM_HYPER_POTION, 10},
     {ITEM_MAGNET, 10},
-    {ITEM_THUNDER_STONE, 5},
+    {ITEM_MAX_REPEL, 5},
+    {ITEM_METAL_COAT, 5},
+    {ITEM_PP_UP, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sGeneratorItems3[] =
 {
-    {ITEM_HYPER_POTION, 25},
-    {ITEM_MAX_REPEL, 20},
-    {ITEM_FULL_HEAL, 15},
-    {ITEM_MAX_POTION, 10},
+    {ITEM_POWER_CELL, 35},
+    {ITEM_THUNDER_STONE, 20},
+    {ITEM_MAX_POTION, 15},
+    {ITEM_METAL_COAT, 10},
+    {ITEM_PP_UP, 10},
     {ITEM_MAGNET, 10},
-    {ITEM_THUNDER_STONE, 10},
-    {ITEM_METAL_COAT, 5},
-    {ITEM_PP_UP, 5},
     {ITEM_NONE},
 };
 
@@ -404,7 +402,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_DeliveryService,
         .workerTypes = sText_TypesFlying,
         .cost = 0, // The Builder's free first building
-        .itemSteps = 50,
+        .itemSteps = 40,
         .items = {sDeliveryServiceItems, sDeliveryServiceItems2, sDeliveryServiceItems3},
         .builtFlag = FLAG_DELIVERY_SERVICE_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_DELIVERY_TERMINAL,
@@ -418,7 +416,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Greenhouse,
         .workerTypes = sText_TypesGrassBug,
         .cost = 5000,
-        .itemSteps = 50,
+        .itemSteps = 25,
         .items = {sGreenhouseItems, sGreenhouseItems2, sGreenhouseItems3},
         .builtFlag = FLAG_GREENHOUSE_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_GREENHOUSE_TERMINAL,
@@ -432,7 +430,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Quarry,
         .workerTypes = sText_TypesRockGround,
         .cost = 15000,
-        .itemSteps = 50,
+        .itemSteps = 75,
         .items = {sQuarryItems, sQuarryItems2, sQuarryItems3},
         .builtFlag = FLAG_QUARRY_BUILT,
         .unlockFlag = FLAG_BADGE01_GET,
@@ -462,7 +460,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Generator,
         .workerTypes = sText_TypesElectricSteel,
         .cost = 80000,
-        .itemSteps = 50,
+        .itemSteps = 55,
         .items = {sGeneratorItems, sGeneratorItems2, sGeneratorItems3},
         .builtFlag = FLAG_GENERATOR_BUILT,
         .unlockFlag = FLAG_BADGE03_GET,
@@ -477,7 +475,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Forge,
         .workerTypes = sText_TypesFireFighting,
         .cost = 250000,
-        .itemSteps = 50,
+        .itemSteps = 90,
         .items = {sForgeItems, sForgeItems2, sForgeItems3},
         .builtFlag = FLAG_FORGE_BUILT,
         .unlockFlag = FLAG_BADGE04_GET,
@@ -492,7 +490,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_SpiritSanctum,
         .workerTypes = sText_TypesGhostPsychicPoison,
         .cost = 750000,
-        .itemSteps = 50,
+        .itemSteps = 120,
         .items = {sSpiritSanctumItems, sSpiritSanctumItems2, sSpiritSanctumItems3},
         .builtFlag = FLAG_SPIRIT_SANCTUM_BUILT,
         .unlockFlag = FLAG_VISITED_MT_PYRE,
@@ -507,7 +505,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_IceDome,
         .workerTypes = sText_TypesIce,
         .cost = 1500000,
-        .itemSteps = 50,
+        .itemSteps = 120,
         .items = {sIceDomeItems, sIceDomeItems2, sIceDomeItems3},
         .builtFlag = FLAG_ICE_DOME_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_ICE_DOME_TERMINAL,

@@ -615,8 +615,9 @@ def main():
                     raise ValueError("assert_items_gained needs an earlier remember_bag")
                 allowed = {constants.item(name) for name in step["items"]}
                 now = emulator.bag()
-                gained = {item: count - saved_bag.get(item, 0) for item, count in now.items()
-                          if count != saved_bag.get(item, 0)}
+                # Union of both, so an item sold or used up entirely still counts.
+                gained = {item: now.get(item, 0) - saved_bag.get(item, 0) for item in now.keys() | saved_bag.keys()
+                          if now.get(item, 0) != saved_bag.get(item, 0)}
                 unexpected = {item: count for item, count in gained.items() if item not in allowed}
                 if unexpected:
                     raise AssertionError(f"Unexpected bag changes (item id: count): {unexpected}")

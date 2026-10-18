@@ -66,7 +66,7 @@
     {"action": "assert_money_gained", "min": 0, "max": 0},
     {"action": "press_until_task", "task": "Task_HandleMultichoiceInput"},
     {"action": "run", "frames": 20},
-    {"action": "assert_items_gained", "items": ["ORAN_BERRY", "PECHA_BERRY", "CHERI_BERRY", "RAWST_BERRY", "CHESTO_BERRY", "ASPEAR_BERRY", "PERSIM_BERRY", "SITRUS_BERRY"], "min": 4, "max": 4},
+    {"action": "assert_items_gained", "items": ["ORAN_BERRY", "PECHA_BERRY", "CHERI_BERRY", "RAWST_BERRY", "CHESTO_BERRY", "ASPEAR_BERRY", "TINY_MUSHROOM", "BIG_MUSHROOM"], "min": 8, "max": 8},
     {"action": "press", "key": "DOWN", "times": 2, "wait": 10},
     {"action": "screenshot", "name": "14-take-worker-back"},
     {"action": "press", "key": "A", "wait": 30},

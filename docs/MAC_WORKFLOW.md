@@ -172,7 +172,7 @@ Delivery Service tests (all use the test-only ROM):
 
 - `builder_needs_flying_type.json`: the Builder asks for a Flying-type.
 - `delivery_service.json`: rebuild it, assign Wingull, get the Bird Whistle,
-  walk about 200 steps on Route 101 and collect 4 Tier 1 items (and no
+  walk about 200 steps on Route 101 and collect 5 Tier 1 items (and no
   money) at the terminal, fly to
   Oldale from the terminal, take the opened road onto Route 102, and whistle
   home.
@@ -185,7 +185,7 @@ Builder tests (each starts with the Delivery Service running):
 - `unlock_0_only_upgrades_before_badge.json`: with the Greenhouse built and
   no badges, the Builder offers only upgrades, even with ₽9,999,999.
 - `unlock_1_greenhouse.json`: buy the Greenhouse for ₽5,000, staff it with
-  Lotad, walk about 200 steps on Route 101, collect 4 Berries, and take Lotad
+  Lotad, walk about 200 steps on Route 101, collect 8 Berries and mushrooms, and take Lotad
   back at Lv. 7 (worker EXP).
 - `unlock_2_quarry.json` to `unlock_7_ice_dome.json`: at each building's
   unlock point, with every cheaper building already built and exactly its
@@ -193,7 +193,7 @@ Builder tests (each starts with the Delivery Service running):
   first worker.
 - `upgrade_delivery_service.json`: upgrade the Delivery Service to Lv. 2 for
   ₽5,000, add Taillow to the new slot, walk about 200 steps on Route 101 with
-  two workers and collect 8 tier 2 items, then take Taillow back from a slot
+  two workers and collect 10 tier 2 items, then take Taillow back from a slot
   list.
 - `no_prize_money.json`: a Lv. 50 Mudkip beats Calvin on Route 102 and the
   player's money doesn't change.
@@ -207,6 +207,9 @@ Playtest fixes:
 
 - `marts_sell_only.json`: the Oldale Mart clerk says the shelves are empty,
   then offers SELL / QUIT; selling a Potion pays ₽150.
+- `sell_farm_goods.json`: the new Power Cell shows its description in the
+  bag and sells for ₽1,000, and the Moon Stone (unsellable in the original)
+  sells for ₽1,050.
 - `devon_mart_offer.json`: Mr. Stone's scene in Devon Corp ends with his offer
   of a buyer in Littleroot and sets `FLAG_LITTLEROOT_MART_OFFERED`.
 - `littleroot_mart.json`: after that offer, the Builder builds the POKé MART

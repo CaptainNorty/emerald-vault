@@ -69,7 +69,7 @@
     {"action": "assert_money_gained", "min": 0, "max": 0},
     {"action": "press_until_task", "task": "Task_HandleMultichoiceInput"},
     {"action": "run", "frames": 20},
-    {"action": "assert_items_gained", "items": ["SUPER_POTION", "GREAT_BALL", "PARALYZE_HEAL", "SUPER_REPEL", "AWAKENING", "ESCAPE_ROPE"], "min": 8, "max": 8},
+    {"action": "assert_items_gained", "items": ["SUPER_POTION", "GREAT_BALL", "PARALYZE_HEAL", "SUPER_REPEL", "AWAKENING", "ESCAPE_ROPE"], "min": 10, "max": 10},
     {"action": "press", "key": "DOWN", "times": 3, "wait": 10},
     {"action": "press", "key": "A", "wait": 30},
     {"action": "assert_task", "task": "Task_TownListMenu"},

@@ -62,7 +62,7 @@
     {"action": "screenshot", "name": "14-collected-items"},
     {"action": "press_until_task", "task": "Task_HandleMultichoiceInput"},
     {"action": "run", "frames": 20},
-    {"action": "assert_items_gained", "items": ["POTION", "POKE_BALL", "ANTIDOTE", "REPEL", "ESCAPE_ROPE"], "min": 4, "max": 4},
+    {"action": "assert_items_gained", "items": ["POTION", "POKE_BALL", "ANTIDOTE", "REPEL", "ESCAPE_ROPE"], "min": 5, "max": 5},
     {"action": "screenshot", "name": "15-terminal-menu-after-collecting"},
     {"action": "press", "key": "DOWN", "wait": 10},
     {"action": "run", "frames": 2, "keys": ["A"]},
