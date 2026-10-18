@@ -1,0 +1,26 @@
+{
+  "name": "Laps around the farm earn nothing: only steps outside Littleroot count",
+  "build": "test_start",
+  "setup": {"base": "delivery_service_running"},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "remember_money"},
+    {"action": "remember_bag"},
+    {"action": "walk_to", "x": 27, "y": 10},
+    {"action": "walk", "path": ["DOWN 1", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "RIGHT 10", "LEFT 10", "UP 1"]},
+    {"action": "assert_position", "x": 27, "y": 10},
+    {"action": "run", "frames": 2, "keys": ["UP"]},
+    {"action": "run", "frames": 20},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "next_message", "times": 0},
+    {"action": "next_message"},
+    {"action": "run", "frames": 20},
+    {"action": "screenshot", "name": "01-nothing-in-stock"},
+    {"action": "press", "key": "A", "wait": 30},
+    {"action": "next_message", "times": 0},
+    {"action": "screenshot", "name": "02-nothing-to-collect"},
+    {"action": "press_until_task", "task": "Task_HandleMultichoiceInput"},
+    {"action": "assert_money_gained", "min": 0, "max": 0},
+    {"action": "assert_items_gained", "items": [], "min": 0, "max": 0}
+  ]
+}

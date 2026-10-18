@@ -10,6 +10,7 @@
 #include "constants/songs.h"
 #include "constants/game_stat.h"
 #include "constants/trainers.h"
+#include "constants/vault_town.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/battle_script.inc"
 	.include "constants/constants.inc"
@@ -2934,9 +2935,11 @@ BattleScript_LocalBattleWonLoseTexts::
 	waitstate
 	printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_LocalBattleWonReward::
+#if TRAINER_PRIZE_MONEY
 	getmoneyreward
 	printstring STRINGID_PLAYERGOTMONEY
 	waitmessage B_WAIT_TIME_LONG
+#endif
 BattleScript_PayDayMoneyAndPickUpItems::
 	givepaydaymoney
 	pickup

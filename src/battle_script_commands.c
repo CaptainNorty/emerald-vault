@@ -51,6 +51,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "constants/vault_town.h"
 
 extern const u8 *const gBattleScriptsForMoveEffects[];
 
@@ -5637,6 +5638,10 @@ static void Cmd_getmoneyreward(void)
     u32 moneyReward = GetTrainerMoneyToGive(gTrainerBattleOpponent_A);
     if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
         moneyReward += GetTrainerMoneyToGive(gTrainerBattleOpponent_B);
+    // Emerald Vault: the victory script skips this command when prize money is
+    // off; this covers any other script that still uses it.
+    if (!TRAINER_PRIZE_MONEY)
+        moneyReward = 0;
 
     AddMoney(&gSaveBlock1Ptr->money, moneyReward);
     PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 5, moneyReward);

@@ -1396,7 +1396,8 @@ LittlerootTown_EventScript_TerminalLogOff::
 	release
 	end
 
-@ Pays out the money, then moves each kind of item into the bag.
+@ Moves each kind of item into the bag. Saves from before items only may also
+@ have money left over, which is paid out first.
 LittlerootTown_EventScript_TerminalCollect::
 	special Town_BufferStock
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNothingToCollect
@@ -1404,8 +1405,6 @@ LittlerootTown_EventScript_TerminalCollect::
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalCollectItems
 	playse SE_SHOP
 	msgbox LittlerootTown_Text_TerminalEarnings, MSGBOX_DEFAULT
-	special Town_BufferTotalEarnings
-	msgbox LittlerootTown_Text_TerminalTotalEarnings, MSGBOX_DEFAULT
 LittlerootTown_EventScript_TerminalCollectItems::
 	setvar VAR_0x8009, 0
 LittlerootTown_EventScript_TerminalCollectNextItem::
@@ -1645,16 +1644,11 @@ LittlerootTown_Text_TerminalNoWorker:
 	.string "Choose CHANGE WORKER to add one.$"
 
 LittlerootTown_Text_TerminalStock:
-	.string "In stock: ¥{STR_VAR_1} and\n"
-	.string "{STR_VAR_2} items.$"
+	.string "In stock: {STR_VAR_2} items.$"
 
 LittlerootTown_Text_TerminalEarnings:
-	.string "Since your last collection, the\n"
-	.string "business {STR_VAR_3}!\p"
-	.string "¥{STR_VAR_2} was added to your money.$"
-
-LittlerootTown_Text_TerminalTotalEarnings:
-	.string "Total earned so far: ¥{STR_VAR_1}.$"
+	.string "Found ¥{STR_VAR_2} in old earnings!\n"
+	.string "It was added to your money.$"
 
 LittlerootTown_Text_TerminalCollectedItem:
 	.string "Collected {STR_VAR_2} {STR_VAR_1}!$"
@@ -1665,8 +1659,9 @@ LittlerootTown_Text_TerminalNoRoomForItem:
 	.string "They'll stay in stock.$"
 
 LittlerootTown_Text_TerminalNothingToCollect:
-	.string "Nothing to collect yet. Business\n"
-	.string "picks up as you walk around!$"
+	.string "Nothing to collect yet. Workers get\n"
+	.string "things done while you're out on\l"
+	.string "your adventure!$"
 
 LittlerootTown_Text_DeliveryWhereTo:
 	.string "Where to? Our birds can fly you to\n"

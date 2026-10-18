@@ -1,10 +1,12 @@
 // Emerald Vault: businesses on the Littleroot Town farm.
 //
 // The Builder rebuilds ruined plots into businesses and upgrades them (Lv. 1 to
-// 3; each level adds a worker slot and a better item tier). Each business earns
-// money and stocks items as the player walks, and its workers gain EXP.
-// Everything is worked out lazily from GAME_STAT_STEPS whenever the player uses
-// its terminal, scaled by how well suited its workers are (type, level and
+// 3; each level adds a worker slot and a better item tier). Each business
+// stocks items as the player walks, and its workers gain EXP; it makes no money
+// itself (the player sells the goods at a Poké Mart). Only steps taken outside
+// Littleroot count, so the farm grows while the player is out adventuring.
+// Everything is worked out lazily from GAME_STAT_FARM_STEPS whenever the player
+// uses a terminal, scaled by how well suited its workers are (type, level and
 // species). Workers live in the last PC box, the FARM box, which the PC shows
 // but won't let the player change.
 #include "global.h"
@@ -41,12 +43,11 @@
 #include "constants/map_event_ids.h"
 #include "constants/map_groups.h"
 #include "constants/party_menu.h"
+#include "constants/region_map_sections.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/species.h"
 
-#define STEPS_PER_SALE 20  // Steps per sale for a worker at 1.0x efficiency
-#define STOCKROOM_SIZE 100 // Uncollected sales stop at this many
 #define ITEM_STOCKROOM_SIZE 30 // Uncollected items stop at this many
 #define WORKER_STEPS_PER_EXP 2 // Half the Day Care's rate
 
@@ -61,10 +62,7 @@ struct Business
 {
     const u8 *name;
     const u8 *workerTypes; // Shown to the player, e.g. "GRASS or BUG"
-    const u8 *saleVerb;    // "sold" in "sold 12 BERRIES"
-    const u8 *product;
     u32 cost;
-    u16 price;             // Money per sale
     u16 itemSteps;         // Steps per item for a worker at 1.0x efficiency
     const struct TownItem *items[TOWN_MAX_LEVEL]; // By level; up to TOWN_ITEM_KINDS, ending with ITEM_NONE
     u16 builtFlag;
@@ -103,19 +101,6 @@ static const u8 sText_TypesElectricSteel[] = _("ELECTRIC or STEEL");
 static const u8 sText_TypesFireFighting[] = _("FIRE or FIGHTING");
 static const u8 sText_TypesGhostPsychicPoison[] = _("GHOST, PSYCHIC or POISON");
 static const u8 sText_TypesIce[] = _("ICE");
-
-static const u8 sText_Made[] = _("made");
-static const u8 sText_Sold[] = _("sold");
-static const u8 sText_CaughtAndSold[] = _("caught and sold");
-
-static const u8 sText_Deliveries[] = _("deliveries");
-static const u8 sText_Berries[] = _("BERRIES");
-static const u8 sText_EvolutionStones[] = _("EVOLUTION STONES");
-static const u8 sText_Pokemon[] = _("POKéMON");
-static const u8 sText_PowerCells[] = _("POWER CELLS");
-static const u8 sText_PokeBalls[] = _("POKé BALLS");
-static const u8 sText_Charms[] = _("CHARMS");
-static const u8 sText_IceBlocks[] = _("ICE BLOCKS");
 
 // Items each business stocks, by level: tier 1 at Lv. 1, and better tiers at
 // Lv. 2 and 3.
@@ -411,18 +396,14 @@ static const struct TownItem sIceDomeItems3[] =
     {ITEM_NONE},
 };
 
-// Money per sale scales with each building's cost; the Greenhouse earns twice
-// the Delivery Service's rate. The Weather Stabilizer isn't for sale yet.
+// The Weather Stabilizer isn't for sale yet.
 static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
 {
     [TOWN_DELIVERY_SERVICE] =
     {
         .name = sText_DeliveryService,
         .workerTypes = sText_TypesFlying,
-        .saleVerb = sText_Made,
-        .product = sText_Deliveries,
         .cost = 0, // The Builder's free first building
-        .price = 12,
         .itemSteps = 50,
         .items = {sDeliveryServiceItems, sDeliveryServiceItems2, sDeliveryServiceItems3},
         .builtFlag = FLAG_DELIVERY_SERVICE_BUILT,
@@ -436,10 +417,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_Greenhouse,
         .workerTypes = sText_TypesGrassBug,
-        .saleVerb = sText_Sold,
-        .product = sText_Berries,
         .cost = 5000,
-        .price = 24,
         .itemSteps = 50,
         .items = {sGreenhouseItems, sGreenhouseItems2, sGreenhouseItems3},
         .builtFlag = FLAG_GREENHOUSE_BUILT,
@@ -453,10 +431,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_Quarry,
         .workerTypes = sText_TypesRockGround,
-        .saleVerb = sText_Sold,
-        .product = sText_EvolutionStones,
         .cost = 15000,
-        .price = 72,
         .itemSteps = 50,
         .items = {sQuarryItems, sQuarryItems2, sQuarryItems3},
         .builtFlag = FLAG_QUARRY_BUILT,
@@ -471,10 +446,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_Fishery,
         .workerTypes = sText_TypesWaterDark,
-        .saleVerb = sText_CaughtAndSold,
-        .product = sText_Pokemon,
         .cost = 45000,
-        .price = 216,
         .itemSteps = 50,
         .items = {sFisheryItems, sFisheryItems2, sFisheryItems3},
         .builtFlag = FLAG_FISHERY_BUILT,
@@ -489,10 +461,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_Generator,
         .workerTypes = sText_TypesElectricSteel,
-        .saleVerb = sText_Sold,
-        .product = sText_PowerCells,
         .cost = 80000,
-        .price = 384,
         .itemSteps = 50,
         .items = {sGeneratorItems, sGeneratorItems2, sGeneratorItems3},
         .builtFlag = FLAG_GENERATOR_BUILT,
@@ -507,10 +476,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_Forge,
         .workerTypes = sText_TypesFireFighting,
-        .saleVerb = sText_Sold,
-        .product = sText_PokeBalls,
         .cost = 250000,
-        .price = 1200,
         .itemSteps = 50,
         .items = {sForgeItems, sForgeItems2, sForgeItems3},
         .builtFlag = FLAG_FORGE_BUILT,
@@ -525,10 +491,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_SpiritSanctum,
         .workerTypes = sText_TypesGhostPsychicPoison,
-        .saleVerb = sText_Sold,
-        .product = sText_Charms,
         .cost = 750000,
-        .price = 3600,
         .itemSteps = 50,
         .items = {sSpiritSanctumItems, sSpiritSanctumItems2, sSpiritSanctumItems3},
         .builtFlag = FLAG_SPIRIT_SANCTUM_BUILT,
@@ -543,10 +506,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
     {
         .name = sText_IceDome,
         .workerTypes = sText_TypesIce,
-        .saleVerb = sText_Sold,
-        .product = sText_IceBlocks,
         .cost = 1500000,
-        .price = 7200,
         .itemSteps = 50,
         .items = {sIceDomeItems, sIceDomeItems2, sIceDomeItems3},
         .builtFlag = FLAG_ICE_DOME_BUILT,
@@ -570,6 +530,8 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
 // The Poké Mart buys the player's goods. Mr. Stone offers it after the Devon
 // Goods are returned (FLAG_LITTLEROOT_MART_OFFERED).
 #define MART_COST 3000
+
+static void SettleBuildingAt(u8 building, u32 now);
 
 static const u8 sText_FarmBoxName[] = _("FARM");
 static const u8 sText_Of[] = _(" of ");
@@ -730,6 +692,19 @@ void Town_InitFarmBox(void)
         ZeroBoxMonData(&town->worker);
         town->hasWorker = FALSE;
     }
+
+    // Saves from before farm steps: credit what was earned on all steps so
+    // far, then count farm steps from here on.
+    if (!FlagGet(FLAG_FARM_STEPS_READY))
+    {
+        for (building = 0; building < TOWN_BUILDING_COUNT; building++)
+        {
+            if (IsBusiness(building))
+                SettleBuildingAt(building, GetGameStat(GAME_STAT_STEPS));
+            GetBuilding(building)->lastSteps = GetGameStat(GAME_STAT_FARM_STEPS);
+        }
+        FlagSet(FLAG_FARM_STEPS_READY);
+    }
 }
 
 void ResetTownData(void)
@@ -889,15 +864,13 @@ static void GiveWorkerExp(struct BoxPokemon *worker, u32 steps)
     SetBoxMonData(worker, MON_DATA_EXP, &exp);
 }
 
-// Credit the business for the steps walked since it was last settled: sales,
-// items, and EXP for the workers.
-static void SettleBuilding(u8 building)
+// Credit the business for the farm steps walked since it was last settled:
+// items, and EXP for the workers. `now` is the step counter to settle up to.
+static void SettleBuildingAt(u8 building, u32 now)
 {
     struct TownBuilding *town = GetBuilding(building);
-    u32 now = GetGameStat(GAME_STAT_STEPS);
     u32 steps = now - town->lastSteps;
-    u32 threshold = STEPS_PER_SALE * 100;
-    u32 sales, efficiency;
+    u32 efficiency;
     u8 slot;
 
     town->lastSteps = now;
@@ -905,25 +878,25 @@ static void SettleBuilding(u8 building)
     if (efficiency == 0)
         return;
 
-    // Cap to avoid overflow; the stockrooms fill long before this many steps.
+    // Cap to avoid overflow; the stockroom fills long before this many steps.
     if (steps > 0xFFFF)
         steps = 0xFFFF;
     for (slot = 0; slot < TOWN_MAX_WORKERS; slot++)
         GiveWorkerExp(GetWorker(building, slot), steps);
     SettleItems(building, steps, efficiency);
-    if (town->pendingSales >= STOCKROOM_SIZE)
-        return;
+}
 
-    town->progress += steps * efficiency;
-    sales = town->progress / threshold;
-    town->progress %= threshold;
-    if (town->pendingSales + sales >= STOCKROOM_SIZE)
-    {
-        sales = STOCKROOM_SIZE - town->pendingSales;
-        town->progress = 0;
-    }
-    town->pendingSales += sales;
-    town->pendingMoney += sales * sBusinesses[building].price;
+static void SettleBuilding(u8 building)
+{
+    SettleBuildingAt(building, GetGameStat(GAME_STAT_FARM_STEPS));
+}
+
+// Called for every step the player takes. Steps in Littleroot (the farm, the
+// houses and the Mart) don't count toward the farm.
+void Town_CountStep(void)
+{
+    if (gMapHeader.regionMapSectionId != MAPSEC_LITTLEROOT_TOWN)
+        IncrementGameStat(GAME_STAT_FARM_STEPS);
 }
 
 // Writes an efficiency such as "1.5" to dest.
@@ -1095,27 +1068,17 @@ void Town_BufferStatus(void)
     gSpecialVar_Result = TRUE;
 }
 
-// Collects the earnings of business VAR_0x8006 into the player's money.
-// Buffers STR_VAR_3 what was sold (e.g. "sold 12 BERRIES") and STR_VAR_2 the
-// money since the last collection. VAR_RESULT: whether anything was earned.
+// Pays out money business VAR_0x8006 earned back when businesses sold their
+// goods themselves (saves from before items only). Buffers STR_VAR_2 the
+// amount. VAR_RESULT: whether there was any.
 void Town_CollectEarnings(void)
 {
-    const struct Business *business;
     struct TownBuilding *town;
-    u8 *end;
 
     gSpecialVar_Result = FALSE;
     if (!IsBusiness(gSpecialVar_0x8006))
         return;
-    business = &sBusinesses[gSpecialVar_0x8006];
     town = GetBuilding(gSpecialVar_0x8006);
-    SettleBuilding(gSpecialVar_0x8006);
-
-    end = StringCopy(gStringVar3, business->saleVerb);
-    *end++ = CHAR_SPACE;
-    end = ConvertIntToDecimalStringN(end, town->pendingSales, STR_CONV_MODE_LEFT_ALIGN, 5);
-    *end++ = CHAR_SPACE;
-    StringCopy(end, business->product);
     ConvertIntToDecimalStringN(gStringVar2, town->pendingMoney, STR_CONV_MODE_LEFT_ALIGN, 10);
     if (town->pendingMoney != 0)
     {
@@ -1129,8 +1092,8 @@ void Town_CollectEarnings(void)
 }
 
 // For the terminal's status line: settles business VAR_0x8006, then buffers
-// STR_VAR_1 the uncollected money and STR_VAR_2 the number of uncollected
-// items. VAR_0x8008: the first worker's species, for showmonpic. VAR_RESULT:
+// STR_VAR_2 the number of uncollected items (and STR_VAR_1 any money left over
+// from before items only). VAR_0x8008: the first worker's species, for showmonpic. VAR_RESULT:
 // whether there's anything to collect.
 void Town_BufferStock(void)
 {
@@ -1186,13 +1149,6 @@ void Town_CollectNextItem(void)
         }
         return;
     }
-}
-
-// Buffers STR_VAR_1: all the money business VAR_0x8006 has earned.
-void Town_BufferTotalEarnings(void)
-{
-    if (IsBusiness(gSpecialVar_0x8006))
-        ConvertIntToDecimalStringN(gStringVar1, GetBuilding(gSpecialVar_0x8006)->totalMoney, STR_CONV_MODE_LEFT_ALIGN, 10);
 }
 
 static u8 CountOtherUsablePartyMons(u8 slot)
@@ -1287,7 +1243,7 @@ void Town_SetWorkerForTest(u8 building, u16 species, u8 level)
     CreateMon(&mon, species, level, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
     *GetWorker(building, 0) = mon.box;
     town->everStaffed = TRUE;
-    town->lastSteps = GetGameStat(GAME_STAT_STEPS);
+    town->lastSteps = GetGameStat(GAME_STAT_FARM_STEPS);
 }
 #endif
 

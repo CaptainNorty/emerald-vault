@@ -1,0 +1,16 @@
+{
+  "name": "Beating a trainer pays no prize money (TRAINER_PRIZE_MONEY is off)",
+  "build": "test_start",
+  "setup": {"base": "after_pokedex", "money": 1000, "party": [["MUDKIP", 50]], "location": {"map": "MAP_ROUTE102", "x": 33, "y": 18}},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "remember_money"},
+    {"action": "run", "frames": 16, "keys": ["UP"]},
+    {"action": "run", "frames": 120},
+    {"action": "screenshot", "name": "01-spotted"},
+    {"action": "press_until_overworld"},
+    {"action": "screenshot", "name": "02-after-battle"},
+    {"action": "assert_flag", "flag": "TRAINER_FLAGS_START + TRAINER_CALVIN_1"},
+    {"action": "assert_money_gained", "min": 0, "max": 0}
+  ]
+}

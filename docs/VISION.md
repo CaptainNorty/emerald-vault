@@ -157,9 +157,9 @@ work.
   swapped or taken back anytime. The terminal also gives the **Bird Whistle**
   (flies you back to Littleroot from anywhere outdoors) and can fly you to any
   visited town.
-- **Earnings:** one delivery per 20 steps at 1.0x efficiency, ₽12 each, up to
-  100 uncollected. Efficiency is type fit (2x Flying, 1.5x Normal, 0.5x other)
-  x level / 10, doubled for Swellow. A level 5 Wingull runs at 1.0x.
+- **Output:** items only (see "Tying the farm to the adventure"); it used to
+  earn ₽12 per delivery. Efficiency is type fit (2x Flying, 1.5x Normal, 0.5x
+  other) x level / 10, doubled for Swellow. A level 5 Wingull runs at 1.0x.
 - **Code:** `src/vault_town.c` (businesses, earnings, workers, flights),
   `include/constants/vault_town.h`, Littleroot and Oldale map scripts. Workers
   and earnings are saved at the end of PC storage (`struct TownSaveData`, about
@@ -193,8 +193,8 @@ Three directions were considered:
 **Chosen direction: #1 now, #3 layered on later.** Terminals, items, closed
 Marts, worker EXP, upgrades and the FARM box are built.
 
-- **Buildings produce items as well as money (built).** Each building stocks
-  one item per 50 steps at 1.0x efficiency, rolled from its weighted item table
+- **Buildings produce items, not money (built).** Each building stocks
+  one item per 50 farm steps at 1.0x efficiency, rolled from its weighted item table
   (`sDeliveryServiceItems` and friends in `src/vault_town.c`), up to 30
   uncollected. Tier 1 tables:
 
@@ -293,14 +293,23 @@ broadly: the game is too easy, and the farm is the main lever for fixing that.
 
 ### The plan
 
-1. **Buildings make items, never money.** Marts reopen **for selling only**
-   (buying stays closed; built, along with Littleroot's own Mart), so money
-   comes only from what you choose to sell.
+1. **Buildings make items, never money (built).** Marts reopen **for selling
+   only** (buying stays closed; built, along with Littleroot's own Mart), so
+   money comes only from what you choose to sell. Money a building had earned
+   on an older save is paid out at its terminal the next time you collect.
    Every item becomes "use it or sell it?", and evolution stones have value (a
    Fire Stone sells for ₽1,050). Upgrade prices start to mean something again.
-2. **Steps on the farm don't count.** Production only moves forward on steps
-   taken **outside Littleroot**, so running laps does nothing: you start
-   something, go adventure, and come back. (Alternative to consider: count
+2. **Steps on the farm don't count (built).** Production only moves forward on
+   steps taken **outside Littleroot**, so running laps does nothing: you start
+   something, go adventure, and come back. These "farm steps" are a new game
+   stat, `GAME_STAT_FARM_STEPS`, counted on every step whose map isn't in
+   Littleroot (so the houses and the Mart don't count either); worker EXP uses
+   them too. Older saves keep what they earned under the old counting.
+   - **No prize money from trainers (built, for now).** Beating a trainer pays
+     nothing and skips the "got ¥X for winning!" message, so the farm and the
+     Marts are the only income. It's one switch, `TRAINER_PRIZE_MONEY` in
+     `include/constants/vault_town.h`; set it to 1 to bring prize money back.
+     Losing a battle still costs money as usual. (Alternative to consider: count
    battles won or new places visited, which ties the pace to the story.)
    Production also becomes much slower overall. Want more Poké Balls? Bring a
    higher-level worker and go do something while you wait. Want an evolution
@@ -327,9 +336,9 @@ broadly: the game is too easy, and the farm is the main lever for fixing that.
 
 ### Order
 
-1. Items only, Marts reopened for selling (done, plus a Mart in Littleroot),
-   steps count only outside Littleroot, slower production. Small changes that fix most of the
-   generosity. Playtest again before going further.
+1. Items only (done), Marts reopened for selling (done, plus a Mart in
+   Littleroot), steps count only outside Littleroot (done), slower production
+   (not yet: tune after a playtest). Playtest again before going further.
 2. Work orders.
 3. The Steven and Captain Stern trades.
 4. Processing and townspeople requests.

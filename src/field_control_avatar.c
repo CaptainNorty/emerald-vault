@@ -26,6 +26,7 @@
 #include "sound.h"
 #include "start_menu.h"
 #include "trainer_see.h"
+#include "vault_town.h"
 #include "trainer_hill.h"
 #include "wild_encounter.h"
 #include "constants/event_bg.h"
@@ -155,6 +156,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     if (input->tookStep)
     {
         IncrementGameStat(GAME_STAT_STEPS);
+        Town_CountStep();
         IncrementBirthIslandRockStepCount();
         if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
             return TRUE;

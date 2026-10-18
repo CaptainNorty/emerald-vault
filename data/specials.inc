@@ -555,7 +555,6 @@ gSpecials::
 	def_special Town_WasEverStaffed
 	def_special Town_BufferWorker
 	def_special Town_CollectEarnings
-	def_special Town_BufferTotalEarnings
 	def_special Town_BufferStock
 	def_special Town_CollectNextItem
 	def_special Town_BufferStatus

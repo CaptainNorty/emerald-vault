@@ -7,9 +7,9 @@
 // Emerald Vault: save data for one business on the Littleroot farm.
 struct TownBuilding
 {
-    u32 lastSteps;    // GAME_STAT_STEPS when earnings were last worked out
-    u32 progress;     // Efficiency-weighted steps toward the next sale
-    u32 pendingMoney; // Earned but not yet collected
+    u32 lastSteps;    // GAME_STAT_FARM_STEPS when it was last worked out
+    u32 progress;     // Unused (was steps toward the next sale)
+    u32 pendingMoney; // Saves from before items only: money not yet collected
     u32 totalSales;
     u32 totalMoney;
     u16 pendingSales;
@@ -42,5 +42,6 @@ void ResetTownData(void);
 void Town_InitFarmBox(void);
 void SetDeliveryServiceFlightHome(void);
 void Town_SetWorkerForTest(u8 building, u16 species, u8 level);
+void Town_CountStep(void);
 
 #endif // GUARD_VAULT_TOWN_H

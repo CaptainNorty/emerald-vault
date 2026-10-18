@@ -13,6 +13,11 @@
 #define TOWN_QUARRY              8
 #define TOWN_BUILDING_COUNT      9
 
+// Whether beating a trainer pays prize money. Off: money comes from selling the
+// farm's goods. Set to TRUE to bring back vanilla prize money (also used by
+// data/battle_scripts_1.s, so it's a plain number).
+#define TRAINER_PRIZE_MONEY      0
+
 // The Poké Mart is a plot the Builder can build too, but not a business: no
 // workers, no save data besides its built flag.
 #define TOWN_MART                TOWN_BUILDING_COUNT

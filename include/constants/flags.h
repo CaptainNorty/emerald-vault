@@ -67,7 +67,7 @@
 #define FLAG_FARM_BOX_READY                   0x35 // Emerald Vault
 #define FLAG_LITTLEROOT_MART_BUILT             0x36 // Emerald Vault
 #define FLAG_LITTLEROOT_MART_OFFERED           0x37 // Emerald Vault: Mr. Stone offered a buyer in Littleroot
-#define FLAG_UNUSED_0x038    0x38 // Unused Flag
+#define FLAG_FARM_STEPS_READY                  0x38 // Emerald Vault: businesses count GAME_STAT_FARM_STEPS
 #define FLAG_UNUSED_0x039    0x39 // Unused Flag
 #define FLAG_UNUSED_0x03A    0x3A // Unused Flag
 #define FLAG_UNUSED_0x03B    0x3B // Unused Flag

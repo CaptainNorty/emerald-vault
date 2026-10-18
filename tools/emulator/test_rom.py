@@ -38,7 +38,7 @@ BASES = {
         "flags": ["FLAG_SYS_POKEMON_GET", "FLAG_SYS_POKEDEX_GET", "FLAG_ADVENTURE_STARTED",
                   "FLAG_RESCUED_BIRCH", "FLAG_RECEIVED_RUNNING_SHOES", "FLAG_SYS_B_DASH",
                   "FLAG_VISITED_LITTLEROOT_TOWN", "FLAG_VISITED_OLDALE_TOWN"],
-        "vars": {"VAR_LITTLEROOT_TOWN_STATE": 4, "VAR_REPEL_STEP_COUNT": 1000},
+        "vars": {"VAR_LITTLEROOT_TOWN_STATE": 4, "VAR_ROUTE101_STATE": 3, "VAR_REPEL_STEP_COUNT": 1000},
         "party": [["MUDKIP", 5]],
     },
     # As above, with the Delivery Service rebuilt and run by a Wingull; the
@@ -71,7 +71,7 @@ def merge_setup(setup):
 class Constants:
     # Resolves names such as FLAG_BADGE01_GET or SPECIES_WINGULL with the C
     # preprocessor, so values defined in terms of other constants work too.
-    HEADERS = ["constants/flags.h", "constants/vars.h", "constants/species.h", "constants/vault_town.h"]
+    HEADERS = ["constants/flags.h", "constants/vars.h", "constants/species.h", "constants/vault_town.h", "constants/opponents.h"]
 
     def __init__(self, devkitarm):
         self.cpp = str(devkitarm / "bin/arm-none-eabi-cpp")
@@ -354,8 +354,10 @@ class Emulator:
                 waited += 2
         self.run(1)  # Release the button so the final step doesn't chain into another.
         waited = 0
+        # Walking onto a connected map can take a while to settle.
+        settle_frames = timeout_frames if self.current_map() == start_map else max(timeout_frames, 600)
         while not (self.player_settled() and self.overworld_ready()):
-            if waited >= timeout_frames:
+            if waited >= settle_frames:
                 raise AssertionError(f"Player did not stop after walking {direction}")
             self.run(2)
             waited += 2
@@ -582,6 +584,18 @@ def main():
                     emulator.run(28)
                     waited += 30
                 result["checks"].append({"task": step["task"], "frame": emulator.frame})
+            elif action == "press_until_overworld":
+                # Keep pressing a button (default A), e.g. through a battle,
+                # until the player is back in control on the overworld.
+                limit, waited = step.get("timeout_frames", 6000), 0
+                while not emulator.overworld_ready():
+                    if waited >= limit:
+                        raise AssertionError(f"Overworld not reached within {limit} frames")
+                    emulator.run(2, [step.get("key", "A")])
+                    emulator.run(18)
+                    waited += 20
+                result["checks"].append({"overworld": True, "frame": emulator.frame})
+                print(f"PASS: back on the overworld at frame {emulator.frame}", flush=True)
             elif action == "remember_money":
                 saved_money = emulator.money()
                 result["checks"].append({"money": saved_money, "frame": emulator.frame})

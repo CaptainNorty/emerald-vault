@@ -172,7 +172,8 @@ Delivery Service tests (all use the test-only ROM):
 
 - `builder_needs_flying_type.json`: the Builder asks for a Flying-type.
 - `delivery_service.json`: rebuild it, assign Wingull, get the Bird Whistle,
-  walk 200 steps and collect ₽120 and 4 Tier 1 items at the terminal, fly to
+  walk about 200 steps on Route 101 and collect 4 Tier 1 items (and no
+  money) at the terminal, fly to
   Oldale from the terminal, take the opened road onto Route 102, and whistle
   home.
 - `oldale_delivery_gate.json`: Oldale's west road is closed until the Delivery
@@ -184,15 +185,20 @@ Builder tests (each starts with the Delivery Service running):
 - `unlock_0_only_upgrades_before_badge.json`: with the Greenhouse built and
   no badges, the Builder offers only upgrades, even with ₽9,999,999.
 - `unlock_1_greenhouse.json`: buy the Greenhouse for ₽5,000, staff it with
-  Lotad, walk 200 steps, collect ₽240 and 4 Berries, and take Lotad back at
-  Lv. 7 (worker EXP).
+  Lotad, walk about 200 steps on Route 101, collect 4 Berries, and take Lotad
+  back at Lv. 7 (worker EXP).
 - `unlock_2_quarry.json` to `unlock_7_ice_dome.json`: at each building's
   unlock point, with every cheaper building already built and exactly its
   price in hand, the Builder offers it, sells it, and its terminal takes a
   first worker.
 - `upgrade_delivery_service.json`: upgrade the Delivery Service to Lv. 2 for
-  ₽5,000, add Taillow to the new slot, walk 200 steps with two workers and
-  collect ₽240+ and 8 tier 2 items, then take Taillow back from a slot list.
+  ₽5,000, add Taillow to the new slot, walk about 200 steps on Route 101 with
+  two workers and collect 8 tier 2 items, then take Taillow back from a slot
+  list.
+- `no_prize_money.json`: a Lv. 50 Mudkip beats Calvin on Route 102 and the
+  player's money doesn't change.
+- `farm_steps_outside_only.json`: 200 steps of laps around the farm stock
+  nothing; the terminal says there's nothing to collect.
 - `farm_box_locked.json`: the PC's last box is named FARM and shows the
   Delivery Service's Wingull, and trying to move it says "Use the farm
   terminals!".
@@ -234,6 +240,7 @@ Actions currently supported:
 | `press` | `key`, optional `times`, `wait` (default 30) | Press a button, waiting `wait` frames after each press. |
 | `press_until_task` | `task`, optional `key` (default A), `timeout_frames` | Keep pressing a button until a game task is active, such as `Task_HandleChooseMonInput` for the party menu. |
 | `walk_to` | `x`, `y` | Walk to a tile on the current map, routing around walls, NPCs and trigger tiles. |
+| `press_until_overworld` | optional `key` (default `A`), `timeout_frames` | Keep pressing the button (for example through a battle) until the player is back in control. |
 | `remember_money` | | Record the player's money. |
 | `assert_money` | `equals` | Fail unless the player has exactly that much money. |
 | `assert_money_gained` | optional `min` (default 1), `max` | Fail unless money rose by that much since `remember_money`. |
