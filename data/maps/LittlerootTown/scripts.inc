@@ -387,6 +387,16 @@ LittlerootTown_EventScript_TownSign::
 	msgbox LittlerootTown_Text_TownSign, MSGBOX_SIGN
 	end
 
+@ A Pokémon Storage PC out on the farm, so workers can be swapped without a trip
+@ to Oldale. It's an object, so it skips the PC screen flicker on the map.
+LittlerootTown_EventScript_FarmPC::
+	lockall
+	setvar VAR_0x8004, PC_LOCATION_OTHER
+	playse SE_PC_ON
+	msgbox Text_BootUpPC, MSGBOX_DEFAULT
+	goto EventScript_PCMainMenu
+	end
+
 LittlerootTown_EventScript_RuinsSign_DeliveryService::
 	goto_if_set FLAG_DELIVERY_SERVICE_BUILT, LittlerootTown_EventScript_DeliveryServiceSign
 	msgbox LittlerootTown_Text_RuinsSign_DeliveryService, MSGBOX_SIGN

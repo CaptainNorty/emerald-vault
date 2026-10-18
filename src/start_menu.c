@@ -22,6 +22,7 @@
 #include "load_save.h"
 #include "main.h"
 #include "menu.h"
+#include "money.h"
 #include "new_game.h"
 #include "option_menu.h"
 #include "overworld.h"
@@ -80,6 +81,7 @@ COMMON_DATA bool8 (*gMenuCallback)(void) = NULL;
 // EWRAM
 EWRAM_DATA static u8 sSafariBallsWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
+EWRAM_DATA static bool8 sMoneyBoxShown = FALSE;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
 EWRAM_DATA static u8 sCurrentStartMenuActions[9] = {0};
@@ -246,6 +248,7 @@ static void BuildMultiPartnerRoomStartMenu(void);
 static void ShowSafariBallsWindow(void);
 static void ShowPyramidFloorWindow(void);
 static void RemoveExtraStartMenuWindows(void);
+static void HideStartMenuMoneyBox(void);
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count);
 static bool32 InitStartMenuStep(void);
 static void InitStartMenu(void);
@@ -431,8 +434,18 @@ static void ShowPyramidFloorWindow(void)
     CopyWindowToVram(sBattlePyramidFloorWindowId, COPYWIN_GFX);
 }
 
+static void HideStartMenuMoneyBox(void)
+{
+    if (sMoneyBoxShown)
+    {
+        HideMoneyBox();
+        sMoneyBoxShown = FALSE;
+    }
+}
+
 static void RemoveExtraStartMenuWindows(void)
 {
+    HideStartMenuMoneyBox();
     if (GetSafariZoneFlag())
     {
         ClearStdWindowAndFrameToTransparent(sSafariBallsWindowId, FALSE);
@@ -501,6 +514,12 @@ static bool32 InitStartMenuStep(void)
             ShowSafariBallsWindow();
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             ShowPyramidFloorWindow();
+        // Emerald Vault: money matters, so the normal Start menu always shows it.
+        else if (!GetSafariZoneFlag() && !IsOverworldLinkActive() && !InUnionRoom() && !sMoneyBoxShown)
+        {
+            DrawMoneyBox(GetMoney(&gSaveBlock1Ptr->money), 0, 0);
+            sMoneyBoxShown = TRUE;
+        }
         sInitStartMenuData[0]++;
         break;
     case 4:
@@ -536,6 +555,7 @@ static void CreateStartMenuTask(TaskFunc followupFunc)
 
     sInitStartMenuData[0] = 0;
     sInitStartMenuData[1] = 0;
+    sMoneyBoxShown = FALSE;
     taskId = CreateTask(StartMenuTask, 0x50);
     SetTaskFuncWithFollowupFunc(taskId, StartMenuTask, followupFunc);
 }
@@ -555,6 +575,7 @@ void ShowReturnToFieldStartMenu(void)
 {
     sInitStartMenuData[0] = 0;
     sInitStartMenuData[1] = 0;
+    sMoneyBoxShown = FALSE;
     gFieldCallback2 = FieldCB_ReturnToFieldStartMenu;
 }
 
@@ -720,6 +741,8 @@ static bool8 StartMenuPlayerNameCallback(void)
 
 static bool8 StartMenuSaveCallback(void)
 {
+    // The save info window goes where the money box is.
+    HideStartMenuMoneyBox();
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
         RemoveExtraStartMenuWindows();
 

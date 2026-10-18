@@ -1106,6 +1106,12 @@ static void PCTurnOffEffect(void)
     else if (gSpecialVar_0x8004 == PC_LOCATION_MAYS_HOUSE)
         metatileId = METATILE_BrendansMaysHouse_MayPC_Off;
 
+    // Emerald Vault: the farm PC in Littleroot is an object, not a metatile, so
+    // only switch off a PC metatile that's actually on.
+    if (gSpecialVar_0x8004 == PC_LOCATION_OTHER
+     && MapGridGetMetatileIdAt(gSaveBlock1Ptr->pos.x + dx + MAP_OFFSET, gSaveBlock1Ptr->pos.y + dy + MAP_OFFSET) != METATILE_Building_PC_On)
+        return;
+
     MapGridSetMetatileIdAt(gSaveBlock1Ptr->pos.x + dx + MAP_OFFSET, gSaveBlock1Ptr->pos.y + dy + MAP_OFFSET, metatileId | MAPGRID_IMPASSABLE);
     DrawWholeMapView();
 }

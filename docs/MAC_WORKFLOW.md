@@ -183,6 +183,12 @@ Builder tests (each starts with the Delivery Service running):
   price in hand, the Builder offers it, sells it, and its manager takes a
   first worker.
 
+Playtest fixes:
+
+- `quick_wins.json`: the farm PC by the Builder opens the storage system, the
+  Start menu shows money (hidden while saving, back after the party menu), and
+  screenshots of the fixed tree tops.
+
 ## Adding tests
 
 Copy `tests/emulator/boot.json` and run the new scenario with:

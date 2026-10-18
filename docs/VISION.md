@@ -169,6 +169,66 @@ causes extreme weather around Sootopolis, and the player calls Rayquaza from Sky
 Pillar to calm them. The Weather Stabilizer could replace or support that
 ending. To be decided later.
 
+## Tying the farm to the adventure (next)
+
+The first playtest (about an hour) found that the farm and the adventure felt
+like **two disconnected gameplay loops**. The farm only produced money, money
+was only useful for more buildings, and it wasn't visible without opening a
+menu. Giving a good Flying-type to the Delivery Service also meant losing a
+team member for nothing but cash.
+
+Three directions were considered:
+
+1. **The farm is the item source.** Poké Marts are closed (or nearly empty, or
+   priced terribly, or battle income is cut), and 90%+ of items come from the
+   farm.
+2. **Money gates progression now.** Gym entry, boat passage or Pokémon Center
+   healing cost money, so money matters from early on (see below).
+3. **The world needs what the farm makes.** Like Stardew Valley's bundles,
+   people ask for things only the farm can produce (a peach, not just money),
+   so progression isn't only gated by money.
+
+**Chosen direction: #1 now, #3 layered on later.**
+
+- **Buildings produce items as well as money.** Each building slowly stocks
+  items alongside its earnings. The Delivery Service stocks "Tier 1" items:
+  Potions, Poké Balls, Antidotes, Repels and Escape Ropes. The Forge stocks
+  better Poké Balls, the Quarry stones, the Greenhouse Berries, and so on.
+  Starting rate to tune: one item per 40–60 steps, rolled from the building's
+  item table.
+- **Marts are closed** for the first pass. Every shop opens through the
+  `pokemart` script command, so one change covers them all. They may be
+  replaced with something else later.
+- **Upgrades:** A building can be upgraded. Each upgrade adds a worker slot and
+  raises the tier of items it produces (for example, the Delivery Service moves
+  on to Super Potions and Super Repels).
+- **Workers gain EXP** slowly, like at the Day Care, so the Pokémon you leave
+  working grows instead of being a pure loss to your team.
+- **Workers live in a FARM PC box.** Storing a full Pokémon per slot (80 bytes)
+  won't fit once upgrades add slots (9 buildings × 3 slots = 2,160 bytes). The
+  last PC box becomes the FARM box, and each building slot records which box
+  slot holds its worker (2 bytes).
+- **Terminals instead of managers:** Each building gets a terminal with Collect
+  money / Collect items / Workers / Fly (Delivery Service). Items pile up as
+  item and quantity pairs (8 slots × 9 buildings, about 290 bytes). The terminal
+  shows the worker's front sprite. Managers may stay as flavor NPCs.
+- **Later:** Overworld sprites of workers walking around their building
+  (pokeemerald-expansion has overworld sprites for every species), Stardew-style
+  requests from townspeople (for example, a Slateport sailor wants Fishery
+  catches before the boat sails), money gates, and real building art.
+
+### Quick wins from the playtest
+- Fix the cut-off and floating tree tops around the farm.
+- A Pokémon Storage PC on the farm, near the buildings.
+- The money box is shown whenever the Start menu is open.
+
+### Order
+1. Quick wins (above).
+2. Terminals with the worker's sprite.
+3. Items: buildings stock items, Marts close, workers gain EXP.
+4. Upgrades: the FARM box, extra worker slots, higher item tiers.
+5. Later: requests, money gates, building art.
+
 ## Progression gated by money
 
 Key progression events are blocked until you pay. That gives you the reason to
