@@ -1,36 +1,230 @@
 {
-  "name": "The new Power Cell and the Moon Stone sell at a Mart",
+  "name": "The farm's new goods (Power Cell, Steel Ingot, Spirit Orb, Ice Crystal) and the Moon Stone sell at a Mart",
   "build": "test_start",
-  "setup": {"base": "after_pokedex", "money": 0, "items": [["POWER_CELL", 2], ["MOON_STONE", 1]], "location": {"map": "MAP_OLDALE_TOWN_MART", "x": 3, "y": 6}},
+  "setup": {
+    "base": "after_pokedex",
+    "money": 0,
+    "items": [
+      [
+        "POWER_CELL",
+        2
+      ],
+      [
+        "MOON_STONE",
+        1
+      ],
+      [
+        "STEEL_INGOT",
+        1
+      ],
+      [
+        "SPIRIT_ORB",
+        1
+      ],
+      [
+        "ICE_CRYSTAL",
+        99
+      ]
+    ],
+    "location": {
+      "map": "MAP_OLDALE_TOWN_MART",
+      "x": 3,
+      "y": 6
+    }
+  },
   "steps": [
-    {"action": "wait_overworld", "timeout_frames": 3000},
-    {"action": "remember_money"},
-    {"action": "remember_bag"},
-    {"action": "walk_to", "x": 3, "y": 3},
-    {"action": "run", "frames": 2, "keys": ["LEFT"]},
-    {"action": "run", "frames": 20},
-    {"action": "run", "frames": 2, "keys": ["A"]},
-    {"action": "next_message", "times": 0},
-    {"action": "next_message"},
-    {"action": "press_until_task", "task": "Task_ShopMenu"},
-    {"action": "run", "frames": 20},
-    {"action": "press", "key": "A", "wait": 10},
-    {"action": "wait_task", "task": "Task_BagMenu_HandleInput", "timeout_frames": 300},
-    {"action": "run", "frames": 30},
-    {"action": "screenshot", "name": "01-power-cell-in-bag"},
-    {"action": "press", "key": "A", "wait": 40},
-    {"action": "press", "key": "A", "wait": 40},
-    {"action": "screenshot", "name": "02-power-cell-offer"},
-    {"action": "press_until_task", "task": "Task_BagMenu_HandleInput"},
-    {"action": "run", "frames": 20},
-    {"action": "assert_money_gained", "min": 1000, "max": 1000},
-    {"action": "press", "key": "DOWN", "wait": 20},
-    {"action": "screenshot", "name": "03-moon-stone-in-bag"},
-    {"action": "press", "key": "A", "wait": 40},
-    {"action": "screenshot", "name": "04-moon-stone-offer"},
-    {"action": "press_until_task", "task": "Task_BagMenu_HandleInput"},
-    {"action": "run", "frames": 20},
-    {"action": "assert_money_gained", "min": 2050, "max": 2050},
-    {"action": "assert_items_gained", "items": ["POWER_CELL", "MOON_STONE"], "min": -2, "max": -2}
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "remember_money"
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "walk_to",
+      "x": 3,
+      "y": 3
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "LEFT"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "next_message"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_ShopMenu"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "wait_task",
+      "task": "Task_BagMenu_HandleInput",
+      "timeout_frames": 300
+    },
+    {
+      "action": "run",
+      "frames": 30
+    },
+    {
+      "action": "screenshot",
+      "name": "01-power-cell-in-bag"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 40
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 40
+    },
+    {
+      "action": "screenshot",
+      "name": "02-power-cell-offer"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_BagMenu_HandleInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "assert_money_gained",
+      "min": 2800,
+      "max": 2800
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "wait": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "03-moon-stone-in-bag"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 40
+    },
+    {
+      "action": "screenshot",
+      "name": "04-moon-stone-offer"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_BagMenu_HandleInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "assert_money_gained",
+      "min": 3850,
+      "max": 3850
+    },
+    {
+      "action": "screenshot",
+      "name": "05-steel-ingot"
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "wait": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "06-spirit-orb"
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "wait": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "07-ice-crystal"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 40
+    },
+    {
+      "action": "press",
+      "key": "RIGHT",
+      "times": 10,
+      "wait": 10
+    },
+    {
+      "action": "screenshot",
+      "name": "08-sell-91-ice-crystals"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 40
+    },
+    {
+      "action": "screenshot",
+      "name": "09-offer"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_BagMenu_HandleInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "assert_money_gained",
+      "min": 4098850,
+      "max": 4098850
+    },
+    {
+      "action": "assert_items_gained",
+      "items": [
+        "POWER_CELL",
+        "MOON_STONE",
+        "ICE_CRYSTAL"
+      ],
+      "min": -93,
+      "max": -93
+    }
   ]
 }

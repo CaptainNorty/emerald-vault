@@ -22,11 +22,13 @@ struct TownBuilding
 // saves from before these existed still line up.
 struct TownStock
 {
-    u32 itemProgress; // Efficiency-weighted steps toward the next item
+    u32 itemProgress; // Efficiency-weighted steps toward the item being made
     u16 items[TOWN_ITEM_KINDS]; // Uncollected items: which...
     u8 counts[TOWN_ITEM_KINDS]; // ...and how many (0 means the slot is free)
     u8 level;         // 0 or 1 for Lv. 1, up to TOWN_MAX_LEVEL
-    u8 unused[3];
+    u8 nextItem;      // Item table entry + 1 being made from the usual mix; 0: not picked yet
+    u8 orderItem;     // Work order: item table entry + 1, made until the stockroom is full; 0 for the usual mix
+    u8 unused;
 };
 
 // Workers live in the last PC box; see src/vault_town.c.

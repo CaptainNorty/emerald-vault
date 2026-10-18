@@ -1,0 +1,294 @@
+{
+  "name": "Set a work order for Pok\u00e9 Balls: the Delivery Service makes only those; switch back to the usual mix",
+  "build": "test_start",
+  "setup": {
+    "base": "delivery_service_running"
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "walk_to",
+      "x": 27,
+      "y": 10
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "UP"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleMultichoiceInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "01-terminal-usual-mix"
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "wait": 10
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "wait_task",
+      "task": "Task_TownListMenu",
+      "timeout_frames": 600
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "02-what-to-make"
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "times": 2,
+      "wait": 20
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 30
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "03-making-poke-balls"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleMultichoiceInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "04-terminal-shows-order"
+    },
+    {
+      "action": "press",
+      "key": "B",
+      "wait": 60
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "walk_to",
+      "x": 10,
+      "y": 3
+    },
+    {
+      "action": "walk",
+      "path": [
+        "UP 4"
+      ]
+    },
+    {
+      "action": "assert_position",
+      "x": 10,
+      "y": 19,
+      "map": "MAP_ROUTE101"
+    },
+    {
+      "action": "walk",
+      "path": [
+        "UP 2",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 8",
+        "RIGHT 8",
+        "LEFT 4",
+        "RIGHT 4",
+        "DOWN 2"
+      ]
+    },
+    {
+      "action": "walk",
+      "path": [
+        "DOWN 1"
+      ]
+    },
+    {
+      "action": "walk",
+      "path": [
+        "DOWN 3"
+      ]
+    },
+    {
+      "action": "walk_to",
+      "x": 27,
+      "y": 10
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "UP"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleMultichoiceInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "05-back-with-poke-balls"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 30
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleMultichoiceInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "assert_items_gained",
+      "items": [
+        "POKE_BALL"
+      ],
+      "min": 5,
+      "max": 6
+    },
+    {
+      "action": "screenshot",
+      "name": "06-collected-order-continues"
+    },
+    {
+      "action": "press",
+      "key": "DOWN",
+      "wait": 10
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "wait_task",
+      "task": "Task_TownListMenu",
+      "timeout_frames": 600
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "07-cursor-on-poke-ball"
+    },
+    {
+      "action": "press",
+      "key": "UP",
+      "times": 2,
+      "wait": 20
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 30
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "08-back-to-usual-mix"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleMultichoiceInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "09-terminal-usual-mix"
+    }
+  ]
+}

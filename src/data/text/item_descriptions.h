@@ -251,6 +251,21 @@ static const u8 sPowerCellDesc[] = _(
     "by the GENERATOR.\n"
     "Sells for a lot.");
 
+static const u8 sSteelIngotDesc[] = _(
+    "A bar of steel made\n"
+    "at the FORGE. Very\n"
+    "valuable.");
+
+static const u8 sSpiritOrbDesc[] = _(
+    "A glowing orb from\n"
+    "the SPIRIT SANCTUM.\n"
+    "Sells for a fortune.");
+
+static const u8 sIceCrystalDesc[] = _(
+    "A flawless crystal\n"
+    "from the ICE DOME.\n"
+    "Priceless.");
+
 static const u8 sGreenShardDesc[] = _(
     "A shard from an\n"
     "ancient item. Can\n"

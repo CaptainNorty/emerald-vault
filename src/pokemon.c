@@ -1701,6 +1701,7 @@ static const u8 sMonFrontAnimIdsTable[NUM_SPECIES - 1] =
     [SPECIES_NOSEPASS - 1]    = ANIM_BOUNCE_ROTATE_TO_SIDES_SLOW,
     [SPECIES_TORKOAL - 1]     = ANIM_V_STRETCH,
     [SPECIES_SABLEYE - 1]     = ANIM_GLOW_BLACK,
+    [SPECIES_SABLEER - 1]     = ANIM_GLOW_BLACK,
     [SPECIES_BARBOACH - 1]    = ANIM_BOUNCE_ROTATE_TO_SIDES_SLOW,
     [SPECIES_WHISCASH - 1]    = ANIM_BOUNCE_ROTATE_TO_SIDES_SLOW,
     [SPECIES_LUVDISC - 1]     = ANIM_H_SLIDE_WOBBLE,
@@ -5701,6 +5702,10 @@ u16 HoennToNationalOrder(u16 hoennNum)
 
 u16 SpeciesToCryId(u16 species)
 {
+    // Vault: Sableer borrows Sableye's cry.
+    if (species == SPECIES_SABLEER - 1)
+        return SpeciesToCryId(SPECIES_SABLEYE - 1);
+
     if (species <= SPECIES_CELEBI - 1)
         return species;
 

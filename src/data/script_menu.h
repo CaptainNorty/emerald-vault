@@ -784,6 +784,7 @@ struct MultichoiceListStruct
 
 // Emerald Vault
 static const u8 sText_TerminalCollect[] = _("COLLECT");
+static const u8 sText_TerminalOrder[] = _("WORK ORDER");
 static const u8 sText_TerminalFly[] = _("FLY");
 static const u8 sText_TerminalChangeWorker[] = _("CHANGE WORKER");
 static const u8 sText_TerminalTakeBack[] = _("TAKE WORKER BACK");
@@ -792,6 +793,7 @@ static const u8 sText_TerminalLogOff[] = _("LOG OFF");
 static const struct MenuAction MultichoiceList_DeliveryTerminal[] =
 {
     {sText_TerminalCollect},
+    {sText_TerminalOrder},
     {sText_TerminalFly},
     {sText_TerminalChangeWorker},
     {sText_TerminalTakeBack},
@@ -801,6 +803,7 @@ static const struct MenuAction MultichoiceList_DeliveryTerminal[] =
 static const struct MenuAction MultichoiceList_TownTerminal[] =
 {
     {sText_TerminalCollect},
+    {sText_TerminalOrder},
     {sText_TerminalChangeWorker},
     {sText_TerminalTakeBack},
     {sText_TerminalLogOff},

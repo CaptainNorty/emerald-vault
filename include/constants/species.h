@@ -255,6 +255,9 @@
 #define SPECIES_CELEBI 251
 
 #define SPECIES_OLD_UNOWN_B 252
+// Vault: a hand-drawn species in the first unused "old Unown" slot. No Pokédex
+// entry (its dex number is past NATIONAL_DEX_COUNT, so the Pokédex skips it).
+#define SPECIES_SABLEER SPECIES_OLD_UNOWN_B
 #define SPECIES_OLD_UNOWN_C 253
 #define SPECIES_OLD_UNOWN_D 254
 #define SPECIES_OLD_UNOWN_E 255

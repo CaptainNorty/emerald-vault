@@ -2081,6 +2081,13 @@ const u32 gMonShinyPalette_Sableye[] = INCGFX_U32("graphics/pokemon/sableye/shin
 const u8 gMonIcon_Sableye[] = INCGFX_U8("graphics/pokemon/sableye/icon.png", ".4bpp");
 const u8 gMonFootprint_Sableye[] = INCGFX_U8("graphics/pokemon/sableye/footprint.png", ".1bpp");
 
+const u32 gMonStillFrontPic_Sableer[] = INCGFX_U32("graphics/pokemon/sableer/front.png", ".4bpp.lz");
+const u32 gMonPalette_Sableer[] = INCGFX_U32("graphics/pokemon/sableer/normal.pal", ".gbapal.lz");
+const u32 gMonBackPic_Sableer[] = INCGFX_U32("graphics/pokemon/sableer/back.png", ".4bpp.lz");
+const u32 gMonShinyPalette_Sableer[] = INCGFX_U32("graphics/pokemon/sableer/shiny.pal", ".gbapal.lz");
+const u8 gMonIcon_Sableer[] = INCGFX_U8("graphics/pokemon/sableer/icon.png", ".4bpp");
+const u8 gMonFootprint_Sableer[] = INCGFX_U8("graphics/pokemon/sableer/footprint.png", ".1bpp");
+
 const u32 gMonStillFrontPic_Barboach[] = INCGFX_U32("graphics/pokemon/barboach/front.png", ".4bpp.lz");
 const u32 gMonPalette_Barboach[] = INCGFX_U32("graphics/pokemon/barboach/normal.pal", ".gbapal.lz");
 const u32 gMonBackPic_Barboach[] = INCGFX_U32("graphics/pokemon/barboach/back.png", ".4bpp.lz");

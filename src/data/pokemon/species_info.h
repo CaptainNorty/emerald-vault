@@ -7566,7 +7566,36 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .noFlip = FALSE,
     },
 
-    [SPECIES_OLD_UNOWN_B] = OLD_UNOWN_SPECIES_INFO,
+    // Vault: Sableye's evolution, drawn for the hack.
+    [SPECIES_SABLEER] =
+    {
+        .baseHP        = 65,
+        .baseAttack    = 90,
+        .baseDefense   = 85,
+        .baseSpeed     = 60,
+        .baseSpAttack  = 75,
+        .baseSpDefense = 80,
+        .types = { TYPE_DARK, TYPE_GHOST },
+        .catchRate = 45,
+        .expYield = 150,
+        .evYield_HP        = 0,
+        .evYield_Attack    = 2,
+        .evYield_Defense   = 0,
+        .evYield_Speed     = 0,
+        .evYield_SpAttack  = 0,
+        .evYield_SpDefense = 0,
+        .itemCommon = ITEM_NONE,
+        .itemRare   = ITEM_NONE,
+        .genderRatio = PERCENT_FEMALE(50),
+        .eggCycles = 25,
+        .friendship = 35,
+        .growthRate = GROWTH_MEDIUM_SLOW,
+        .eggGroups = { EGG_GROUP_HUMAN_LIKE, EGG_GROUP_HUMAN_LIKE },
+        .abilities = {ABILITY_KEEN_EYE, ABILITY_PRESSURE},
+        .safariZoneFleeRate = 0,
+        .bodyColor = BODY_COLOR_PURPLE,
+        .noFlip = FALSE,
+    },
 
     [SPECIES_OLD_UNOWN_C] = OLD_UNOWN_SPECIES_INFO,
 

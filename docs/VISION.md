@@ -194,10 +194,10 @@ Three directions were considered:
 Marts, worker EXP, upgrades and the FARM box are built.
 
 - **Buildings produce items, not money (built).** Each building stocks
-  one item every `itemSteps` farm steps at 1.0x efficiency (each building has
-  its own speed; see the pricing pass below), rolled from its weighted item table
-  (`sDeliveryServiceItems` and friends in `src/vault_town.c`), up to 30
-  uncollected. Tier 1 tables:
+  items from its weighted item table (`sDeliveryServiceItems` and friends in
+  `src/vault_town.c`), each taking time in proportion to its value (see
+  "Exponential earnings" below), up to 30 uncollected at Lv. 1 (60 and 99 at
+  Lv. 2 and 3). Tier 1 tables (some since changed; see below):
 
   | Building | Items |
   |---|---|
@@ -315,7 +315,7 @@ broadly: the game is too easy, and the farm is the main lever for fixing that.
    Production also becomes much slower overall. Want more Poké Balls? Bring a
    higher-level worker and go do something while you wait. Want an evolution
    stone? Those are valuable; bring a great worker and get busy.
-3. **Work orders.** At the terminal you choose what the building makes next,
+3. **Work orders (built; see the third playtest below).** At the terminal you choose what the building makes next,
    for example "5 Super Potions" or "1 Fire Stone". It makes that order, then
    stops and waits for you. Each product has a step cost (roughly: Potion 100,
    Super Potion 400, Fire Stone 3,000), which worker speed shortens. Upgrades
@@ -424,48 +424,87 @@ old `ITEM_034` slot, sells for ₽1,000) about 35–40% of the time, plus more
 Thunder Stones; Lv. 2 and 3 add PP Ups and Metal Coat. It borrows the Yellow
 Shard's icon until it has its own.
 
-**Each building has its own speed** (`itemSteps`: farm steps per item at 1.0x):
-cheap goods come fast, valuable goods slowly.
+**Exponential earnings (built).** Each building makes goods worth a fixed
+amount per farm step (`rate` in `sBusinesses`, for one 1.0x worker at Lv. 1),
+about twice the building before it. Lv. 2 makes goods twice as fast and Lv. 3
+four times as fast, on top of the extra worker slot each level adds. Every
+item takes as long as its value says: a ₽4,900 Star Piece takes about five
+times as long as a ₽1,050 Fire Stone. So a random mix never changes how much
+a building earns, only what you find, and rare jackpots take their time.
+The item being made from the mix is picked when the last one is done
+(`nextItem` in `struct TownStock`).
 
-| Building | Steps per item | Avg. sale per item (Lv. 1 / 2 / 3) | ₽ per step at Lv. 1 |
-|---|---|---|---|
-| Greenhouse | 25 | ₽160 / 360 / 820 | 6.4 |
-| Delivery Service | 40 | ₽133 / 259 / 540 | 3.3 |
-| Fishery | 50 | ₽652 / 998 / 1,418 | 13.0 |
-| Generator | 55 | ₽742 / 1,085 / 1,388 | 13.5 |
-| Quarry | 75 | ₽568 / 815 / 2,015 | 7.6 |
-| Forge | 90 | ₽618 / 643 / 914 | 6.9 |
-| Spirit Sanctum | 120 | ₽535 / 580 / 1,250 | 4.5 |
-| Ice Dome | 120 | ₽725 / 1,006 / 2,038 | 6.0 |
+The top three buildings each make a new product worth five figures, borrowing
+an icon until they have their own (`ITEM_035`–`037`, like the Power Cell):
 
-The Delivery Service is mostly for supplies you use, not sell. The Forge,
-Spirit Sanctum and Ice Dome cost ₽250k, ₽750k and ₽1.5M, prices set when
-buildings earned money per step; revisit them (and their tables) once a
-playtest reaches them.
+| Item | Sells for | Placeholder icon |
+|---|---|---|
+| Power Cell (Generator) | ₽2,800 | Yellow Shard |
+| Steel Ingot (Forge) | ₽9,000 | Metal Coat |
+| Spirit Orb (Spirit Sanctum) | ₽24,000 | Soul Dew |
+| Ice Crystal (Ice Dome) | ₽45,000 | Never-Melt Ice |
 
-### Idea: specialists that sell for you
+Item prices are now 32-bit (`struct Item.price`), and the bag shows sale
+totals up to 7 digits. Hard Stone, Everstone and Soft Sand now sell for ₽500;
+Spell Tag, Twisted Spoon, Cleanse Tag, Black Belt and Never-Melt Ice for
+₽1,000.
 
-Each building has a designated Pokémon (Pelipper for the Delivery Service,
-Ludicolo for the Greenhouse, and so on). Assigning it does more than speed the
-building up: it **automates selling**. Its goods are sold as they're made and
-the money waits at the terminal, so a full stockroom no longer stops the
-building. This could replace the traveling seller, or the seller could be
-Meowth's version that works for every building. To decide before work
-orders, since the two interact:
-- Does auto-selling pay the full Mart price, or less (a fee for the
-  convenience)?
-- Does it sell everything, or can you keep some kinds (say, keep Thunder
-  Stones for the Weather Institute, sell the rest)?
-- Which Pokémon for each building, and are they the same as today's speed
-  specialists (Swellow, Ludicolo, Golem, Sharpedo, Magneton, Blaziken,
-  Dusclops/Claydol, Glalie)?
+| Building | Cost | ₽ per farm step at 1.0x (Lv. 1 / 2 / 3) | Avg. farm steps per item at 1.0x (Lv. 1 / 2 / 3) | Steps to pay back Lv. 1 |
+|---|---|---|---|---|
+| Delivery Service | free | 3.5 / 7 / 14 | 38 / 37 / 39 | — |
+| Greenhouse | ₽5,000 | 6.5 / 13 / 26 | 25 / 28 / 32 | 770 |
+| Quarry | ₽15,000 | 12 / 24 / 48 | 85 / 63 / 48 | 1,250 |
+| Fishery | ₽45,000 | 23 / 46 / 92 | 51 / 37 / 26 | 1,960 |
+| Generator | ₽80,000 | 44 / 88 / 176 | 56 / 31 / 18 | 1,820 |
+| Forge | ₽250,000 | 84 / 168 / 336 | 95 / 49 / 25 | 2,980 |
+| Spirit Sanctum | ₽750,000 | 160 / 320 / 640 | 121 / 65 / 32 | 4,690 |
+| Ice Dome | ₽1,500,000 | 300 / 600 / 1,200 | 121 / 64 / 34 | 5,000 |
+
+Items per step still follow the order asked for (Greenhouse fastest, then the
+Delivery Service, Fishery, Generator, Quarry, Forge, then the Spirit Sanctum
+and Ice Dome). For scale: if the Delivery Service kept going past Lv. 3
+(twice the rate and one more worker per level), a full Lv. 5 Delivery Service
+would earn about ₽280 per step at 1.0x, about what a Lv. 1 Ice Dome earns
+with one worker.
+
+### Work orders (built)
+
+The terminal's **WORK ORDER** lists USUAL MIX and the items the building can
+make at its level, with the cursor on the current choice. Pick one item and
+the building makes only that item, without stopping, until the stockroom is
+full; it keeps on after each collection until the order is changed. USUAL MIX
+goes back to the random mix. No quantities, and the number of steps an item
+takes is never shown. An ordered item takes 25% longer than the same item from
+the mix (`WORK_ORDER_EXTRA_PERCENT`): you pay a little for certainty. The
+terminal's status reads "In stock: 12 of 30 items. / Making: POWER CELLS." (or
+"the usual mix"). Upgrading keeps the order if the new level's table still has
+the item, else goes back to the usual mix. Saved in `orderItem` in
+`struct TownStock` (formerly unused bytes).
+
+**Stockroom size grows with level:** 30 items at Lv. 1, 60 at Lv. 2, 99 at
+Lv. 3 (`sStockroomSizes`).
+
+### Specialists and the Builder's assistant (decided, not built)
+
+- **Each building has a specialist Pokémon** (Pelipper for the Delivery
+  Service, Ludicolo for the Greenhouse, and so on). It **only sells the
+  overflow**: once the stockroom is full, it sells new goods instead of the
+  building stopping, and the money waits at the terminal. It never changes
+  what the building does on its own.
+- **Machop is the Builder's assistant:** the Builder needs one donated before
+  he can do upgrades.
+- Still to decide: whether overflow sells at the full Mart price or less, and
+  which Pokémon for each building (today's speed specialists are Swellow,
+  Ludicolo, Golem, Sharpedo, Magneton, Blaziken, Dusclops/Claydol, Glalie).
 
 ### Order
 
 1. Pricing pass, plus the Power Cell (done; the Power Cell needs an icon).
-2. Work orders (step 3 of the rebalancing plan).
-3. Donations: the flags, then Machop for the Builder and Meowth for the Mart
-   or the seller.
+2. Exponential earnings, work orders and bigger stockrooms at higher levels
+   (done; the new products need icons).
+   Playtest these.
+3. Donations (the flags), Machop for the Builder, and specialists that sell
+   the overflow. Meowth for the Mart is still an option.
 4. Bulk deliveries: the Weather Institute, then the Weather Stabilizer.
 5. The grass patch.
 6. A healing spot unlocked by a donation.
@@ -511,8 +550,13 @@ prices:
 The economy systems are a big enough job on their own, so to keep the project
 manageable:
 
-- No new Pokémon, except possibly a few hand-drawn evolutions (starting with
-  one for Sableye; see `art/pokemon_kit/`)
+- No new Pokémon, except a few hand-drawn evolutions. **Sableer** (built) is
+  Sableye's evolution at Lv. 24: Dark/Ghost, Keen Eye or Pressure, base stats
+  65/90/85/75/80/60 (455 total; Sableye is 380), learns Shadow Punch on
+  evolving. It sits in the first unused "old Unown" species slot
+  (`SPECIES_SABLEER`), so nothing is renumbered; it has no Pokédex entry and
+  borrows Sableye's cry. Art: `art/pokemon/sableer/`, copied into
+  `graphics/pokemon/sableer/`. A final form, Sablord, may follow.
 - No changes to music or sprites
 - Map changes limited to Littleroot Town and what money gates need
 

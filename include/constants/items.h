@@ -63,9 +63,9 @@ enum {
     ITEM_YELLOW_SHARD,
     ITEM_GREEN_SHARD,
     ITEM_POWER_CELL, // Vault: was the unused ITEM_034
-    ITEM_035,
-    ITEM_036,
-    ITEM_037,
+    ITEM_STEEL_INGOT, // Vault: was the unused ITEM_035
+    ITEM_SPIRIT_ORB,  // Vault: was the unused ITEM_036
+    ITEM_ICE_CRYSTAL, // Vault: was the unused ITEM_037
     ITEM_038,
     ITEM_039,
     ITEM_03A,

@@ -48,7 +48,7 @@
 #include "constants/songs.h"
 #include "constants/species.h"
 
-#define ITEM_STOCKROOM_SIZE 30 // Uncollected items stop at this many
+#define WORK_ORDER_EXTRA_PERCENT 25 // A work order's item takes this much longer than from the usual mix
 #define WORKER_STEPS_PER_EXP 2 // Half the Day Care's rate
 
 // One kind of item a business stocks, and how often it comes up.
@@ -63,8 +63,8 @@ struct Business
     const u8 *name;
     const u8 *workerTypes; // Shown to the player, e.g. "GRASS or BUG"
     u32 cost;
-    u16 itemSteps;         // Steps per item for a worker at 1.0x efficiency: cheap goods
-                           // come fast (Greenhouse), valuable ones slowly
+    u16 rate;              // Worth of goods made per farm step (x100) by a 1.0x worker at
+                           // Lv. 1; see GetItemCost
     const struct TownItem *items[TOWN_MAX_LEVEL]; // By level; up to TOWN_ITEM_KINDS, ending with ITEM_NONE
     u16 builtFlag;
     u16 unlockFlag;        // Needed besides money and a worker; 0 for none
@@ -131,70 +131,60 @@ static const struct TownItem sGreenhouseItems[] =
 static const struct TownItem sQuarryItems[] =
 {
     {ITEM_STARDUST, 30},
-    {ITEM_HARD_STONE, 15},
-    {ITEM_EVERSTONE, 15},
-    {ITEM_SOFT_SAND, 15},
-    {ITEM_FIRE_STONE, 5},
-    {ITEM_WATER_STONE, 5},
-    {ITEM_THUNDER_STONE, 5},
-    {ITEM_LEAF_STONE, 5},
+    {ITEM_HARD_STONE, 20},
+    {ITEM_EVERSTONE, 10},
+    {ITEM_FIRE_STONE, 8},
+    {ITEM_WATER_STONE, 8},
+    {ITEM_THUNDER_STONE, 8},
+    {ITEM_LEAF_STONE, 8},
+    {ITEM_STAR_PIECE, 4},
     {ITEM_NONE},
 };
 
 static const struct TownItem sFisheryItems[] =
 {
-    {ITEM_PEARL, 30},
-    {ITEM_SHOAL_SALT, 20},
-    {ITEM_SHOAL_SHELL, 15},
-    {ITEM_HEART_SCALE, 15},
-    {ITEM_NET_BALL, 10},
+    {ITEM_PEARL, 35},
+    {ITEM_SHOAL_SALT, 12},
+    {ITEM_SHOAL_SHELL, 10},
+    {ITEM_HEART_SCALE, 10},
+    {ITEM_NET_BALL, 8},
     {ITEM_DIVE_BALL, 5},
-    {ITEM_BIG_PEARL, 5},
+    {ITEM_BIG_PEARL, 20},
     {ITEM_NONE},
 };
 
 static const struct TownItem sGeneratorItems[] =
 {
-    {ITEM_POWER_CELL, 40},
-    {ITEM_THUNDER_STONE, 20},
-    {ITEM_SUPER_POTION, 15},
-    {ITEM_SUPER_REPEL, 10},
-    {ITEM_MAGNET, 10},
-    {ITEM_PARALYZE_HEAL, 5},
+    {ITEM_POWER_CELL, 85},
+    {ITEM_THUNDER_STONE, 5},
+    {ITEM_SUPER_POTION, 5},
+    {ITEM_MAGNET, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sForgeItems[] =
 {
-    {ITEM_GREAT_BALL, 40},
-    {ITEM_ULTRA_BALL, 15},
-    {ITEM_TIMER_BALL, 10},
-    {ITEM_NEST_BALL, 10},
-    {ITEM_REPEAT_BALL, 10},
-    {ITEM_BURN_HEAL, 10},
+    {ITEM_STEEL_INGOT, 85},
+    {ITEM_ULTRA_BALL, 5},
+    {ITEM_TIMER_BALL, 5},
     {ITEM_CHARCOAL, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sSpiritSanctumItems[] =
 {
-    {ITEM_REVIVE, 30},
-    {ITEM_FULL_HEAL, 25},
-    {ITEM_HYPER_POTION, 20},
-    {ITEM_CLEANSE_TAG, 10},
-    {ITEM_SPELL_TAG, 10},
-    {ITEM_MAX_REVIVE, 5},
+    {ITEM_SPIRIT_ORB, 80},
+    {ITEM_REVIVE, 10},
+    {ITEM_SPELL_TAG, 5},
+    {ITEM_CLEANSE_TAG, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sIceDomeItems[] =
 {
-    {ITEM_MAX_POTION, 25},
-    {ITEM_MAX_REPEL, 20},
-    {ITEM_ICE_HEAL, 20},
-    {ITEM_FULL_RESTORE, 15},
-    {ITEM_ULTRA_BALL, 15},
-    {ITEM_NEVER_MELT_ICE, 5},
+    {ITEM_ICE_CRYSTAL, 80},
+    {ITEM_MAX_POTION, 10},
+    {ITEM_NEVER_MELT_ICE, 10},
     {ITEM_NONE},
 };
 
@@ -248,20 +238,20 @@ static const struct TownItem sGreenhouseItems3[] =
 static const struct TownItem sQuarryItems2[] =
 {
     {ITEM_STARDUST, 20},
-    {ITEM_HARD_STONE, 12},
     {ITEM_FIRE_STONE, 12},
     {ITEM_WATER_STONE, 12},
     {ITEM_THUNDER_STONE, 12},
     {ITEM_LEAF_STONE, 12},
     {ITEM_MOON_STONE, 10},
     {ITEM_SUN_STONE, 10},
+    {ITEM_STAR_PIECE, 12},
     {ITEM_NONE},
 };
 
 static const struct TownItem sQuarryItems3[] =
 {
-    {ITEM_STAR_PIECE, 15},
-    {ITEM_NUGGET, 13},
+    {ITEM_STAR_PIECE, 20},
+    {ITEM_NUGGET, 15},
     {ITEM_FIRE_STONE, 12},
     {ITEM_WATER_STONE, 12},
     {ITEM_THUNDER_STONE, 12},
@@ -274,24 +264,23 @@ static const struct TownItem sQuarryItems3[] =
 static const struct TownItem sFisheryItems2[] =
 {
     {ITEM_PEARL, 20},
-    {ITEM_BIG_PEARL, 15},
-    {ITEM_HEART_SCALE, 15},
-    {ITEM_NET_BALL, 15},
-    {ITEM_DIVE_BALL, 15},
-    {ITEM_SHOAL_SALT, 10},
-    {ITEM_SHOAL_SHELL, 5},
-    {ITEM_MYSTIC_WATER, 5},
+    {ITEM_BIG_PEARL, 35},
+    {ITEM_HEART_SCALE, 10},
+    {ITEM_NET_BALL, 10},
+    {ITEM_DIVE_BALL, 10},
+    {ITEM_MYSTIC_WATER, 10},
+    {ITEM_DRAGON_SCALE, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sFisheryItems3[] =
 {
-    {ITEM_BIG_PEARL, 25},
-    {ITEM_HEART_SCALE, 15},
-    {ITEM_NET_BALL, 15},
-    {ITEM_DIVE_BALL, 15},
-    {ITEM_MYSTIC_WATER, 10},
-    {ITEM_DRAGON_SCALE, 10},
+    {ITEM_BIG_PEARL, 55},
+    {ITEM_HEART_SCALE, 5},
+    {ITEM_NET_BALL, 5},
+    {ITEM_DIVE_BALL, 5},
+    {ITEM_MYSTIC_WATER, 5},
+    {ITEM_DRAGON_SCALE, 15},
     {ITEM_DEEP_SEA_TOOTH, 5},
     {ITEM_DEEP_SEA_SCALE, 5},
     {ITEM_NONE},
@@ -299,100 +288,72 @@ static const struct TownItem sFisheryItems3[] =
 
 static const struct TownItem sGeneratorItems2[] =
 {
-    {ITEM_POWER_CELL, 40},
-    {ITEM_THUNDER_STONE, 25},
-    {ITEM_HYPER_POTION, 10},
-    {ITEM_MAGNET, 10},
-    {ITEM_MAX_REPEL, 5},
-    {ITEM_METAL_COAT, 5},
-    {ITEM_PP_UP, 5},
+    {ITEM_POWER_CELL, 80},
+    {ITEM_THUNDER_STONE, 5},
+    {ITEM_PP_UP, 10},
+    {ITEM_HYPER_POTION, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sGeneratorItems3[] =
 {
-    {ITEM_POWER_CELL, 35},
-    {ITEM_THUNDER_STONE, 20},
-    {ITEM_MAX_POTION, 15},
-    {ITEM_METAL_COAT, 10},
-    {ITEM_PP_UP, 10},
-    {ITEM_MAGNET, 10},
+    {ITEM_POWER_CELL, 70},
+    {ITEM_PP_UP, 25},
+    {ITEM_METAL_COAT, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sForgeItems2[] =
 {
-    {ITEM_GREAT_BALL, 30},
-    {ITEM_ULTRA_BALL, 20},
-    {ITEM_TIMER_BALL, 12},
-    {ITEM_NEST_BALL, 12},
-    {ITEM_REPEAT_BALL, 12},
-    {ITEM_BURN_HEAL, 5},
-    {ITEM_CHARCOAL, 5},
-    {ITEM_BLACK_BELT, 4},
+    {ITEM_STEEL_INGOT, 85},
+    {ITEM_CHARCOAL, 10},
+    {ITEM_BLACK_BELT, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sForgeItems3[] =
 {
-    {ITEM_ULTRA_BALL, 40},
-    {ITEM_TIMER_BALL, 12},
-    {ITEM_NEST_BALL, 12},
-    {ITEM_REPEAT_BALL, 12},
-    {ITEM_LUXURY_BALL, 10},
-    {ITEM_CHARCOAL, 5},
-    {ITEM_BLACK_BELT, 5},
-    {ITEM_PROTEIN, 4},
+    {ITEM_STEEL_INGOT, 85},
+    {ITEM_PROTEIN, 15},
     {ITEM_NONE},
 };
 
 static const struct TownItem sSpiritSanctumItems2[] =
 {
-    {ITEM_REVIVE, 30},
-    {ITEM_FULL_HEAL, 20},
-    {ITEM_HYPER_POTION, 20},
-    {ITEM_MAX_REVIVE, 8},
-    {ITEM_TWISTED_SPOON, 8},
-    {ITEM_CLEANSE_TAG, 7},
-    {ITEM_SPELL_TAG, 7},
+    {ITEM_SPIRIT_ORB, 85},
+    {ITEM_MAX_REVIVE, 10},
+    {ITEM_TWISTED_SPOON, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sSpiritSanctumItems3[] =
 {
-    {ITEM_MAX_REVIVE, 20},
-    {ITEM_REVIVE, 20},
-    {ITEM_FULL_RESTORE, 15},
-    {ITEM_ELIXIR, 15},
-    {ITEM_RARE_CANDY, 10},
-    {ITEM_SPELL_TAG, 10},
-    {ITEM_TWISTED_SPOON, 10},
+    {ITEM_SPIRIT_ORB, 85},
+    {ITEM_RARE_CANDY, 15},
     {ITEM_NONE},
 };
 
 static const struct TownItem sIceDomeItems2[] =
 {
-    {ITEM_MAX_POTION, 25},
-    {ITEM_FULL_RESTORE, 20},
-    {ITEM_MAX_REPEL, 15},
-    {ITEM_ULTRA_BALL, 15},
-    {ITEM_NEVER_MELT_ICE, 10},
-    {ITEM_RARE_CANDY, 10},
-    {ITEM_ICE_HEAL, 5},
+    {ITEM_ICE_CRYSTAL, 85},
+    {ITEM_FULL_RESTORE, 10},
+    {ITEM_PP_MAX, 5},
     {ITEM_NONE},
 };
 
 static const struct TownItem sIceDomeItems3[] =
 {
-    {ITEM_FULL_RESTORE, 30},
-    {ITEM_MAX_POTION, 15},
-    {ITEM_MAX_REVIVE, 15},
-    {ITEM_RARE_CANDY, 15},
-    {ITEM_PP_UP, 10},
-    {ITEM_NEVER_MELT_ICE, 10},
-    {ITEM_PP_MAX, 5},
+    {ITEM_ICE_CRYSTAL, 90},
+    {ITEM_PP_MAX, 10},
     {ITEM_NONE},
 };
+
+// Each level makes goods this many times as fast (on top of its extra worker
+// slot and better items).
+static const u8 sLevelRateMultipliers[TOWN_MAX_LEVEL] = {1, 2, 4};
+
+// How many uncollected items a business holds before it stops, by level.
+static const u8 sStockroomSizes[TOWN_MAX_LEVEL] = {30, 60, 99};
 
 // The Weather Stabilizer isn't for sale yet.
 static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
@@ -402,7 +363,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_DeliveryService,
         .workerTypes = sText_TypesFlying,
         .cost = 0, // The Builder's free first building
-        .itemSteps = 40,
+        .rate = 350,
         .items = {sDeliveryServiceItems, sDeliveryServiceItems2, sDeliveryServiceItems3},
         .builtFlag = FLAG_DELIVERY_SERVICE_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_DELIVERY_TERMINAL,
@@ -416,7 +377,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Greenhouse,
         .workerTypes = sText_TypesGrassBug,
         .cost = 5000,
-        .itemSteps = 25,
+        .rate = 650,
         .items = {sGreenhouseItems, sGreenhouseItems2, sGreenhouseItems3},
         .builtFlag = FLAG_GREENHOUSE_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_GREENHOUSE_TERMINAL,
@@ -430,7 +391,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Quarry,
         .workerTypes = sText_TypesRockGround,
         .cost = 15000,
-        .itemSteps = 75,
+        .rate = 1200,
         .items = {sQuarryItems, sQuarryItems2, sQuarryItems3},
         .builtFlag = FLAG_QUARRY_BUILT,
         .unlockFlag = FLAG_BADGE01_GET,
@@ -445,7 +406,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Fishery,
         .workerTypes = sText_TypesWaterDark,
         .cost = 45000,
-        .itemSteps = 50,
+        .rate = 2300,
         .items = {sFisheryItems, sFisheryItems2, sFisheryItems3},
         .builtFlag = FLAG_FISHERY_BUILT,
         .unlockFlag = FLAG_RECEIVED_OLD_ROD,
@@ -460,7 +421,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Generator,
         .workerTypes = sText_TypesElectricSteel,
         .cost = 80000,
-        .itemSteps = 55,
+        .rate = 4400,
         .items = {sGeneratorItems, sGeneratorItems2, sGeneratorItems3},
         .builtFlag = FLAG_GENERATOR_BUILT,
         .unlockFlag = FLAG_BADGE03_GET,
@@ -475,7 +436,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_Forge,
         .workerTypes = sText_TypesFireFighting,
         .cost = 250000,
-        .itemSteps = 90,
+        .rate = 8400,
         .items = {sForgeItems, sForgeItems2, sForgeItems3},
         .builtFlag = FLAG_FORGE_BUILT,
         .unlockFlag = FLAG_BADGE04_GET,
@@ -490,7 +451,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_SpiritSanctum,
         .workerTypes = sText_TypesGhostPsychicPoison,
         .cost = 750000,
-        .itemSteps = 120,
+        .rate = 16000,
         .items = {sSpiritSanctumItems, sSpiritSanctumItems2, sSpiritSanctumItems3},
         .builtFlag = FLAG_SPIRIT_SANCTUM_BUILT,
         .unlockFlag = FLAG_VISITED_MT_PYRE,
@@ -505,7 +466,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .name = sText_IceDome,
         .workerTypes = sText_TypesIce,
         .cost = 1500000,
-        .itemSteps = 120,
+        .rate = 30000,
         .items = {sIceDomeItems, sIceDomeItems2, sIceDomeItems3},
         .builtFlag = FLAG_ICE_DOME_BUILT,
         .terminalHideFlag = FLAG_HIDE_LITTLEROOT_ICE_DOME_TERMINAL,
@@ -530,6 +491,7 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
 #define MART_COST 3000
 
 static void SettleBuildingAt(u8 building, u32 now);
+static void BufferOrderLine(u8 *dest, u8 building);
 
 static const u8 sText_FarmBoxName[] = _("FARM");
 static const u8 sText_Of[] = _(" of ");
@@ -779,6 +741,36 @@ static u32 GetTotalEfficiency(u8 building)
     return total;
 }
 
+// Goods that don't take an "S" in the plural.
+static const u16 sUncountableItems[] = {
+    ITEM_STARDUST, ITEM_SOFT_SAND, ITEM_MYSTIC_WATER, ITEM_CHARCOAL, ITEM_NEVER_MELT_ICE,
+    ITEM_PROTEIN, ITEM_SHOAL_SALT, ITEM_FULL_RESTORE, ITEM_ANTIDOTE,
+};
+
+// An item's name for `count` of it: "POTIONS", "PECHA BERRIES", "STARDUST".
+static void CopyFarmItemName(u16 item, u8 *dest, u32 count)
+{
+    u32 i;
+    u8 *end;
+
+    if (count < 2 || item == ITEM_POKE_BALL || (item >= FIRST_BERRY_INDEX && item <= LAST_BERRY_INDEX))
+    {
+        CopyItemNameHandlePlural(item, dest, count);
+        return;
+    }
+    end = StringCopy(dest, GetItemName(item));
+    for (i = 0; i < ARRAY_COUNT(sUncountableItems); i++)
+    {
+        if (item == sUncountableItems[i])
+            return;
+    }
+    if (end != dest && end[-1] != CHAR_S)
+    {
+        *end++ = CHAR_S;
+        *end = EOS;
+    }
+}
+
 static u32 CountStockedItems(struct TownStock *stock)
 {
     u32 i, count = 0;
@@ -788,18 +780,88 @@ static u32 CountStockedItems(struct TownStock *stock)
     return count;
 }
 
-// Picks an item from the business's table for its level, weighted.
-static u16 RollItem(u8 building)
+static const struct TownItem *GetItemTable(u8 building)
 {
-    const struct TownItem *items = sBusinesses[building].items[GetLevel(building) - 1];
+    return sBusinesses[building].items[GetLevel(building) - 1];
+}
+
+static u8 CountItemKinds(u8 building)
+{
+    const struct TownItem *items = GetItemTable(building);
+    u8 count = 0;
+
+    while (count < TOWN_ITEM_KINDS && items[count].item != ITEM_NONE)
+        count++;
+    return count;
+}
+
+// Picks an entry from the business's table for its level, weighted.
+static u8 RollItemEntry(u8 building)
+{
+    const struct TownItem *items = GetItemTable(building);
     u32 i, total = 0, roll;
 
-    for (i = 0; i < TOWN_ITEM_KINDS && items[i].item != ITEM_NONE; i++)
+    for (i = 0; i < CountItemKinds(building); i++)
         total += items[i].weight;
     roll = Random() % total;
     for (i = 0; roll >= items[i].weight; i++)
         roll -= items[i].weight;
-    return items[i].item;
+    return i;
+}
+
+// A business makes goods worth `rate` per farm step (more at higher levels),
+// whatever the item: each item takes as long as its Mart price says, so a Star
+// Piece takes about five times as long as a Fire Stone. Returns the cost in
+// efficiency-weighted steps (100 per step at 1.0x).
+static u32 GetRate(u8 building)
+{
+    return sBusinesses[building].rate * sLevelRateMultipliers[GetLevel(building) - 1];
+}
+
+static u32 GetItemCost(u8 building, u8 entry, bool8 ordered)
+{
+    u32 value = GetItemPrice(GetItemTable(building)[entry].item) / 2;
+    u32 cost = value * 10000 / GetRate(building);
+
+    if (ordered)
+        cost += cost * WORK_ORDER_EXTRA_PERCENT / 100;
+    return max(cost, 100);
+}
+
+static u32 GetStockroomSize(u8 building)
+{
+    return sStockroomSizes[GetLevel(building) - 1];
+}
+
+// The table entry being made now: the work order's, or one from the usual mix
+// (picked when the previous item is done).
+static u8 GetCurrentEntry(u8 building)
+{
+    struct TownStock *stock = GetStock(building);
+
+    if (stock->orderItem != 0 && stock->orderItem <= CountItemKinds(building))
+        return stock->orderItem - 1;
+    if (stock->nextItem == 0 || stock->nextItem > CountItemKinds(building))
+        stock->nextItem = RollItemEntry(building) + 1;
+    return stock->nextItem - 1;
+}
+
+// After an upgrade changes the item table: keep the work order if the new
+// table still has its item (else go back to the usual mix), and forget the
+// item from the mix being made. Progress carries over.
+static void UpdateProductionForLevel(u8 building, u16 orderedItem)
+{
+    struct TownStock *stock = GetStock(building);
+    const struct TownItem *items = GetItemTable(building);
+    u8 entry;
+
+    stock->nextItem = 0;
+    stock->orderItem = 0;
+    for (entry = 0; entry < CountItemKinds(building); entry++)
+    {
+        if (orderedItem != ITEM_NONE && items[entry].item == orderedItem)
+            stock->orderItem = entry + 1;
+    }
 }
 
 // Adds one item to the stock. FALSE if there's no room for another kind.
@@ -830,19 +892,25 @@ static bool8 StockItem(struct TownStock *stock, u16 item)
 static void SettleItems(u8 building, u32 steps, u32 efficiency)
 {
     struct TownStock *stock = GetStock(building);
-    u32 threshold = sBusinesses[building].itemSteps * 100;
     u32 stocked = CountStockedItems(stock);
 
     stock->itemProgress += steps * efficiency;
-    while (stock->itemProgress >= threshold && stocked < ITEM_STOCKROOM_SIZE)
+    while (stocked < GetStockroomSize(building))
     {
-        stock->itemProgress -= threshold;
-        // After an upgrade, old and new kinds can fill every stock slot; a roll
-        // with nowhere to go is lost.
-        if (StockItem(stock, RollItem(building)))
+        u8 entry = GetCurrentEntry(building);
+        bool8 ordered = (stock->orderItem != 0);
+        u32 cost = GetItemCost(building, entry, ordered);
+
+        if (stock->itemProgress < cost)
+            break;
+        stock->itemProgress -= cost;
+        // After an upgrade, old and new kinds can fill every stock slot; an
+        // item with nowhere to go is lost.
+        if (StockItem(stock, GetItemTable(building)[entry].item))
             stocked++;
+        stock->nextItem = 0;
     }
-    if (stocked >= ITEM_STOCKROOM_SIZE)
+    if (stocked >= GetStockroomSize(building))
         stock->itemProgress = 0;
 }
 
@@ -987,8 +1055,11 @@ void Town_BuyBuilding(void)
     if (gSpecialVar_0x8005 >= 2)
     {
         // Settle at the old level first, so earlier steps use the old items.
+        struct TownStock *stock = GetStock(gSpecialVar_0x8006);
+        u16 orderedItem = stock->orderItem != 0 ? GetItemTable(gSpecialVar_0x8006)[stock->orderItem - 1].item : ITEM_NONE;
         SettleBuilding(gSpecialVar_0x8006);
-        GetStock(gSpecialVar_0x8006)->level = gSpecialVar_0x8005;
+        stock->level = gSpecialVar_0x8005;
+        UpdateProductionForLevel(gSpecialVar_0x8006, orderedItem);
     }
     else
     {
@@ -1090,14 +1161,17 @@ void Town_CollectEarnings(void)
 }
 
 // For the terminal's status line: settles business VAR_0x8006, then buffers
-// STR_VAR_2 the number of uncollected items (and STR_VAR_1 any money left over
-// from before items only). VAR_0x8008: the first worker's species, for showmonpic. VAR_RESULT:
-// whether there's anything to collect.
+// STR_VAR_2 the number of uncollected items and the stockroom's size ("12 of
+// 30"), STR_VAR_3 what it's making ("Making: POWER CELLS.", or empty with no
+// workers), and STR_VAR_1 any money left over from before items only.
+// VAR_0x8008: the first worker's species, for showmonpic. VAR_RESULT: whether
+// there's anything to collect.
 void Town_BufferStock(void)
 {
     struct TownBuilding *town;
     s8 slot;
     u32 items;
+    u8 *end;
 
     gSpecialVar_Result = FALSE;
     gSpecialVar_0x8008 = SPECIES_NONE;
@@ -1107,7 +1181,10 @@ void Town_BufferStock(void)
     SettleBuilding(gSpecialVar_0x8006);
     items = CountStockedItems(GetStock(gSpecialVar_0x8006));
     ConvertIntToDecimalStringN(gStringVar1, town->pendingMoney, STR_CONV_MODE_LEFT_ALIGN, 10);
-    ConvertIntToDecimalStringN(gStringVar2, items, STR_CONV_MODE_LEFT_ALIGN, 3);
+    end = ConvertIntToDecimalStringN(gStringVar2, items, STR_CONV_MODE_LEFT_ALIGN, 3);
+    end = StringCopy(end, sText_Of);
+    ConvertIntToDecimalStringN(end, GetStockroomSize(gSpecialVar_0x8006), STR_CONV_MODE_LEFT_ALIGN, 3);
+    BufferOrderLine(gStringVar3, gSpecialVar_0x8006);
     slot = GetFirstWorkerSlot(gSpecialVar_0x8006);
     if (slot >= 0)
         gSpecialVar_0x8008 = GetBoxMonData(GetWorker(gSpecialVar_0x8006, slot), MON_DATA_SPECIES);
@@ -1134,7 +1211,7 @@ void Town_CollectNextItem(void)
             continue;
 
         gSpecialVar_0x8009 = i + 1;
-        CopyItemNameHandlePlural(stock->items[i], gStringVar1, count);
+        CopyFarmItemName(stock->items[i], gStringVar1, count);
         ConvertIntToDecimalStringN(gStringVar2, count, STR_CONV_MODE_LEFT_ALIGN, 3);
         if (AddBagItem(stock->items[i], count))
         {
@@ -1271,12 +1348,65 @@ void Town_OpenFlyMap(void)
 }
 
 // ---------------------------------------------------------------------------
-// List menus: the Builder's offers and a business's worker slots.
+// Work orders: the player picks one item from the business's table and it
+// makes only that (a little slower than from the usual mix) until the
+// stockroom is full, and keeps on after each collection until changed. How
+// many steps an item takes is never shown.
+// ---------------------------------------------------------------------------
+
+static const u8 sText_MakingPrefix[] = _("Making: ");
+static const u8 sText_UsualMix[] = _("the usual mix");
+static const u8 sText_UsualMixLabel[] = _("USUAL MIX");
+static const u8 sText_Period[] = _(".");
+
+// Writes "Making: POWER CELLS." for the terminal (or the usual mix), or
+// nothing with nobody working.
+static void BufferOrderLine(u8 *dest, u8 building)
+{
+    struct TownStock *stock = GetStock(building);
+
+    *dest = EOS;
+    if (CountWorkers(building) == 0)
+        return;
+    dest = StringCopy(dest, sText_MakingPrefix);
+    if (stock->orderItem != 0)
+        CopyFarmItemName(GetItemTable(building)[stock->orderItem - 1].item, dest, 2);
+    else
+        StringCopy(dest, sText_UsualMix);
+    StringAppend(dest, sText_Period);
+}
+
+// Sets business VAR_0x8006's work order to table entry VAR_0x800A, or the
+// usual mix for TOWN_ORDER_USUAL_MIX. Buffers STR_VAR_1 the item (plural).
+// VAR_RESULT: whether it's a single item (not the usual mix).
+void Town_SetOrder(void)
+{
+    struct TownStock *stock;
+
+    gSpecialVar_Result = FALSE;
+    if (!IsBusiness(gSpecialVar_0x8006))
+        return;
+    SettleBuilding(gSpecialVar_0x8006);
+    stock = GetStock(gSpecialVar_0x8006);
+    stock->nextItem = 0;
+    if (gSpecialVar_0x800A >= CountItemKinds(gSpecialVar_0x8006))
+    {
+        stock->orderItem = 0;
+        return;
+    }
+    stock->orderItem = gSpecialVar_0x800A + 1;
+    CopyFarmItemName(GetItemTable(gSpecialVar_0x8006)[gSpecialVar_0x800A].item, gStringVar1, 2);
+    gSpecialVar_Result = TRUE;
+}
+
+// ---------------------------------------------------------------------------
+// List menus: the Builder's offers, a business's worker slots, and work orders.
 // ---------------------------------------------------------------------------
 
 #define LIST_MENU_EXIT 0xFF
 #define BUILDER_MENU_WIDTH 24
 #define WORKER_MENU_WIDTH  20
+#define ORDER_MENU_WIDTH   14
 #define LIST_MENU_ROWS     4
 #define LIST_LABEL_LENGTH  24
 
@@ -1292,6 +1422,7 @@ void Town_OpenFlyMap(void)
 enum {
     MENU_KIND_BUILDER,
     MENU_KIND_WORKERS,
+    MENU_KIND_ORDER_ITEMS,
 };
 
 struct TownListMenu
@@ -1299,6 +1430,7 @@ struct TownListMenu
     struct ListMenuItem items[TOWN_PLOT_COUNT * TOWN_MAX_LEVEL + 1];
     u8 labels[TOWN_PLOT_COUNT * TOWN_MAX_LEVEL + 1][LIST_LABEL_LENGTH];
     u8 width;
+    u8 kind;
 };
 
 static EWRAM_DATA struct TownListMenu *sTownListMenu = NULL;
@@ -1359,7 +1491,11 @@ static void TownListMenu_PrintRight(u8 windowId, u32 itemId, u8 y)
     if (itemId == LIST_MENU_EXIT)
         return;
     label = gStringVar4;
-    if (sTownListMenu->width == BUILDER_MENU_WIDTH)
+    if (sTownListMenu->kind == MENU_KIND_ORDER_ITEMS)
+    {
+        return;
+    }
+    if (sTownListMenu->kind == MENU_KIND_BUILDER)
     {
         ConvertIntToDecimalStringN(gStringVar1, GetCost(OFFER_PLOT(itemId), OFFER_LEVEL(itemId)),
                                    STR_CONV_MODE_LEFT_ALIGN, 7);
@@ -1426,7 +1562,8 @@ static void Task_TownListMenu(u8 taskId)
     ScriptContext_Enable();
 }
 
-static void ShowTownListMenu(u8 kind, u8 count)
+// Shows the list with the cursor on row `selected` (scrolled into view).
+static void ShowTownListMenu(u8 kind, u8 count, u8 selected)
 {
     struct ListMenuTemplate list;
     struct WindowTemplate window;
@@ -1460,10 +1597,12 @@ static void ShowTownListMenu(u8 kind, u8 count)
     list.fontId = FONT_NORMAL;
     list.cursorKind = CURSOR_BLACK_ARROW;
 
+    sTownListMenu->kind = kind;
     taskId = CreateTask(Task_TownListMenu, 80);
     gTasks[taskId].tWindowId = windowId;
     gTasks[taskId].tMenuKind = kind;
-    gTasks[taskId].tListTaskId = ListMenuInit(&list, 0, 0);
+    gTasks[taskId].tListTaskId = ListMenuInit(&list, selected >= rows ? selected - rows + 1 : 0,
+                                              selected >= rows ? rows - 1 : selected);
     CopyWindowToVram(windowId, COPYWIN_FULL);
 }
 
@@ -1527,7 +1666,7 @@ void Town_ShowBuilderMenu(void)
             *b = swap;
         }
     }
-    ShowTownListMenu(MENU_KIND_BUILDER, count);
+    ShowTownListMenu(MENU_KIND_BUILDER, count, 0);
 }
 
 // Lets the player pick a worker slot of business VAR_0x8006. VAR_0x8005 is
@@ -1576,7 +1715,37 @@ void Town_ChooseWorkerSlot(void)
         CreateTask(Task_ResumeScript, 80);
         return;
     }
-    ShowTownListMenu(MENU_KIND_WORKERS, count);
+    ShowTownListMenu(MENU_KIND_WORKERS, count, 0);
+}
+
+// Lists the usual mix and the items business VAR_0x8006 can make at its
+// level, with the cursor on the current work order. Used with waitstate.
+// VAR_RESULT: whether one was picked; VAR_0x800A: its table entry, or
+// TOWN_ORDER_USUAL_MIX.
+void Town_ChooseOrderItem(void)
+{
+    u8 entry, count = 0, selected = 0;
+
+    gSpecialVar_Result = FALSE;
+    sTownListMenu = AllocZeroed(sizeof(*sTownListMenu));
+    sTownListMenu->width = ORDER_MENU_WIDTH;
+    sTownListMenu->items[count].name = sText_UsualMixLabel;
+    sTownListMenu->items[count].id = TOWN_ORDER_USUAL_MIX;
+    count++;
+    if (IsBusiness(gSpecialVar_0x8006))
+    {
+        const struct TownItem *items = GetItemTable(gSpecialVar_0x8006);
+        for (entry = 0; entry < CountItemKinds(gSpecialVar_0x8006); entry++)
+        {
+            CopyItemName(items[entry].item, sTownListMenu->labels[count]);
+            sTownListMenu->items[count].name = sTownListMenu->labels[count];
+            sTownListMenu->items[count].id = entry;
+            if (GetStock(gSpecialVar_0x8006)->orderItem == entry + 1)
+                selected = count;
+            count++;
+        }
+    }
+    ShowTownListMenu(MENU_KIND_ORDER_ITEMS, count, selected);
 }
 
 #undef tListTaskId

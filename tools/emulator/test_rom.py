@@ -627,6 +627,17 @@ def main():
                     raise AssertionError(f"Gained {total} items; expected {low} to {high if high is not None else 'any'}")
                 result["checks"].append({"items_gained": gained, "frame": emulator.frame})
                 print(f"PASS: gained {total} items {gained}", flush=True)
+            elif action == "assert_item_gained":
+                # How many of one item was gained since remember_bag; other items may change too.
+                if saved_bag is None:
+                    raise ValueError("assert_item_gained needs an earlier remember_bag")
+                item = constants.item(step["item"])
+                gained = emulator.bag().get(item, 0) - saved_bag.get(item, 0)
+                low, high = step.get("min", 1), step.get("max")
+                if gained < low or (high is not None and gained > high):
+                    raise AssertionError(f"Gained {gained} {step['item']}; expected {low} to {high if high is not None else 'any'}")
+                result["checks"].append({"item_gained": {step["item"]: gained}, "frame": emulator.frame})
+                print(f"PASS: gained {gained} {step['item']}", flush=True)
             elif action == "assert_flag":
                 value = constants.resolve([step["flag"]])[step["flag"]]
                 expected = step.get("set", True)

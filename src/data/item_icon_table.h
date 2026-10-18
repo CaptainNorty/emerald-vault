@@ -57,9 +57,9 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_GREEN_SHARD] = {gItemIcon_Shard, gItemIconPalette_GreenShard},
     // ????????
     [ITEM_POWER_CELL] = {gItemIcon_Shard, gItemIconPalette_YellowShard}, // Placeholder until it has its own icon
-    [ITEM_035] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_036] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_037] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
+    [ITEM_STEEL_INGOT] = {gItemIcon_MetalCoat, gItemIconPalette_MetalCoat}, // Placeholder until it has its own icon
+    [ITEM_SPIRIT_ORB] = {gItemIcon_SoulDew, gItemIconPalette_SoulDew}, // Placeholder until it has its own icon
+    [ITEM_ICE_CRYSTAL] = {gItemIcon_NeverMeltIce, gItemIconPalette_NeverMeltIce}, // Placeholder until it has its own icon
     [ITEM_038] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_039] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_03A] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},

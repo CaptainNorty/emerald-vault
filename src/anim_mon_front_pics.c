@@ -303,6 +303,7 @@ const u32 gMonFrontPic_Claydol[] = INCGFX_U32("graphics/pokemon/claydol/anim_fro
 const u32 gMonFrontPic_Nosepass[] = INCGFX_U32("graphics/pokemon/nosepass/anim_front.png", ".4bpp.lz");
 const u32 gMonFrontPic_Torkoal[] = INCGFX_U32("graphics/pokemon/torkoal/anim_front.png", ".4bpp.lz");
 const u32 gMonFrontPic_Sableye[] = INCGFX_U32("graphics/pokemon/sableye/anim_front.png", ".4bpp.lz");
+const u32 gMonFrontPic_Sableer[] = INCGFX_U32("graphics/pokemon/sableer/anim_front.png", ".4bpp.lz");
 const u32 gMonFrontPic_Barboach[] = INCGFX_U32("graphics/pokemon/barboach/anim_front.png", ".4bpp.lz");
 const u32 gMonFrontPic_Whiscash[] = INCGFX_U32("graphics/pokemon/whiscash/anim_front.png", ".4bpp.lz");
 const u32 gMonFrontPic_Luvdisc[] = INCGFX_U32("graphics/pokemon/luvdisc/anim_front.png", ".4bpp.lz");

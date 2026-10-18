@@ -127,16 +127,18 @@
 
 // Emerald Vault: Delivery Service terminal selections
 #define DELIVERY_TERMINAL_COLLECT       0
-#define DELIVERY_TERMINAL_FLY           1
-#define DELIVERY_TERMINAL_CHANGE_WORKER 2
-#define DELIVERY_TERMINAL_TAKE_BACK     3
-#define DELIVERY_TERMINAL_LOG_OFF       4
+#define DELIVERY_TERMINAL_ORDER         1
+#define DELIVERY_TERMINAL_FLY           2
+#define DELIVERY_TERMINAL_CHANGE_WORKER 3
+#define DELIVERY_TERMINAL_TAKE_BACK     4
+#define DELIVERY_TERMINAL_LOG_OFF       5
 
 // Emerald Vault: other business terminals' selections
 #define TOWN_TERMINAL_COLLECT           0
-#define TOWN_TERMINAL_CHANGE_WORKER     1
-#define TOWN_TERMINAL_TAKE_BACK         2
-#define TOWN_TERMINAL_LOG_OFF           3
+#define TOWN_TERMINAL_ORDER             1
+#define TOWN_TERMINAL_CHANGE_WORKER     2
+#define TOWN_TERMINAL_TAKE_BACK         3
+#define TOWN_TERMINAL_LOG_OFF           4
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

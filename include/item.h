@@ -11,7 +11,7 @@ struct Item
 {
     u8 name[ITEM_NAME_LENGTH];
     u16 itemId;
-    u16 price;
+    u32 price; // Vault: u32 so farm goods can sell for more than 32,767
     u8 holdEffect;
     u8 holdEffectParam;
     const u8 *description;
@@ -64,7 +64,7 @@ u16 CountTotalItemQuantityInBag(u16 itemId);
 bool8 AddPyramidBagItem(u16 itemId, u16 count);
 bool8 RemovePyramidBagItem(u16 itemId, u16 count);
 const u8 *GetItemName(u16 itemId);
-u16 GetItemPrice(u16 itemId);
+u32 GetItemPrice(u16 itemId);
 u8 GetItemHoldEffect(u16 itemId);
 u8 GetItemHoldEffectParam(u16 itemId);
 const u8 *GetItemDescription(u16 itemId);

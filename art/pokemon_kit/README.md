@@ -48,3 +48,10 @@ Load Palette, set View → Grid Settings to 64 × 64, and open
 `reference/sableye/anim_front.png` beside it. Draw frame 1 in the top half,
 then copy it to the bottom half and change it. Hand the folder back and I'll
 put it in the game.
+
+## In the game
+
+Finished art lives in `art/pokemon/<name>/` (`anim_front.png`, `back.png`,
+`icon.png`) and is copied, re-saved as 4-bit PNGs, into
+`graphics/pokemon/<name>/` along with `front.png` (the top frame), the
+palettes and a footprint. Sableer is the first: `art/pokemon/sableer/`.

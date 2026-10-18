@@ -1367,18 +1367,20 @@ LittlerootTown_EventScript_TerminalMenu::
 	message LittlerootTown_Text_TerminalStock
 	waitmessage
 	goto_if_eq VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_DeliveryTerminalMenu
-	multichoice 17, 4, MULTI_TOWN_TERMINAL, FALSE
+	multichoice 17, 2, MULTI_TOWN_TERMINAL, FALSE
 	switch VAR_RESULT
 	case TOWN_TERMINAL_COLLECT, LittlerootTown_EventScript_TerminalCollect
+	case TOWN_TERMINAL_ORDER, LittlerootTown_EventScript_TerminalOrder
 	case TOWN_TERMINAL_CHANGE_WORKER, LittlerootTown_EventScript_TerminalChooseWorker
 	case TOWN_TERMINAL_TAKE_BACK, LittlerootTown_EventScript_TerminalTakeBackWorker
 	goto LittlerootTown_EventScript_TerminalLogOff
 
 @ The Delivery Service's terminal also books flights to visited towns.
 LittlerootTown_EventScript_DeliveryTerminalMenu::
-	multichoice 17, 2, MULTI_DELIVERY_TERMINAL, FALSE
+	multichoice 17, 0, MULTI_DELIVERY_TERMINAL, FALSE
 	switch VAR_RESULT
 	case DELIVERY_TERMINAL_COLLECT, LittlerootTown_EventScript_TerminalCollect
+	case DELIVERY_TERMINAL_ORDER, LittlerootTown_EventScript_TerminalOrder
 	case DELIVERY_TERMINAL_FLY, LittlerootTown_EventScript_DeliveryFly
 	case DELIVERY_TERMINAL_CHANGE_WORKER, LittlerootTown_EventScript_TerminalChooseWorker
 	case DELIVERY_TERMINAL_TAKE_BACK, LittlerootTown_EventScript_TerminalTakeBackWorker
@@ -1421,6 +1423,30 @@ LittlerootTown_EventScript_TerminalNoRoomForItem::
 
 LittlerootTown_EventScript_TerminalNothingToCollect::
 	msgbox LittlerootTown_Text_TerminalNothingToCollect, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
+@ A work order: the building makes only the chosen item (or its usual mix)
+@ until the stockroom is full, and keeps on until it's changed.
+LittlerootTown_EventScript_TerminalOrder::
+	special Town_HasWorker
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalOrderNoWorker
+	hidemonpic
+	message LittlerootTown_Text_TerminalWhatToMake
+	waitmessage
+	special Town_ChooseOrderItem
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalMenu
+	special Town_SetOrder
+	playse SE_SELECT
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalOrderUsualMix
+	msgbox LittlerootTown_Text_TerminalOrderSet, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
+LittlerootTown_EventScript_TerminalOrderUsualMix::
+	msgbox LittlerootTown_Text_TerminalOrderUsualMix, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
+LittlerootTown_EventScript_TerminalOrderNoWorker::
+	msgbox LittlerootTown_Text_TerminalOrderNoWorker, MSGBOX_DEFAULT
 	goto LittlerootTown_EventScript_TerminalMenu
 
 LittlerootTown_EventScript_DeliveryFly::
@@ -1644,7 +1670,23 @@ LittlerootTown_Text_TerminalNoWorker:
 	.string "Choose CHANGE WORKER to add one.$"
 
 LittlerootTown_Text_TerminalStock:
-	.string "In stock: {STR_VAR_2} items.$"
+	.string "In stock: {STR_VAR_2} items.\n"
+	.string "{STR_VAR_3}$"
+
+LittlerootTown_Text_TerminalWhatToMake:
+	.string "What should we make? A single item\n"
+	.string "takes a bit longer than the usual mix.$"
+
+LittlerootTown_Text_TerminalOrderSet:
+	.string "Got it! Making {STR_VAR_1} from now\n"
+	.string "on, until the stockroom is full.$"
+
+LittlerootTown_Text_TerminalOrderUsualMix:
+	.string "Got it! Back to the usual mix.$"
+
+LittlerootTown_Text_TerminalOrderNoWorker:
+	.string "Nobody's here to fill an order. Put\n"
+	.string "a worker on the job first!$"
 
 LittlerootTown_Text_TerminalEarnings:
 	.string "Found ¥{STR_VAR_2} in old earnings!\n"

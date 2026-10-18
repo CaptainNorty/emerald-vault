@@ -49,6 +49,9 @@
 #define TOWN_ITEM_COLLECTED     1
 #define TOWN_ITEM_NO_ROOM       2
 
+// VAR_0x800A for Town_SetOrder: back to the usual mix instead of one item
+#define TOWN_ORDER_USUAL_MIX    0xFE
+
 // VAR_RESULT from Town_ShowBuilderMenu, besides a building
 #define TOWN_MENU_CANCELLED     0xFF
 #define TOWN_MENU_EMPTY         0xFE
