@@ -88,3 +88,9 @@ Save each finished building as a PNG with the same name as its template (for
 example `templates/2_greenhouse_112x112.png` → `art/buildings/2_greenhouse.png`).
 I'll convert it to tiles and palettes, add it to the map, check the tile and
 color budgets, and show you an in-game screenshot.
+
+The conversion is `tools/art/import_building.py <png> --palette <6-12> --name
+<array>`. Grass-colored pixels become transparent over the game's own grass, so
+they cost no colors. It reuses tiles that already exist, so re-running it after
+a small edit only adds the changed tiles. It prints the map entries for
+`src/data/vault_town_buildings.h`.

@@ -19,7 +19,7 @@ LITTLEROOT_WIDTH = 60
 # (file name, title, plot x, y, width, height in 16px map squares, terminal x, y)
 # Plots match the ruins in data/layouts/LittlerootTown/map.bin.
 BUILDINGS = [
-    ("1_delivery_service", "Delivery Service", 24, 4, 6, 5, 28, 9),
+    ("1_delivery_service", "Delivery Service", 24, 4, 6, 5, 27, 9),
     ("2_greenhouse", "Greenhouse", 49, 3, 7, 7, 55, 10),
     ("3_quarry", "Quarry", 49, 27, 7, 7, 55, 34),
     ("4_fishery", "Fishery", 23, 27, 7, 7, 29, 34),
