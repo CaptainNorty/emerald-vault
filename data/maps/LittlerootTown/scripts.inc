@@ -1144,6 +1144,7 @@ LittlerootTown_EventScript_Builder::
 	special Town_BufferBuildingInfo
 	special Town_CanAffordBuilding
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_BuilderCantAfford
+	goto_if_ge VAR_0x8005, 2, LittlerootTown_EventScript_BuilderUpgrade
 	special Town_CheckPartyForWorker
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_BuilderNeedWorker
 	showmoneybox 0, 0
@@ -1168,6 +1169,32 @@ LittlerootTown_EventScript_Builder::
 	fadescreen FADE_FROM_BLACK
 	special Town_BufferBuildingInfo
 	msgbox LittlerootTown_Text_BuilderBuilt, MSGBOX_DEFAULT
+	release
+	end
+
+@ Upgrades add a worker slot and a better item tier; the building looks the same.
+LittlerootTown_EventScript_BuilderUpgrade::
+	showmoneybox 0, 0
+	@ Drawing money boxes reuses STR_VAR_1, so buffer the building again.
+	special Town_BufferBuildingInfo
+	buffernumberstring STR_VAR_3, VAR_0x8005
+	msgbox LittlerootTown_Text_BuilderConfirmUpgrade, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_EventScript_BuilderDeclined
+	special Town_BuyBuilding
+	updatemoneybox
+	playse SE_SHOP
+	waitse
+	hidemoneybox
+	msgbox LittlerootTown_Text_BuilderStandBack, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	playse SE_M_STRENGTH
+	waitse
+	delay 30
+	fadescreen FADE_FROM_BLACK
+	special Town_BufferBuildingInfo
+	buffernumberstring STR_VAR_3, VAR_0x8005
+	msgbox LittlerootTown_Text_BuilderUpgraded, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1276,8 +1303,13 @@ LittlerootTown_EventScript_Terminal::
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNoWorker
 	special Town_BufferStock
 	showmonpic VAR_0x8008, 1, 1
-	special Town_BufferWorker
+	special Town_BufferStatus
+	goto_if_eq VAR_RESULT, TRUE, LittlerootTown_EventScript_TerminalTeamStatus
 	msgbox LittlerootTown_Text_TerminalWorkerStatus, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
+LittlerootTown_EventScript_TerminalTeamStatus::
+	msgbox LittlerootTown_Text_TerminalTeamStatus, MSGBOX_DEFAULT
 	goto LittlerootTown_EventScript_TerminalMenu
 
 LittlerootTown_EventScript_TerminalNoWorker::
@@ -1285,6 +1317,7 @@ LittlerootTown_EventScript_TerminalNoWorker::
 	msgbox LittlerootTown_Text_TerminalNoWorker, MSGBOX_DEFAULT
 LittlerootTown_EventScript_TerminalMenu::
 	special Town_BufferStock
+	call_if_ne VAR_0x8008, SPECIES_NONE, LittlerootTown_EventScript_TerminalShowWorkerPic
 	message LittlerootTown_Text_TerminalStock
 	waitmessage
 	goto_if_eq VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_DeliveryTerminalMenu
@@ -1304,6 +1337,11 @@ LittlerootTown_EventScript_DeliveryTerminalMenu::
 	case DELIVERY_TERMINAL_CHANGE_WORKER, LittlerootTown_EventScript_TerminalChooseWorker
 	case DELIVERY_TERMINAL_TAKE_BACK, LittlerootTown_EventScript_TerminalTakeBackWorker
 	goto LittlerootTown_EventScript_TerminalLogOff
+
+@ Does nothing if the picture is already up.
+LittlerootTown_EventScript_TerminalShowWorkerPic::
+	showmonpic VAR_0x8008, 1, 1
+	return
 
 LittlerootTown_EventScript_TerminalLogOff::
 	hidemonpic
@@ -1349,6 +1387,9 @@ LittlerootTown_EventScript_DeliveryFly::
 
 LittlerootTown_EventScript_TerminalChooseWorker::
 	hidemonpic
+	setvar VAR_0x8005, TOWN_SLOTS_TO_ASSIGN
+	special Town_ChooseWorkerSlot
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalMenu
 	msgbox LittlerootTown_Text_TerminalWhoShouldWork, MSGBOX_DEFAULT
 	closemessage
 	special ChoosePartyMon
@@ -1363,6 +1404,10 @@ LittlerootTown_EventScript_TerminalChooseWorker::
 LittlerootTown_EventScript_TerminalTakeBackWorker::
 	special Town_HasWorker
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNoWorkerToTakeBack
+	hidemonpic
+	setvar VAR_0x8005, TOWN_SLOTS_TO_TAKE_BACK
+	special Town_ChooseWorkerSlot
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalMenu
 	special Town_BufferWorker
 	special Town_TakeBackWorker
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalPartyFull
@@ -1396,6 +1441,7 @@ LittlerootTown_EventScript_TerminalFirstWorker::
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_TerminalFirstWorkerLater
 	special Town_IsPartyMonSuited
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalFirstWorkerUnsuited
+	setvar VAR_0x800A, 0
 	special Town_AssignWorker
 	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_TerminalCantUseLastMon
 	special Town_BufferWorker
@@ -1459,8 +1505,19 @@ LittlerootTown_Text_BuilderGoodbye:
 	.string "Come back anytime, boss!$"
 
 LittlerootTown_Text_BuilderCantAfford:
-	.string "The {STR_VAR_1} costs ¥{STR_VAR_2}.\n"
+	.string "That'll cost ¥{STR_VAR_2}.\n"
 	.string "Come back when you've saved up!$"
+
+LittlerootTown_Text_BuilderConfirmUpgrade:
+	.string "Upgrade the {STR_VAR_1} to\n"
+	.string "Lv. {STR_VAR_3} for ¥{STR_VAR_2}?$"
+
+LittlerootTown_Text_BuilderUpgraded:
+	.string "Ta-da! The {STR_VAR_1} is\n"
+	.string "now Lv. {STR_VAR_3}!\p"
+	.string "It has room for another worker,\n"
+	.string "and it'll make better goods.\p"
+	.string "Add a worker at its terminal!$"
 
 LittlerootTown_Text_BuilderNeedWorker:
 	.string "The {STR_VAR_1} needs a\n"
@@ -1522,6 +1579,11 @@ LittlerootTown_Text_TerminalWorkerStatus:
 	.string "{STR_VAR_1} (Lv. {STR_VAR_2}) is working\n"
 	.string "at {STR_VAR_3}x speed.$"
 
+LittlerootTown_Text_TerminalTeamStatus:
+	.string "{STR_VAR_1} workers on the job at\n"
+	.string "this Lv. {STR_VAR_2} business.\p"
+	.string "Total speed: {STR_VAR_3}x.$"
+
 LittlerootTown_Text_TerminalNoWorker:
 	.string "The {STR_VAR_1} has no worker!\n"
 	.string "Choose CHANGE WORKER to add one.$"
@@ -1562,9 +1624,7 @@ LittlerootTown_Text_TerminalNewWorker:
 	.string "It works at {STR_VAR_3}x speed.$"
 
 LittlerootTown_Text_TerminalWorkerReturned:
-	.string "{STR_VAR_1} returned to your party.\p"
-	.string "Without a worker, the business\n"
-	.string "can't make anything.$"
+	.string "{STR_VAR_1} returned to your party.$"
 
 LittlerootTown_Text_TerminalNoWorkerToTakeBack:
 	.string "There's no worker to take back.$"

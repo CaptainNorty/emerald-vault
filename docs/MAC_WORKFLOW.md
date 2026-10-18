@@ -149,7 +149,13 @@ Every field is optional. `base` starts from a named setup in
 | `delivery_service_running` | As above, with the Delivery Service rebuilt, run by a level 5 Wingull, the Bird Whistle in the bag, and the Builder in the yard. |
 
 Up to 64 flags, 16 variables, 6 party Pokémon, 16 items and one worker per
-business.
+business (in its first FARM box slot).
+
+A scenario can instead start from a real save with `"save_file": "path/to.sav"`
+(relative to the repo, or absolute). The harness copies it into the run
+directory and the emulator opens the copy without writing it back, so the
+original is never changed. Use it with the normal build and the title screen's
+CONTINUE to check that older saves still load.
 
 `tests/emulator/town_ruins.json` uses this build to walk from the player's
 house to each of the 9 ruined plots on the farm east of the old town, read the
@@ -175,15 +181,21 @@ Delivery Service tests (all use the test-only ROM):
 
 Builder tests (each starts with the Delivery Service running):
 
-- `unlock_0_nothing_before_badge.json`: with the Greenhouse built and no
-  badges, the Builder has nothing to offer, even with ₽9,999,999.
+- `unlock_0_only_upgrades_before_badge.json`: with the Greenhouse built and
+  no badges, the Builder offers only upgrades, even with ₽9,999,999.
 - `unlock_1_greenhouse.json`: buy the Greenhouse for ₽5,000, staff it with
   Lotad, walk 200 steps, collect ₽240 and 4 Berries, and take Lotad back at
-  Lv. 8 (worker EXP).
+  Lv. 7 (worker EXP).
 - `unlock_2_quarry.json` to `unlock_7_ice_dome.json`: at each building's
   unlock point, with every cheaper building already built and exactly its
   price in hand, the Builder offers it, sells it, and its terminal takes a
   first worker.
+- `upgrade_delivery_service.json`: upgrade the Delivery Service to Lv. 2 for
+  ₽5,000, add Taillow to the new slot, walk 200 steps with two workers and
+  collect ₽240+ and 8 tier 2 items, then take Taillow back from a slot list.
+- `farm_box_locked.json`: the PC's last box is named FARM and shows the
+  Delivery Service's Wingull, and trying to move it says "Use the farm
+  terminals!".
 
 Playtest fixes:
 

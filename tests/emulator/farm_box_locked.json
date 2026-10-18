@@ -1,0 +1,30 @@
+{
+  "name": "Workers show up in the PC's FARM box, which can't be changed there",
+  "build": "test_start",
+  "setup": {"base": "delivery_service_running", "location": {"map": "MAP_LITTLEROOT_TOWN", "x": 22, "y": 11}},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "run", "frames": 2, "keys": ["UP"]},
+    {"action": "run", "frames": 20},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "next_message", "times": 0},
+    {"action": "next_message"},
+    {"action": "run", "frames": 30},
+    {"action": "press", "key": "A", "wait": 30},
+    {"action": "press_until_task", "task": "Task_PCMainMenu"},
+    {"action": "press", "key": "DOWN", "times": 2, "wait": 10},
+    {"action": "press", "key": "A", "wait": 30},
+    {"action": "wait_task", "task": "Task_PokeStorageMain", "timeout_frames": 600},
+    {"action": "run", "frames": 30},
+    {"action": "press", "key": "UP", "wait": 20},
+    {"action": "press", "key": "LEFT", "wait": 60},
+    {"action": "press", "key": "DOWN", "wait": 20},
+    {"action": "press", "key": "LEFT", "times": 2, "wait": 20},
+    {"action": "screenshot", "name": "01-farm-box-with-wingull"},
+    {"action": "press", "key": "A", "wait": 30},
+    {"action": "screenshot", "name": "02-wingull-menu"},
+    {"action": "press", "key": "A", "wait": 30},
+    {"action": "screenshot", "name": "03-cant-move-worker"},
+    {"action": "assert_task", "task": "Task_OnSelectedMon"}
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "With the Greenhouse built and no badges, the Builder has nothing to offer",
+  "name": "With the Greenhouse built and no badges, the Builder offers only upgrades",
   "build": "test_start",
   "setup": {"base": "delivery_service_running", "flags": ["FLAG_GREENHOUSE_BUILT"], "money": 9999999},
   "steps": [
@@ -9,9 +9,10 @@
     {"action": "run", "frames": 20},
     {"action": "run", "frames": 2, "keys": ["A"]},
     {"action": "next_message", "times": 0},
-    {"action": "screenshot", "name": "01-nothing-to-rebuild"},
-    {"action": "next_message"},
-    {"action": "screenshot", "name": "02-come-back-later"},
+    {"action": "run", "frames": 20},
+    {"action": "assert_task", "task": "Task_TownListMenu"},
+    {"action": "screenshot", "name": "01-only-upgrades-offered"},
+    {"action": "press", "key": "B", "wait": 30},
     {"action": "dismiss_text"},
     {"action": "assert_money", "equals": 9999999}
   ]

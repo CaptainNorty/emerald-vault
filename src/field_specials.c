@@ -3429,7 +3429,8 @@ bool8 IsDestinationBoxFull(void)
     box = StorageGetCurrentBox();
     do
     {
-        for (i = 0; i < IN_BOX_COUNT; i++)
+        // Emerald Vault: the FARM box only holds workers.
+        for (i = 0; i < IN_BOX_COUNT && box != TOWN_FARM_BOX; i++)
         {
             if (GetBoxMonData(GetBoxedMonPtr(box, i), MON_DATA_SPECIES, 0) == SPECIES_NONE)
             {

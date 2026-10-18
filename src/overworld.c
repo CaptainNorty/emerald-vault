@@ -1,5 +1,6 @@
 #include "global.h"
 #include "overworld.h"
+#include "vault_town.h"
 #include "battle_pyramid.h"
 #include "battle_setup.h"
 #include "berry.h"
@@ -1729,6 +1730,7 @@ void CB2_ContinueSavedGame(void)
     UnfreezeObjectEvents();
     DoTimeBasedEvents();
     UpdateMiscOverworldStates();
+    Town_InitFarmBox(); // Emerald Vault: older saves get the FARM box on load
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(TRUE);
     else if (trainerHillMapId != 0)

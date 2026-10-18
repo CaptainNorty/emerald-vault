@@ -64,7 +64,7 @@
 #define FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_TERMINAL 0x32 // Emerald Vault
 #define FLAG_HIDE_LITTLEROOT_ICE_DOME_TERMINAL       0x33 // Emerald Vault
 #define FLAG_VISITED_MT_PYRE                  0x34 // Emerald Vault
-#define FLAG_UNUSED_0x035    0x35 // Unused Flag
+#define FLAG_FARM_BOX_READY                   0x35 // Emerald Vault
 #define FLAG_UNUSED_0x036    0x36 // Unused Flag
 #define FLAG_UNUSED_0x037    0x37 // Unused Flag
 #define FLAG_UNUSED_0x038    0x38 // Unused Flag

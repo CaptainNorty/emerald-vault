@@ -93,6 +93,7 @@ enum {
     MSG_ITEM_IS_HELD,
     MSG_CHANGED_TO_ITEM,
     MSG_CANT_STORE_MAIL,
+    MSG_FARM_BOX_LOCKED,
 };
 
 // IDs for how to resolve variables in the above messages
@@ -1062,6 +1063,10 @@ static const struct SpriteTemplate sSpriteTemplate_DisplayMon =
     .callback = SpriteCallbackDummy,
 };
 
+// Emerald Vault: farm workers live in the last box and can only be changed at
+// their building's terminal.
+static const u8 sText_FarmBoxLocked[] = _("Use the farm terminals!");
+
 static const struct StorageMessage sMessages[] =
 {
     [MSG_EXIT_BOX]             = {gText_ExitFromBox,             MSG_VAR_NONE},
@@ -1094,6 +1099,7 @@ static const struct StorageMessage sMessages[] =
     [MSG_PUT_IN_BAG]           = {gText_PutItemInBag,            MSG_VAR_NONE},
     [MSG_ITEM_IS_HELD]         = {gText_ItemIsNowHeld,           MSG_VAR_ITEM_NAME},
     [MSG_CHANGED_TO_ITEM]      = {gText_ChangedToNewItem,        MSG_VAR_ITEM_NAME},
+    [MSG_FARM_BOX_LOCKED]      = {sText_FarmBoxLocked,           MSG_VAR_NONE},
     [MSG_CANT_STORE_MAIL]      = {gText_MailCantBeStored,        MSG_VAR_NONE},
 };
 
@@ -2259,6 +2265,7 @@ enum {
     MSTATE_WAIT_MSG,
     MSTATE_ERROR_LAST_PARTY_MON,
     MSTATE_ERROR_HAS_MAIL,
+    MSTATE_ERROR_FARM_BOX,
     MSTATE_WAIT_ERROR_MSG,
     MSTATE_MULTIMOVE_RUN,
     MSTATE_MULTIMOVE_RUN_CANCEL,
@@ -2267,12 +2274,45 @@ enum {
     MSTATE_WAIT_ITEM_ANIM,
 };
 
+// Emerald Vault: whether the cursor is on a Pokémon slot in the FARM box,
+// where nothing can be picked up, placed, withdrawn or released.
+static bool8 IsCursorInFarmBox(void)
+{
+    return sCursorArea == CURSOR_AREA_IN_BOX && StorageGetCurrentBox() == TOWN_FARM_BOX;
+}
+
+static bool8 IsInputBlockedByFarmBox(u8 input)
+{
+    if (!IsCursorInFarmBox())
+        return FALSE;
+    switch (input)
+    {
+    case INPUT_WITHDRAW:
+    case INPUT_MOVE_MON:
+    case INPUT_SHIFT_MON:
+    case INPUT_PLACE_MON:
+    case INPUT_MULTIMOVE_START:
+    case INPUT_MULTIMOVE_MOVE_MONS:
+    case INPUT_MULTIMOVE_PLACE_MONS:
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static void Task_PokeStorageMain(u8 taskId)
 {
+    u8 input;
+
     switch (sStorage->state)
     {
     case MSTATE_HANDLE_INPUT:
-        switch (HandleInput())
+        input = HandleInput();
+        if (IsInputBlockedByFarmBox(input))
+        {
+            sStorage->state = MSTATE_ERROR_FARM_BOX;
+            break;
+        }
+        switch (input)
         {
         case INPUT_MOVE_CURSOR:
             PlaySE(SE_SELECT);
@@ -2494,6 +2534,11 @@ static void Task_PokeStorageMain(u8 taskId)
         PrintMessage(MSG_PLEASE_REMOVE_MAIL);
         sStorage->state = MSTATE_WAIT_ERROR_MSG;
         break;
+    case MSTATE_ERROR_FARM_BOX:
+        PlaySE(SE_FAILURE);
+        PrintMessage(MSG_FARM_BOX_LOCKED);
+        sStorage->state = MSTATE_WAIT_ERROR_MSG;
+        break;
     case MSTATE_WAIT_ERROR_MSG:
         if (JOY_NEW(A_BUTTON | B_BUTTON | DPAD_ANY))
         {
@@ -2579,6 +2624,8 @@ static void Task_HidePartyPokemon(u8 taskId)
 
 static void Task_OnSelectedMon(u8 taskId)
 {
+    s16 menuInput;
+
     switch (sStorage->state)
     {
     case 0:
@@ -2601,7 +2648,14 @@ static void Task_OnSelectedMon(u8 taskId)
             sStorage->state = 2;
         break;
     case 2:
-        switch (HandleMenuInput())
+        menuInput = HandleMenuInput();
+        if (IsCursorInFarmBox() && (menuInput == MENU_MOVE || menuInput == MENU_PLACE || menuInput == MENU_SHIFT
+                                 || menuInput == MENU_WITHDRAW || menuInput == MENU_RELEASE))
+        {
+            sStorage->state = 7;
+            break;
+        }
+        switch (menuInput)
         {
         case MENU_B_PRESSED:
         case MENU_CANCEL:
@@ -2717,6 +2771,11 @@ static void Task_OnSelectedMon(u8 taskId)
     case 5:
         PlaySE(SE_FAILURE);
         PrintMessage(MSG_CANT_RELEASE_EGG);
+        sStorage->state = 6;
+        break;
+    case 7:
+        PlaySE(SE_FAILURE);
+        PrintMessage(MSG_FARM_BOX_LOCKED);
         sStorage->state = 6;
         break;
     case 4:
@@ -2869,7 +2928,13 @@ static void Task_DepositMenu(u8 taskId)
             SetPokeStorageTask(Task_PokeStorageMain);
             break;
         default:
-            if (TryStorePartyMonInBox(boxId))
+            if (boxId == TOWN_FARM_BOX)
+            {
+                PlaySE(SE_FAILURE);
+                PrintMessage(MSG_FARM_BOX_LOCKED);
+                sStorage->state = 4;
+            }
+            else if (TryStorePartyMonInBox(boxId))
             {
                 sDepositBoxId = boxId;
                 ClearBottomWindow();

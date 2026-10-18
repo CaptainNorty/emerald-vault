@@ -15,7 +15,7 @@ static void log_message(struct mLogger* logger, int category, enum mLogLevel lev
 }
 
 int main(int argc, char** argv) {
-    if (argc != 2) { fprintf(stderr, "Usage: emerald-emulator ROM\n"); return 2; }
+    if (argc != 2 && argc != 3) { fprintf(stderr, "Usage: emerald-emulator ROM [SAVE]\n"); return 2; }
     struct mLogger logger = { .log = log_message, .filter = NULL };
     mLogSetDefaultLogger(&logger);
     struct mCore* core = mCoreFind(argv[1]);
@@ -29,6 +29,8 @@ int main(int argc, char** argv) {
     core->desiredVideoDimensions(core, &width, &height);
     color_t* pixels = calloc(width * height, sizeof(color_t));
     if (!pixels || !mCoreLoadFile(core, argv[1])) return 1;
+    // An optional save file, opened temporarily so the copy on disk isn't changed.
+    if (argc == 3 && !mCoreLoadSaveFile(core, argv[2], true)) return 1;
     core->setVideoBuffer(core, pixels, width);
     core->rtc.override = RTC_FIXED;
     core->rtc.value = 946684800;

@@ -558,6 +558,8 @@ gSpecials::
 	def_special Town_BufferTotalEarnings
 	def_special Town_BufferStock
 	def_special Town_CollectNextItem
+	def_special Town_BufferStatus
+	def_special Town_ChooseWorkerSlot, waitstate=1
 	def_special Town_AssignWorker
 	def_special Town_TakeBackWorker
 	def_special Town_OpenFlyMap, waitstate=1

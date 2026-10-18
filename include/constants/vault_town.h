@@ -14,13 +14,22 @@
 #define TOWN_BUILDING_COUNT      9
 
 // Town specials take the building in VAR_0x8006, a party slot in VAR_0x8004
-// (as set by ChoosePartyMon) and a Pokémon type in VAR_0x8005.
+// (as set by ChoosePartyMon), a level in VAR_0x8005 (Builder) and a worker
+// slot in VAR_0x800A.
 
 // VAR_RESULT from Town_AssignWorker
 #define TOWN_ASSIGN_OK          0
 #define TOWN_ASSIGN_CANCELLED   1
 #define TOWN_ASSIGN_EGG         2
 #define TOWN_ASSIGN_LAST_MON    3
+
+// Business levels: each level adds a worker slot and a better item tier.
+#define TOWN_MAX_LEVEL   3
+#define TOWN_MAX_WORKERS TOWN_MAX_LEVEL
+
+// VAR_0x8005 for Town_ChooseWorkerSlot
+#define TOWN_SLOTS_TO_ASSIGN    0
+#define TOWN_SLOTS_TO_TAKE_BACK 1
 
 // Most kinds of item one business can stock
 #define TOWN_ITEM_KINDS 8

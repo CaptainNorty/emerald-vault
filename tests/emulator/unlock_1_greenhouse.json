@@ -67,6 +67,6 @@
     {"action": "next_message", "times": 0},
     {"action": "screenshot", "name": "15-lotad-returned"},
     {"action": "dismiss_text"},
-    {"action": "assert_party_level", "slot": 1, "min": 8, "max": 8}
+    {"action": "assert_party_level", "slot": 1, "min": 7, "max": 7}
   ]
 }

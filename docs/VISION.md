@@ -191,7 +191,7 @@ Three directions were considered:
    so progression isn't only gated by money.
 
 **Chosen direction: #1 now, #3 layered on later.** Terminals, items, closed
-Marts and worker EXP are built; upgrades and the FARM box are next.
+Marts, worker EXP, upgrades and the FARM box are built.
 
 - **Buildings produce items as well as money (built).** Each building stocks
   one item per 50 steps at 1.0x efficiency, rolled from its weighted item table
@@ -212,18 +212,27 @@ Marts and worker EXP are built; upgrades and the FARM box are next.
   `EventScript_MartClosed` (`data/scripts/marts_closed.inc`), so every item
   shop's clerk says the shelves are empty and points to the farm in Littleroot.
   Decoration shops still work. They may be replaced with something else later.
-- **Upgrades:** A building can be upgraded. Each upgrade adds a worker slot and
-  raises the tier of items it produces (for example, the Delivery Service moves
-  on to Super Potions and Super Repels).
-- **Workers gain EXP (built)** at the Day Care's rate, 1 EXP per step
-  (`WORKER_EXP_PER_STEP`), so the Pokémon you leave working grows instead of
+- **Upgrades (built).** The Builder sells upgrades to Lv. 2 (2x the building's
+  price) and Lv. 3 (6x); the free Delivery Service is priced as ₽2,500, so
+  ₽5,000 and ₽15,000. His menu lists new buildings first, then upgrades, each
+  cheapest first. Each level adds a worker slot (1, 2, 3 workers, whose speeds
+  add up) and switches to a better item table (`sDeliveryServiceItems2` and
+  `...3`; for example the Delivery Service moves on to Super Potions and Great
+  Balls, then Hyper Potions and Ultra Balls). The building's tiles don't change
+  yet. No badge requirements for upgrades for now.
+- **Workers gain EXP (built)** at half the Day Care's rate, 1 EXP per 2 steps
+  (`WORKER_STEPS_PER_EXP`), so the Pokémon you leave working grows instead of
   being a pure loss to your team. Like the Day Care, they don't learn moves or
-  evolve while working. It's fast at low levels (a Lv. 5 Lotad reaches Lv. 8 in
-  200 steps), so this is a tuning knob.
-- **Workers live in a FARM PC box.** Storing a full Pokémon per slot (80 bytes)
-  won't fit once upgrades add slots (9 buildings × 3 slots = 2,160 bytes). The
-  last PC box becomes the FARM box, and each building slot records which box
-  slot holds its worker (2 bytes).
+  evolve while working. A Lv. 5 Lotad reaches Lv. 7 in about 200 steps; still
+  a tuning knob.
+- **Workers live in the FARM box (built).** Storing a full Pokémon per slot
+  wouldn't fit in the save, so the last PC box (box 14) is named FARM and holds
+  every worker: building *b*'s slot *s* is box position *b* × 3 + *s*. The PC
+  shows it, and Summary works, but moving, withdrawing, depositing and
+  releasing there say "Use the farm terminals!", and caught Pokémon never go
+  there. On older saves, anything kept in box 14 moves to free spots in other
+  boxes and each building's worker moves into the FARM box when the save loads
+  (checked against a copy of a real playthrough save).
 - **Terminals instead of managers (built).** Each building has a terminal (the
   farm PC sprite) where the manager stood. It shows the worker's front sprite,
   level and speed, and how much money and how many items are in stock. Menu:
@@ -245,7 +254,7 @@ Marts and worker EXP are built; upgrades and the FARM box are next.
 1. Quick wins (above). Done.
 2. Terminals with the worker's sprite. Done.
 3. Items: buildings stock items, Marts close, workers gain EXP. Done.
-4. Upgrades: the FARM box, extra worker slots, higher item tiers.
+4. Upgrades: the FARM box, extra worker slots, higher item tiers. Done.
 5. Later: requests, money gates, building art.
 
 ## Progression gated by money

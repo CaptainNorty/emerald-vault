@@ -4454,7 +4454,8 @@ static u8 CopyMonToPC(struct Pokemon *mon)
 
     do
     {
-        for (boxPos = 0; boxPos < IN_BOX_COUNT; boxPos++)
+        // Emerald Vault: the FARM box only holds workers.
+        for (boxPos = 0; boxPos < IN_BOX_COUNT && boxNo != TOWN_FARM_BOX; boxPos++)
         {
             struct BoxPokemon *checkingMon = GetBoxedMonPtr(boxNo, boxPos);
             if (GetBoxMonData(checkingMon, MON_DATA_SPECIES, NULL) == SPECIES_NONE)
@@ -4621,7 +4622,7 @@ bool8 IsPokemonStorageFull(void)
 {
     s32 i, j;
 
-    for (i = 0; i < TOTAL_BOXES_COUNT; i++)
+    for (i = 0; i < TOWN_FARM_BOX; i++) // Emerald Vault: the FARM box only holds workers
         for (j = 0; j < IN_BOX_COUNT; j++)
             if (GetBoxMonDataAt(i, j, MON_DATA_SPECIES) == SPECIES_NONE)
                 return FALSE;

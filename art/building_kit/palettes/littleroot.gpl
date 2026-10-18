@@ -1,0 +1,154 @@
+GIMP Palette
+Name: Littleroot Town
+Columns: 15
+#
+255 255 255	palette 0 color 1
+222 230 238	palette 0 color 2
+189 205 230	palette 0 color 3
+156 180 222	palette 0 color 4
+131 131 139	palette 0 color 5
+ 98  98 123	palette 0 color 6
+ 65  74 106	palette 0 color 7
+189 189 131	palette 0 color 8
+115 189 246	palette 0 color 9
+ 98 172 238	palette 0 color 10
+115 189 246	palette 0 color 11
+ 98 164 222	palette 0 color 12
+ 82 139 197	palette 0 color 13
+ 74 115 172	palette 0 color 14
+115 197 164	palette 0 color 15
+255 255 255	palette 1 color 1
+222 230 238	palette 1 color 2
+189 205 230	palette 1 color 3
+156 180 222	palette 1 color 4
+131 131 139	palette 1 color 5
+ 98  98 123	palette 1 color 6
+ 65  74 106	palette 1 color 7
+ 41  49  90	palette 1 color 8
+115 189 246	palette 1 color 9
+ 98 172 238	palette 1 color 10
+255 189 131	palette 1 color 11
+238 148 115	palette 1 color 12
+222 106  98	palette 1 color 13
+205  65  82	palette 1 color 14
+115 197 164	palette 1 color 15
+180 255 131	palette 2 color 1
+131 197  98	palette 2 color 2
+ 57 139  49	palette 2 color 3
+ 57  82   0	palette 2 color 4
+222 148 115	palette 2 color 5
+106  90  90	palette 2 color 6
+164  98  90	palette 2 color 7
+ 65  57  49	palette 2 color 8
+255 197 148	palette 2 color 9
+222 106  98	palette 2 color 10
+205  65  82	palette 2 color 11
+164 213 197	palette 2 color 12
+115 197 164	palette 2 color 13
+ 65 180 131	palette 2 color 14
+ 24 164 106	palette 2 color 15
+255 255 255	palette 3 color 1
+213 213 213	palette 3 color 2
+189 189 189	palette 3 color 3
+164 164 164	palette 3 color 4
+131 131 139	palette 3 color 5
+ 65 180 131	palette 3 color 6
+164 213 197	palette 3 color 7
+ 65  49  65	palette 3 color 8
+238 213 205	palette 3 color 9
+222 180 164	palette 3 color 10
+189 148 139	palette 3 color 11
+156 115 115	palette 3 color 12
+131  90  90	palette 3 color 13
+ 98  65  82	palette 3 color 14
+115 197 164	palette 3 color 15
+255 255 255	palette 4 color 1
+222 230 238	palette 4 color 2
+255   0 255	palette 4 color 3
+255   0 255	palette 4 color 4
+255   0 255	palette 4 color 5
+156 164 189	palette 4 color 6
+ 82 106 213	palette 4 color 7
+ 65  90 189	palette 4 color 8
+ 57  82 156	palette 4 color 9
+ 41  65 139	palette 4 color 10
+172 197 230	palette 4 color 11
+139 164 222	palette 4 color 12
+106 131 213	palette 4 color 13
+ 82 106 213	palette 4 color 14
+115 197 164	palette 4 color 15
+255 255 255	palette 5 color 1
+222 230 238	palette 5 color 2
+189 205 230	palette 5 color 3
+156 180 222	palette 5 color 4
+131 131 139	palette 5 color 5
+ 98  98 123	palette 5 color 6
+ 65  74 106	palette 5 color 7
+ 41  49  90	palette 5 color 8
+115 189 246	palette 5 color 9
+ 98 172 238	palette 5 color 10
+238 230 164	palette 5 color 11
+222 205 131	palette 5 color 12
+213 180 106	palette 5 color 13
+205 156  82	palette 5 color 14
+115 197 164	palette 5 color 15
+255 255 255	palette 6 color 1
+230 222 222	palette 6 color 2
+213 213 197	palette 6 color 3
+189 197 172	palette 6 color 4
+131 131 139	palette 6 color 5
+ 98 106 123	palette 6 color 6
+ 65  74 106	palette 6 color 7
+ 41  49  90	palette 6 color 8
+164 213 230	palette 6 color 9
+106 189 197	palette 6 color 10
+230 222 156	palette 6 color 11
+205 197 123	palette 6 color 12
+180 164 123	palette 6 color 13
+164 139  98	palette 6 color 14
+115 197 164	palette 6 color 15
+213 222 172	palette 8 color 1
+189 205 172	palette 8 color 2
+189 189 131	palette 8 color 3
+164 172 123	palette 8 color 4
+131 131 139	palette 8 color 5
+ 98 106 123	palette 8 color 6
+ 65  74 106	palette 8 color 7
+ 41  49  90	palette 8 color 8
+164 213 230	palette 8 color 9
+106 189 197	palette 8 color 10
+238 238 246	palette 8 color 11
+205 213 238	palette 8 color 12
+156 156 180	palette 8 color 13
+115 172  57	palette 8 color 14
+115 197 164	palette 8 color 15
+238 230 205	palette 9 color 1
+213 205 148	palette 9 color 2
+205 180 123	palette 9 color 3
+172 139 123	palette 9 color 4
+131 131 139	palette 9 color 5
+ 98  98 123	palette 9 color 6
+ 65  74 106	palette 9 color 7
+ 41  49  90	palette 9 color 8
+156 205 246	palette 9 color 9
+ 98 156 238	palette 9 color 10
+255 230 180	palette 9 color 11
+255 189 172	palette 9 color 12
+246 164 131	palette 9 color 13
+205 139 106	palette 9 color 14
+115 197 164	palette 9 color 15
+255 255 255	palette 10 color 1
+230 222 222	palette 10 color 2
+213 213 197	palette 10 color 3
+189 197 172	palette 10 color 4
+131 131 139	palette 10 color 5
+ 98  98 123	palette 10 color 6
+ 65  74 106	palette 10 color 7
+ 41  49  90	palette 10 color 8
+156 205 246	palette 10 color 9
+ 98 156 238	palette 10 color 10
+255 230 123	palette 10 color 11
+222 172 115	palette 10 color 12
+189 139 115	palette 10 color 13
+156 106 115	palette 10 color 14
+115 197 164	palette 10 color 15

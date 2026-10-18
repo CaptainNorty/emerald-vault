@@ -13,18 +13,24 @@ struct TownBuilding
     u32 totalSales;
     u32 totalMoney;
     u16 pendingSales;
-    bool8 hasWorker;
+    bool8 hasWorker;   // Saves from before the FARM box: worker below still to move there
     bool8 everStaffed; // Has had a worker at least once
-    struct BoxPokemon worker;
+    struct BoxPokemon worker; // Saves from before the FARM box only
 };
 
-// Items a business has stocked. Kept apart from struct TownBuilding so saves
-// from before items existed still line up.
+// A business's level and stocked items. Kept apart from struct TownBuilding so
+// saves from before these existed still line up.
 struct TownStock
 {
     u32 itemProgress; // Efficiency-weighted steps toward the next item
-    u8 itemCounts[TOWN_ITEM_KINDS]; // Uncollected items, by the business's item table
+    u16 items[TOWN_ITEM_KINDS]; // Uncollected items: which...
+    u8 counts[TOWN_ITEM_KINDS]; // ...and how many (0 means the slot is free)
+    u8 level;         // 0 or 1 for Lv. 1, up to TOWN_MAX_LEVEL
+    u8 unused[3];
 };
+
+// Workers live in the last PC box; see src/vault_town.c.
+#define TOWN_FARM_BOX (TOTAL_BOXES_COUNT - 1)
 
 struct TownSaveData
 {
@@ -33,6 +39,7 @@ struct TownSaveData
 };
 
 void ResetTownData(void);
+void Town_InitFarmBox(void);
 void SetDeliveryServiceFlightHome(void);
 void Town_SetWorkerForTest(u8 building, u16 species, u8 level);
 

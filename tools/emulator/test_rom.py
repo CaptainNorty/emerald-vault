@@ -218,13 +218,13 @@ def load_map_ids():
 
 
 class Emulator:
-    def __init__(self, rom, output, symbols):
+    def __init__(self, rom, output, symbols, save=None):
         self.symbols = symbols
         self.output = output
         self.frame = 0
         self.log = (output / "emulator.log").open("w")
         self.proc = subprocess.Popen(
-            [str(ROOT / "build/automation/native/emerald-emulator"), str(rom)],
+            [str(ROOT / "build/automation/native/emerald-emulator"), str(rom)] + ([str(save)] if save else []),
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.log,
             cwd=output, text=True, bufsize=1)
         try:
@@ -468,7 +468,15 @@ def main():
     started = time.monotonic()
     print(f"Test artifacts: {output}", flush=True)
     try:
-        emulator = Emulator(test_rom, output, symbols)
+        save = None
+        if scenario.get("save_file"):
+            # A copy of a real save (relative to the repo), e.g. to test that old saves still load.
+            source = ROOT / scenario["save_file"]
+            if not source.is_file():
+                raise FileNotFoundError(f"No save file at {source}")
+            save = output / "test.sav"
+            shutil.copyfile(source, save)
+        emulator = Emulator(test_rom, output, symbols, save)
         if setup_writes is not None:
             emulator.apply_setup(setup_writes)
             result["setup"] = merge_setup(setup)
