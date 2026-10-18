@@ -18,9 +18,10 @@ Ideas that were explored and set aside are kept in
    a ruined plot as a business.
 2. **Staff:** Assign Pokémon to the business. Their species, type and level set
    its **efficiency**.
-3. **Earn:** The business sells its product and earns money based on the
-   **steps you take**.
-4. **Check in:** Each business has a **manager** who reports how it's going:
+3. **Earn:** The business sells its product, earns money and stocks items
+   based on the **steps you take**. Its worker gains EXP.
+4. **Check in:** Each business has a **terminal** that reports how it's going
+   (originally pitched as a manager):
    - "Business is going great! I've sold 73 evolution stones for a profit of
      $12,683."
    - "Hey boss, we've sold 892 Cheri Berries for $26,984."
@@ -113,13 +114,14 @@ Builder will rebuild it; that Pokémon becomes its first worker. After that,
 anyone can work there, but those types earn 2x, others 0.5x, scaled by level /
 10, doubled for a specialist. Up to 100 uncollected sales pile up per business.
 
-### The Builder and the managers (built)
+### The Builder and the terminals (built)
 After the free Delivery Service, the Builder stands in the yard and lists the
 businesses whose requirements you've met, cheapest first, with prices. He takes
 the money (shown in a money box), rebuilds the plot with placeholder tiles
 (existing house, Lab, Pokémon Center and Mart tiles; a pond and a quarry pit),
-and its manager appears. Each manager takes the first worker, reports and pays
-out earnings, and can change or return the worker. Code: `src/vault_town.c`
+and its terminal appears. Each terminal takes the first worker, shows the
+worker's picture, level and speed, collects money and items, and can change or
+return the worker. Code: `src/vault_town.c`
 (one table, `sBusinesses`, describes every business) and
 `src/data/vault_town_buildings.h` (the placeholder tiles).
 
@@ -135,7 +137,7 @@ between other cities, and it gives a strong reason to build it early.
 
 Technically: flying home is a key item with a Fly-style warp, usable outdoors
 and reusing an existing item icon. Flying out reuses vanilla's Fly map screen,
-opened from the Delivery Service manager's dialogue.
+opened from the Delivery Service terminal.
 
 ### Unlocking the Delivery Service (built)
 The Delivery Service is the first business and is introduced before the first
@@ -150,9 +152,9 @@ work.
   Delivery Service is rebuilt. The Builder's assistant points the player to
   Wingull on Route 103 (20% of encounters) and hands out 5 Poké Balls to anyone
   who has none, so the player can't get stuck.
-- **The manager** handles staffing, reports and collection. The first worker
+- **The terminal** handles staffing, reports and collection. The first worker
   must be a Flying-type; after that, any Pokémon can work there, but it can be
-  swapped or taken back anytime. The manager also gives the **Bird Whistle**
+  swapped or taken back anytime. The terminal also gives the **Bird Whistle**
   (flies you back to Littleroot from anywhere outdoors) and can fly you to any
   visited town.
 - **Earnings:** one delivery per 20 steps at 1.0x efficiency, ₽12 each, up to
@@ -188,30 +190,47 @@ Three directions were considered:
    people ask for things only the farm can produce (a peach, not just money),
    so progression isn't only gated by money.
 
-**Chosen direction: #1 now, #3 layered on later.**
+**Chosen direction: #1 now, #3 layered on later.** Terminals, items, closed
+Marts and worker EXP are built; upgrades and the FARM box are next.
 
-- **Buildings produce items as well as money.** Each building slowly stocks
-  items alongside its earnings. The Delivery Service stocks "Tier 1" items:
-  Potions, Poké Balls, Antidotes, Repels and Escape Ropes. The Forge stocks
-  better Poké Balls, the Quarry stones, the Greenhouse Berries, and so on.
-  Starting rate to tune: one item per 40–60 steps, rolled from the building's
-  item table.
-- **Marts are closed** for the first pass. Every shop opens through the
-  `pokemart` script command, so one change covers them all. They may be
-  replaced with something else later.
+- **Buildings produce items as well as money (built).** Each building stocks
+  one item per 50 steps at 1.0x efficiency, rolled from its weighted item table
+  (`sDeliveryServiceItems` and friends in `src/vault_town.c`), up to 30
+  uncollected. Tier 1 tables:
+
+  | Building | Items |
+  |---|---|
+  | Delivery Service | Potion, Poké Ball, Antidote, Repel, Escape Rope |
+  | Greenhouse | Oran, Pecha, Cheri, Rawst, Chesto, Aspear, Persim, Sitrus Berries |
+  | Quarry | Stardust, Hard Stone, Everstone, Soft Sand, Fire/Water/Thunder/Leaf Stones (rare) |
+  | Fishery | Pearl, Shoal Salt, Shoal Shell, Heart Scale, Net Ball, Dive Ball, Big Pearl |
+  | Generator | Super Potion, Super Repel, Paralyze Heal, Awakening, Magnet, Thunder Stone |
+  | Forge | Great Ball, Ultra Ball, Timer/Nest/Repeat Balls, Burn Heal, Charcoal |
+  | Spirit Sanctum | Revive, Full Heal, Hyper Potion, Cleanse Tag, Spell Tag, Max Revive |
+  | Ice Dome | Max Potion, Max Repel, Ice Heal, Full Restore, Ultra Ball, Never-Melt Ice |
+- **Marts are closed (built).** The `pokemart` script command now jumps to
+  `EventScript_MartClosed` (`data/scripts/marts_closed.inc`), so every item
+  shop's clerk says the shelves are empty and points to the farm in Littleroot.
+  Decoration shops still work. They may be replaced with something else later.
 - **Upgrades:** A building can be upgraded. Each upgrade adds a worker slot and
   raises the tier of items it produces (for example, the Delivery Service moves
   on to Super Potions and Super Repels).
-- **Workers gain EXP** slowly, like at the Day Care, so the Pokémon you leave
-  working grows instead of being a pure loss to your team.
+- **Workers gain EXP (built)** at the Day Care's rate, 1 EXP per step
+  (`WORKER_EXP_PER_STEP`), so the Pokémon you leave working grows instead of
+  being a pure loss to your team. Like the Day Care, they don't learn moves or
+  evolve while working. It's fast at low levels (a Lv. 5 Lotad reaches Lv. 8 in
+  200 steps), so this is a tuning knob.
 - **Workers live in a FARM PC box.** Storing a full Pokémon per slot (80 bytes)
   won't fit once upgrades add slots (9 buildings × 3 slots = 2,160 bytes). The
   last PC box becomes the FARM box, and each building slot records which box
   slot holds its worker (2 bytes).
-- **Terminals instead of managers:** Each building gets a terminal with Collect
-  money / Collect items / Workers / Fly (Delivery Service). Items pile up as
-  item and quantity pairs (8 slots × 9 buildings, about 290 bytes). The terminal
-  shows the worker's front sprite. Managers may stay as flavor NPCs.
+- **Terminals instead of managers (built).** Each building has a terminal (the
+  farm PC sprite) where the manager stood. It shows the worker's front sprite,
+  level and speed, and how much money and how many items are in stock. Menu:
+  COLLECT (money, then each kind of item; items that don't fit in the bag stay
+  in stock) / FLY (Delivery Service only) / CHANGE WORKER / TAKE WORKER BACK /
+  LOG OFF. Items are stored as a count per item-table entry (12 bytes per
+  building, in a separate array so saves from before items still load). Managers could come back later as flavor NPCs.
 - **Later:** Overworld sprites of workers walking around their building
   (pokeemerald-expansion has overworld sprites for every species), Stardew-style
   requests from townspeople (for example, a Slateport sailor wants Fishery
@@ -223,9 +242,9 @@ Three directions were considered:
 - The money box is shown whenever the Start menu is open.
 
 ### Order
-1. Quick wins (above).
-2. Terminals with the worker's sprite.
-3. Items: buildings stock items, Marts close, workers gain EXP.
+1. Quick wins (above). Done.
+2. Terminals with the worker's sprite. Done.
+3. Items: buildings stock items, Marts close, workers gain EXP. Done.
 4. Upgrades: the FARM box, extra worker slots, higher item tiers.
 5. Later: requests, money gates, building art.
 

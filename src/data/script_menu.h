@@ -783,23 +783,27 @@ struct MultichoiceListStruct
 };
 
 // Emerald Vault
-static const u8 sText_DeliveryServiceFly[] = _("FLY");
-static const u8 sText_DeliveryServiceChangeWorker[] = _("CHANGE WORKER");
-static const u8 sText_DeliveryServiceTakeBack[] = _("TAKE WORKER BACK");
+static const u8 sText_TerminalCollect[] = _("COLLECT");
+static const u8 sText_TerminalFly[] = _("FLY");
+static const u8 sText_TerminalChangeWorker[] = _("CHANGE WORKER");
+static const u8 sText_TerminalTakeBack[] = _("TAKE WORKER BACK");
+static const u8 sText_TerminalLogOff[] = _("LOG OFF");
 
-static const struct MenuAction MultichoiceList_DeliveryService[] =
+static const struct MenuAction MultichoiceList_DeliveryTerminal[] =
 {
-    {sText_DeliveryServiceFly},
-    {sText_DeliveryServiceChangeWorker},
-    {sText_DeliveryServiceTakeBack},
-    {gText_Exit},
+    {sText_TerminalCollect},
+    {sText_TerminalFly},
+    {sText_TerminalChangeWorker},
+    {sText_TerminalTakeBack},
+    {sText_TerminalLogOff},
 };
 
-static const struct MenuAction MultichoiceList_TownManager[] =
+static const struct MenuAction MultichoiceList_TownTerminal[] =
 {
-    {sText_DeliveryServiceChangeWorker},
-    {sText_DeliveryServiceTakeBack},
-    {gText_Exit},
+    {sText_TerminalCollect},
+    {sText_TerminalChangeWorker},
+    {sText_TerminalTakeBack},
+    {sText_TerminalLogOff},
 };
 
 static const struct MultichoiceListStruct sMultichoiceLists[] =
@@ -918,8 +922,8 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_SLATEPORT_TENT_RULES]       = MULTICHOICE(MultichoiceList_SlateportTentRules),
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
-    [MULTI_DELIVERY_SERVICE]           = MULTICHOICE(MultichoiceList_DeliveryService),
-    [MULTI_TOWN_MANAGER]               = MULTICHOICE(MultichoiceList_TownManager),
+    [MULTI_DELIVERY_TERMINAL]          = MULTICHOICE(MultichoiceList_DeliveryTerminal),
+    [MULTI_TOWN_TERMINAL]              = MULTICHOICE(MultichoiceList_TownTerminal),
 };
 
 const u8 *const gStdStrings[] =

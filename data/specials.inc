@@ -543,7 +543,7 @@ gSpecials::
 
 	@ Emerald Vault: Littleroot farm businesses (src/vault_town.c)
 	def_special Town_DrawBuildings
-	def_special Town_UpdateManagers
+	def_special Town_UpdateTerminals
 	def_special Town_HasBuilderOffers
 	def_special Town_ShowBuilderMenu, waitstate=1
 	def_special Town_BufferBuildingInfo
@@ -556,6 +556,8 @@ gSpecials::
 	def_special Town_BufferWorker
 	def_special Town_CollectEarnings
 	def_special Town_BufferTotalEarnings
+	def_special Town_BufferStock
+	def_special Town_CollectNextItem
 	def_special Town_AssignWorker
 	def_special Town_TakeBackWorker
 	def_special Town_OpenFlyMap, waitstate=1

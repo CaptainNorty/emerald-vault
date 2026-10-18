@@ -33,6 +33,7 @@ static void DrawLinkServicesMultichoiceMenu(u8 multichoiceId);
 static void CreatePCMultichoice(void);
 static void CreateLilycoveSSTidalMultichoice(void);
 static bool8 IsPicboxClosed(void);
+static u8 CreatePokemonPicWindow(u8 x, u8 y);
 static void CreateStartMenuForPokenavTutorial(void);
 static void InitMultichoiceNoWrap(bool8 ignoreBPress, u8 unusedCount, u8 windowId, u8 multichoiceId);
 
@@ -588,7 +589,9 @@ bool8 ScriptMenu_ShowPokemonPic(u16 species, u8 x, u8 y)
     {
         spriteId = CreateMonSprite_PicBox(species, x * 8 + 40, y * 8 + 40, 0);
         taskId = CreateTask(Task_PokemonPicWindow, 0x50);
-        gTasks[taskId].tWindowId = CreateWindowFromRect(x, y, 8, 8);
+        // Emerald Vault: the pic gets its own window tiles (multichoice menus use
+        // CreateWindowFromRect's), so a menu can be shown beside it.
+        gTasks[taskId].tWindowId = CreatePokemonPicWindow(x, y);
         gTasks[taskId].tState = 0;
         gTasks[taskId].tMonSpecies = species;
         gTasks[taskId].tMonSpriteId = spriteId;
@@ -624,6 +627,14 @@ static bool8 IsPicboxClosed(void)
 #undef tWindowX
 #undef tWindowY
 #undef tWindowId
+
+static u8 CreatePokemonPicWindow(u8 x, u8 y)
+{
+    struct WindowTemplate template = CreateWindowTemplate(0, x + 1, y + 1, 8, 8, 15, 0x240);
+    u8 windowId = AddWindow(&template);
+    PutWindowTilemap(windowId);
+    return windowId;
+}
 
 u8 CreateWindowFromRect(u8 x, u8 y, u8 width, u8 height)
 {

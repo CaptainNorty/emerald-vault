@@ -166,8 +166,9 @@ Delivery Service tests (all use the test-only ROM):
 
 - `builder_needs_flying_type.json`: the Builder asks for a Flying-type.
 - `delivery_service.json`: rebuild it, assign Wingull, get the Bird Whistle,
-  walk 200 steps and collect ₽120, fly to Oldale from the manager, take the
-  opened road onto Route 102, and whistle home.
+  walk 200 steps and collect ₽120 and 4 Tier 1 items at the terminal, fly to
+  Oldale from the terminal, take the opened road onto Route 102, and whistle
+  home.
 - `oldale_delivery_gate.json`: Oldale's west road is closed until the Delivery
   Service is rebuilt, and the Builder's assistant hands out Poké Balls to a
   player who has none.
@@ -177,14 +178,17 @@ Builder tests (each starts with the Delivery Service running):
 - `unlock_0_nothing_before_badge.json`: with the Greenhouse built and no
   badges, the Builder has nothing to offer, even with ₽9,999,999.
 - `unlock_1_greenhouse.json`: buy the Greenhouse for ₽5,000, staff it with
-  Lotad, walk 200 steps and collect ₽240.
+  Lotad, walk 200 steps, collect ₽240 and 4 Berries, and take Lotad back at
+  Lv. 8 (worker EXP).
 - `unlock_2_quarry.json` to `unlock_7_ice_dome.json`: at each building's
   unlock point, with every cheaper building already built and exactly its
-  price in hand, the Builder offers it, sells it, and its manager takes a
+  price in hand, the Builder offers it, sells it, and its terminal takes a
   first worker.
 
 Playtest fixes:
 
+- `marts_closed.json`: the Oldale Mart clerk says the shelves are empty and
+  points to the farm; no money or items change hands.
 - `quick_wins.json`: the farm PC by the Builder opens the storage system, the
   Start menu shows money (hidden while saving, back after the party menu), and
   screenshots of the fixed tree tops.
@@ -217,6 +221,9 @@ Actions currently supported:
 | `remember_money` | | Record the player's money. |
 | `assert_money` | `equals` | Fail unless the player has exactly that much money. |
 | `assert_money_gained` | optional `min` (default 1), `max` | Fail unless money rose by that much since `remember_money`. |
+| `remember_bag` | | Record every item in the bag. |
+| `assert_items_gained` | `items` (names like `POTION`), optional `min` (default 1), `max` | Fail unless the bag gained that many items in total since `remember_bag`, all of them from `items`. |
+| `assert_party_level` | `slot`, optional `min`, `max` | Fail unless the party Pokémon in that slot is within those levels. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons
 between presses to create another key-down event. Task checks follow

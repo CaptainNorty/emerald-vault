@@ -18,9 +18,18 @@ struct TownBuilding
     struct BoxPokemon worker;
 };
 
+// Items a business has stocked. Kept apart from struct TownBuilding so saves
+// from before items existed still line up.
+struct TownStock
+{
+    u32 itemProgress; // Efficiency-weighted steps toward the next item
+    u8 itemCounts[TOWN_ITEM_KINDS]; // Uncollected items, by the business's item table
+};
+
 struct TownSaveData
 {
     struct TownBuilding buildings[TOWN_BUILDING_COUNT];
+    struct TownStock stock[TOWN_BUILDING_COUNT];
 };
 
 void ResetTownData(void);

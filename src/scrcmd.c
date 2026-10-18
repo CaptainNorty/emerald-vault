@@ -11,6 +11,7 @@
 #include "decoration.h"
 #include "decoration_inventory.h"
 #include "event_data.h"
+#include "event_scripts.h"
 #include "field_door.h"
 #include "field_effect.h"
 #include "event_object_lock.h"
@@ -1884,13 +1885,13 @@ bool8 ScrCmd_dowildbattle(struct ScriptContext *ctx)
     return TRUE;
 }
 
+// Emerald Vault: every item shop is closed; goods come from the farm. The
+// clerk explains instead of opening the shop.
 bool8 ScrCmd_pokemart(struct ScriptContext *ctx)
 {
-    const void *ptr = (void *)ScriptReadWord(ctx);
-
-    CreatePokemartMenu(ptr);
-    ScriptContext_Stop();
-    return TRUE;
+    ScriptReadWord(ctx); // The shop's item list
+    ScriptJump(ctx, EventScript_MartClosed);
+    return FALSE;
 }
 
 bool8 ScrCmd_pokemartdecoration(struct ScriptContext *ctx)

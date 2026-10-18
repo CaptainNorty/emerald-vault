@@ -267,6 +267,24 @@ class Emulator:
         save2 = self.read(self.symbols["gSaveBlock2Ptr"])
         return self.read(save1 + 0x490) ^ self.read(save2 + 0xAC)
 
+    def bag(self):
+        # {item id: quantity} over all pockets. gBagPockets[] holds {slots pointer,
+        # capacity}; each slot is {u16 item, u16 quantity ^ encryptionKey}.
+        key = self.read(self.read(self.symbols["gSaveBlock2Ptr"]) + 0xAC) & 0xFFFF
+        items = {}
+        for pocket in range(5):
+            entry = self.symbols["gBagPockets"] + pocket * 8
+            slots, capacity = self.read(entry), self.read(entry + 4, 8)
+            for i in range(capacity):
+                value = self.read(slots + i * 4)
+                if value & 0xFFFF:
+                    items[value & 0xFFFF] = items.get(value & 0xFFFF, 0) + ((value >> 16) ^ key)
+        return items
+
+    def party_level(self, slot):
+        # struct Pokemon is 100 bytes; the level is at +0x54.
+        return self.read(self.symbols["gPlayerParty"] + slot * 100 + 0x54, 8)
+
     def apply_setup(self, writes):
         # The test-only ROM waits briefly at boot (src/test_start.c) for these writes.
         waiting = self.symbols["CB2_TestStartWaitForHarness"] & ~1
@@ -428,7 +446,8 @@ def main():
     map_ids = load_map_ids()
     maps = Maps(map_ids)
     devkitarm = Path(os.environ.get("DEVKITARM", "/opt/devkitpro/devkitARM"))
-    setup_writes = build_config(setup, Constants(devkitarm), map_ids) if setup is not None else None
+    constants = Constants(devkitarm)
+    setup_writes = build_config(setup, constants, map_ids) if setup is not None else None
     nm = subprocess.check_output([str(devkitarm / "bin/arm-none-eabi-nm"), "-n", str(elf)], text=True)
     symbols = {}
     for line in nm.splitlines():
@@ -454,6 +473,7 @@ def main():
             emulator.apply_setup(setup_writes)
             result["setup"] = merge_setup(setup)
         saved_money = None
+        saved_bag = None
         for step in scenario["steps"]:
             action = step["action"]
             if action == "run":
@@ -559,6 +579,32 @@ def main():
                     raise AssertionError(f"Money is ${money}; expected ${step['equals']}")
                 result["checks"].append({"money": money, "frame": emulator.frame})
                 print(f"PASS: money is ${money}", flush=True)
+            elif action == "remember_bag":
+                saved_bag = emulator.bag()
+                print(f"Bag: {saved_bag}", flush=True)
+            elif action == "assert_items_gained":
+                # Total items gained since remember_bag, all of them from `items`.
+                if saved_bag is None:
+                    raise ValueError("assert_items_gained needs an earlier remember_bag")
+                allowed = {constants.item(name) for name in step["items"]}
+                now = emulator.bag()
+                gained = {item: count - saved_bag.get(item, 0) for item, count in now.items()
+                          if count != saved_bag.get(item, 0)}
+                unexpected = {item: count for item, count in gained.items() if item not in allowed}
+                if unexpected:
+                    raise AssertionError(f"Unexpected bag changes (item id: count): {unexpected}")
+                total = sum(gained.values())
+                low, high = step.get("min", 1), step.get("max")
+                if total < low or (high is not None and total > high):
+                    raise AssertionError(f"Gained {total} items; expected {low} to {high if high is not None else 'any'}")
+                result["checks"].append({"items_gained": gained, "frame": emulator.frame})
+                print(f"PASS: gained {total} items {gained}", flush=True)
+            elif action == "assert_party_level":
+                level = emulator.party_level(step["slot"])
+                if level < step.get("min", 1) or level > step.get("max", 100):
+                    raise AssertionError(f"Party slot {step['slot']} is level {level}")
+                result["checks"].append({"party_level": level, "slot": step["slot"], "frame": emulator.frame})
+                print(f"PASS: party slot {step['slot']} is level {level}", flush=True)
             elif action == "assert_money_gained":
                 if saved_money is None:
                     raise ValueError("assert_money_gained needs an earlier remember_money")

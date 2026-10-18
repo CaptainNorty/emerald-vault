@@ -43,7 +43,7 @@ LittlerootTown_OnLoad:
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
 	call_if_set FLAG_DELIVERY_SERVICE_BUILT, LittlerootTown_EventScript_SetBuilderInYard
-	special Town_UpdateManagers
+	special Town_UpdateTerminals
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
 	call_if_unset FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_SetTwinPos
@@ -1119,7 +1119,7 @@ LittlerootTown_Text_QuarrySign:
 	.string "EVOLUTION STONES, dug fresh daily!$"
 
 @ ---------------------------------------------------------------------------
-@ Emerald Vault: the Builder and the businesses' managers (src/vault_town.c)
+@ Emerald Vault: the Builder and the businesses' terminals (src/vault_town.c)
 @ ---------------------------------------------------------------------------
 
 @ After rebuilding the Delivery Service, the Builder stands in the yard
@@ -1228,173 +1228,195 @@ LittlerootTown_EventScript_BuilderNeedFlyingType::
 	release
 	end
 
-LittlerootTown_EventScript_DeliveryManager::
+LittlerootTown_EventScript_DeliveryTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_DELIVERY_SERVICE
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_GreenhouseManager::
+LittlerootTown_EventScript_GreenhouseTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_GREENHOUSE
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_QuarryManager::
+LittlerootTown_EventScript_QuarryTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_QUARRY
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_FisheryManager::
+LittlerootTown_EventScript_FisheryTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_FISHERY
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_GeneratorManager::
+LittlerootTown_EventScript_GeneratorTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_GENERATOR
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_ForgeManager::
+LittlerootTown_EventScript_ForgeTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_FORGE
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_SpiritSanctumManager::
+LittlerootTown_EventScript_SpiritSanctumTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_SPIRIT_SANCTUM
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_IceDomeManager::
+LittlerootTown_EventScript_IceDomeTerminal::
 	lock
-	faceplayer
 	setvar VAR_0x8006, TOWN_ICE_DOME
-	goto LittlerootTown_EventScript_Manager
+	goto LittlerootTown_EventScript_Terminal
 
-LittlerootTown_EventScript_Manager::
+LittlerootTown_EventScript_Terminal::
+	playse SE_PC_ON
 	special Town_WasEverStaffed
-	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_ManagerFirstWorker
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalFirstWorker
 	special Town_HasWorker
-	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_ManagerNoWorker
-	special Town_CollectEarnings
-	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_ManagerNoEarnings
-	playse SE_SHOP
-	msgbox LittlerootTown_Text_ManagerEarnings, MSGBOX_DEFAULT
-	special Town_BufferTotalEarnings
-	msgbox LittlerootTown_Text_ManagerTotalEarnings, MSGBOX_DEFAULT
-	goto LittlerootTown_EventScript_ManagerMenu
-
-LittlerootTown_EventScript_ManagerNoEarnings::
-	msgbox LittlerootTown_Text_ManagerNoEarnings, MSGBOX_DEFAULT
-LittlerootTown_EventScript_ManagerMenu::
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNoWorker
+	special Town_BufferStock
+	showmonpic VAR_0x8008, 1, 1
 	special Town_BufferWorker
-	message LittlerootTown_Text_ManagerWhatCanIDo
+	msgbox LittlerootTown_Text_TerminalWorkerStatus, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
+LittlerootTown_EventScript_TerminalNoWorker::
+	special Town_BufferBuildingInfo
+	msgbox LittlerootTown_Text_TerminalNoWorker, MSGBOX_DEFAULT
+LittlerootTown_EventScript_TerminalMenu::
+	special Town_BufferStock
+	message LittlerootTown_Text_TerminalStock
 	waitmessage
-	goto_if_eq VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_DeliveryServiceMenu
-	multichoice 16, 6, MULTI_TOWN_MANAGER, FALSE
+	goto_if_eq VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_DeliveryTerminalMenu
+	multichoice 17, 4, MULTI_TOWN_TERMINAL, FALSE
 	switch VAR_RESULT
-	case TOWN_MANAGER_CHANGE_WORKER, LittlerootTown_EventScript_ManagerChooseWorker
-	case TOWN_MANAGER_TAKE_BACK, LittlerootTown_EventScript_ManagerTakeBackWorker
-	goto LittlerootTown_EventScript_ManagerGoodbye
+	case TOWN_TERMINAL_COLLECT, LittlerootTown_EventScript_TerminalCollect
+	case TOWN_TERMINAL_CHANGE_WORKER, LittlerootTown_EventScript_TerminalChooseWorker
+	case TOWN_TERMINAL_TAKE_BACK, LittlerootTown_EventScript_TerminalTakeBackWorker
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-@ The Delivery Service manager can also fly the player to visited towns.
-LittlerootTown_EventScript_DeliveryServiceMenu::
-	multichoice 16, 4, MULTI_DELIVERY_SERVICE, FALSE
+@ The Delivery Service's terminal also books flights to visited towns.
+LittlerootTown_EventScript_DeliveryTerminalMenu::
+	multichoice 17, 2, MULTI_DELIVERY_TERMINAL, FALSE
 	switch VAR_RESULT
-	case DELIVERY_SERVICE_FLY, LittlerootTown_EventScript_DeliveryFly
-	case DELIVERY_SERVICE_CHANGE_WORKER, LittlerootTown_EventScript_ManagerChooseWorker
-	case DELIVERY_SERVICE_TAKE_BACK, LittlerootTown_EventScript_ManagerTakeBackWorker
-	goto LittlerootTown_EventScript_ManagerGoodbye
+	case DELIVERY_TERMINAL_COLLECT, LittlerootTown_EventScript_TerminalCollect
+	case DELIVERY_TERMINAL_FLY, LittlerootTown_EventScript_DeliveryFly
+	case DELIVERY_TERMINAL_CHANGE_WORKER, LittlerootTown_EventScript_TerminalChooseWorker
+	case DELIVERY_TERMINAL_TAKE_BACK, LittlerootTown_EventScript_TerminalTakeBackWorker
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerGoodbye::
-	msgbox LittlerootTown_Text_ManagerGoodbye, MSGBOX_DEFAULT
+LittlerootTown_EventScript_TerminalLogOff::
+	hidemonpic
+	closemessage
+	playse SE_PC_OFF
 	release
 	end
 
+@ Pays out the money, then moves each kind of item into the bag.
+LittlerootTown_EventScript_TerminalCollect::
+	special Town_BufferStock
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNothingToCollect
+	special Town_CollectEarnings
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalCollectItems
+	playse SE_SHOP
+	msgbox LittlerootTown_Text_TerminalEarnings, MSGBOX_DEFAULT
+	special Town_BufferTotalEarnings
+	msgbox LittlerootTown_Text_TerminalTotalEarnings, MSGBOX_DEFAULT
+LittlerootTown_EventScript_TerminalCollectItems::
+	setvar VAR_0x8009, 0
+LittlerootTown_EventScript_TerminalCollectNextItem::
+	special Town_CollectNextItem
+	goto_if_eq VAR_RESULT, TOWN_ITEMS_DONE, LittlerootTown_EventScript_TerminalMenu
+	goto_if_eq VAR_RESULT, TOWN_ITEM_NO_ROOM, LittlerootTown_EventScript_TerminalNoRoomForItem
+	playse SE_SELECT
+	msgbox LittlerootTown_Text_TerminalCollectedItem, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalCollectNextItem
+
+LittlerootTown_EventScript_TerminalNoRoomForItem::
+	msgbox LittlerootTown_Text_TerminalNoRoomForItem, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalCollectNextItem
+
+LittlerootTown_EventScript_TerminalNothingToCollect::
+	msgbox LittlerootTown_Text_TerminalNothingToCollect, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
+
 LittlerootTown_EventScript_DeliveryFly::
+	hidemonpic
 	msgbox LittlerootTown_Text_DeliveryWhereTo, MSGBOX_DEFAULT
 	closemessage
 	special Town_OpenFlyMap
-	goto LittlerootTown_EventScript_ManagerGoodbye
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerNoWorker::
-	msgbox LittlerootTown_Text_ManagerNoWorker, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, LittlerootTown_EventScript_ManagerGoodbye
-LittlerootTown_EventScript_ManagerChooseWorker::
-	msgbox LittlerootTown_Text_ManagerWhoShouldWork, MSGBOX_DEFAULT
+LittlerootTown_EventScript_TerminalChooseWorker::
+	hidemonpic
+	msgbox LittlerootTown_Text_TerminalWhoShouldWork, MSGBOX_DEFAULT
 	closemessage
 	special ChoosePartyMon
-	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_ManagerGoodbye
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_TerminalLogOff
 	special Town_AssignWorker
-	goto_if_eq VAR_RESULT, TOWN_ASSIGN_EGG, LittlerootTown_EventScript_ManagerCantUseEgg
-	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_ManagerCantUseLastMon
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_EGG, LittlerootTown_EventScript_TerminalCantUseEgg
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_TerminalCantUseLastMon
 	special Town_BufferWorker
-	msgbox LittlerootTown_Text_ManagerNewWorker, MSGBOX_DEFAULT
-	release
-	end
+	msgbox LittlerootTown_Text_TerminalNewWorker, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerTakeBackWorker::
+LittlerootTown_EventScript_TerminalTakeBackWorker::
+	special Town_HasWorker
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalNoWorkerToTakeBack
 	special Town_BufferWorker
 	special Town_TakeBackWorker
-	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_ManagerPartyFull
-	msgbox LittlerootTown_Text_ManagerWorkerReturned, MSGBOX_DEFAULT
-	release
-	end
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalPartyFull
+	hidemonpic
+	msgbox LittlerootTown_Text_TerminalWorkerReturned, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerPartyFull::
-	msgbox LittlerootTown_Text_ManagerPartyFull, MSGBOX_DEFAULT
-	release
-	end
+LittlerootTown_EventScript_TerminalNoWorkerToTakeBack::
+	msgbox LittlerootTown_Text_TerminalNoWorkerToTakeBack, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
 
-LittlerootTown_EventScript_ManagerCantUseEgg::
-	msgbox LittlerootTown_Text_ManagerCantUseEgg, MSGBOX_DEFAULT
-	release
-	end
+LittlerootTown_EventScript_TerminalPartyFull::
+	msgbox LittlerootTown_Text_TerminalPartyFull, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalMenu
 
-LittlerootTown_EventScript_ManagerCantUseLastMon::
-	msgbox LittlerootTown_Text_ManagerCantUseLastMon, MSGBOX_DEFAULT
-	release
-	end
+LittlerootTown_EventScript_TerminalCantUseEgg::
+	msgbox LittlerootTown_Text_TerminalCantUseEgg, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
+
+LittlerootTown_EventScript_TerminalCantUseLastMon::
+	msgbox LittlerootTown_Text_TerminalCantUseLastMon, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
 
 @ A business's first worker has to be one of its types. After that, anyone
 @ can work there, though those types work best.
-LittlerootTown_EventScript_ManagerFirstWorker::
+LittlerootTown_EventScript_TerminalFirstWorker::
 	special Town_BufferBuildingInfo
-	msgbox LittlerootTown_Text_ManagerNeedFirstWorker, MSGBOX_DEFAULT
+	msgbox LittlerootTown_Text_TerminalNeedFirstWorker, MSGBOX_DEFAULT
 	closemessage
 	special ChoosePartyMon
-	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_ManagerFirstWorkerLater
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, LittlerootTown_EventScript_TerminalFirstWorkerLater
 	special Town_IsPartyMonSuited
-	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_ManagerFirstWorkerUnsuited
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TerminalFirstWorkerUnsuited
 	special Town_AssignWorker
-	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_ManagerCantUseLastMon
+	goto_if_eq VAR_RESULT, TOWN_ASSIGN_LAST_MON, LittlerootTown_EventScript_TerminalCantUseLastMon
 	special Town_BufferWorker
-	msgbox LittlerootTown_Text_ManagerFirstWorkerReady, MSGBOX_DEFAULT
-	goto_if_ne VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_ManagerGoodbye
-	goto_if_set FLAG_RECEIVED_BIRD_WHISTLE, LittlerootTown_EventScript_ManagerGoodbye
+	msgbox LittlerootTown_Text_TerminalFirstWorkerReady, MSGBOX_DEFAULT
+	goto_if_ne VAR_0x8006, TOWN_DELIVERY_SERVICE, LittlerootTown_EventScript_TerminalLogOff
+	goto_if_set FLAG_RECEIVED_BIRD_WHISTLE, LittlerootTown_EventScript_TerminalLogOff
 	msgbox LittlerootTown_Text_DeliveryTakeWhistle, MSGBOX_DEFAULT
 	giveitem ITEM_BIRD_WHISTLE
 	setflag FLAG_RECEIVED_BIRD_WHISTLE
 	msgbox LittlerootTown_Text_DeliveryExplainFlights, MSGBOX_DEFAULT
-	release
-	end
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerFirstWorkerLater::
+LittlerootTown_EventScript_TerminalFirstWorkerLater::
 	special Town_BufferBuildingInfo
-	msgbox LittlerootTown_Text_ManagerFirstWorkerLater, MSGBOX_DEFAULT
-	release
-	end
+	msgbox LittlerootTown_Text_TerminalFirstWorkerLater, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
 
-LittlerootTown_EventScript_ManagerFirstWorkerUnsuited::
+LittlerootTown_EventScript_TerminalFirstWorkerUnsuited::
 	special Town_BufferBuildingInfo
-	msgbox LittlerootTown_Text_ManagerFirstWorkerUnsuited, MSGBOX_DEFAULT
-	release
-	end
+	msgbox LittlerootTown_Text_TerminalFirstWorkerUnsuited, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_TerminalLogOff
 
 LittlerootTown_Text_BuilderIntro:
 	.string "Hey there! I'm the BUILDER.\p"
@@ -1418,7 +1440,7 @@ LittlerootTown_Text_BuilderSeesFlyingType:
 LittlerootTown_Text_BuilderDone:
 	.string "Ta-da! The DELIVERY SERVICE is\n"
 	.string "back in business!\p"
-	.string "Talk to its manager to put your\n"
+	.string "Use its terminal to put your\n"
 	.string "FLYING-type to work.\p"
 	.string "I'll set up in the yard by the old\n"
 	.string "town. Come see me when you want\l"
@@ -1455,96 +1477,105 @@ LittlerootTown_Text_BuilderStandBack:
 LittlerootTown_Text_BuilderBuilt:
 	.string "Ta-da! The {STR_VAR_1} is open\n"
 	.string "for business!\p"
-	.string "Talk to its manager to put a\n"
+	.string "Use its terminal to put a\n"
 	.string "{STR_VAR_3}-type POKéMON to work.$"
 
 LittlerootTown_Text_DeliveryServiceSign:
 	.string "DELIVERY SERVICE\n"
 	.string "Wings for hire, all across HOENN!$"
 
-LittlerootTown_Text_ManagerNeedFirstWorker:
-	.string "Hi, boss! I'm the manager of the\n"
-	.string "{STR_VAR_1}.\p"
-	.string "We need a {STR_VAR_3}-type POKéMON\n"
-	.string "to get started. Who will it be?$"
+LittlerootTown_Text_TerminalNeedFirstWorker:
+	.string "{STR_VAR_1} TERMINAL\n"
+	.string "No worker registered.\p"
+	.string "A {STR_VAR_3}-type POKéMON is\n"
+	.string "needed to start. Choose a worker.$"
 
-LittlerootTown_Text_ManagerFirstWorkerLater:
-	.string "No rush. Come back when you're\n"
-	.string "ready to put a {STR_VAR_3}-type\l"
-	.string "POKéMON to work.$"
+LittlerootTown_Text_TerminalFirstWorkerLater:
+	.string "Register a {STR_VAR_3}-type\n"
+	.string "POKéMON to start the business.$"
 
-LittlerootTown_Text_ManagerFirstWorkerUnsuited:
-	.string "Hmm, that one won't do.\n"
-	.string "Our first worker has to be\l"
-	.string "a {STR_VAR_3}-type!$"
+LittlerootTown_Text_TerminalFirstWorkerUnsuited:
+	.string "Error: the first worker must be\n"
+	.string "a {STR_VAR_3}-type POKéMON.$"
 
-LittlerootTown_Text_ManagerFirstWorkerReady:
-	.string "{STR_VAR_1} is ready to work!\p"
-	.string "The better suited and stronger\n"
-	.string "the worker, the more we earn.\p"
-	.string "We earn money as you walk, so\n"
-	.string "come back to collect it, boss!$"
+LittlerootTown_Text_TerminalFirstWorkerReady:
+	.string "{STR_VAR_1} is registered and\n"
+	.string "ready to work!\p"
+	.string "The better suited and stronger the\n"
+	.string "worker, the more the business makes.\p"
+	.string "Money and goods are made as you\n"
+	.string "walk. Workers gain EXP, too.\p"
+	.string "Come back to this terminal to\n"
+	.string "collect them!$"
 
 LittlerootTown_Text_DeliveryTakeWhistle:
-	.string "Oh, and take this. Blow it anywhere\n"
-	.string "outdoors, and one of our birds will\l"
-	.string "fly you right back here.$"
+	.string "A package is waiting for you!$"
 
 LittlerootTown_Text_DeliveryExplainFlights:
-	.string "From here, our birds can also fly\n"
-	.string "you to any town you've visited.\l"
-	.string "Just ask!$"
+	.string "Blow the BIRD WHISTLE anywhere\n"
+	.string "outdoors, and one of our birds will\l"
+	.string "fly you right back here.\p"
+	.string "This terminal can also book a flight\n"
+	.string "to any town you've visited.$"
 
-LittlerootTown_Text_ManagerEarnings:
-	.string "Welcome back, boss!\p"
-	.string "Since your last visit, we\n"
-	.string "{STR_VAR_3}!\p"
-	.string "That's ¥{STR_VAR_2} for you!$"
+LittlerootTown_Text_TerminalWorkerStatus:
+	.string "{STR_VAR_1} (Lv. {STR_VAR_2}) is working\n"
+	.string "at {STR_VAR_3}x speed.$"
 
-LittlerootTown_Text_ManagerTotalEarnings:
-	.string "We've earned ¥{STR_VAR_1}\n"
-	.string "so far.$"
+LittlerootTown_Text_TerminalNoWorker:
+	.string "The {STR_VAR_1} has no worker!\n"
+	.string "Choose CHANGE WORKER to add one.$"
 
-LittlerootTown_Text_ManagerNoEarnings:
-	.string "Nothing to report since your last\n"
-	.string "visit. Business picks up as you\l"
-	.string "walk around, boss!$"
+LittlerootTown_Text_TerminalStock:
+	.string "In stock: ¥{STR_VAR_1} and\n"
+	.string "{STR_VAR_2} items.$"
 
-LittlerootTown_Text_ManagerWhatCanIDo:
-	.string "{STR_VAR_1} is working at {STR_VAR_3}x\n"
-	.string "speed. What can I do for you?$"
+LittlerootTown_Text_TerminalEarnings:
+	.string "Since your last collection, the\n"
+	.string "business {STR_VAR_3}!\p"
+	.string "¥{STR_VAR_2} was added to your money.$"
 
-LittlerootTown_Text_ManagerGoodbye:
-	.string "Come back anytime, boss!$"
+LittlerootTown_Text_TerminalTotalEarnings:
+	.string "Total earned so far: ¥{STR_VAR_1}.$"
+
+LittlerootTown_Text_TerminalCollectedItem:
+	.string "Collected {STR_VAR_2} {STR_VAR_1}!$"
+
+LittlerootTown_Text_TerminalNoRoomForItem:
+	.string "No room in the BAG for\n"
+	.string "{STR_VAR_2} {STR_VAR_1}.\l"
+	.string "They'll stay in stock.$"
+
+LittlerootTown_Text_TerminalNothingToCollect:
+	.string "Nothing to collect yet. Business\n"
+	.string "picks up as you walk around!$"
 
 LittlerootTown_Text_DeliveryWhereTo:
 	.string "Where to? Our birds can fly you to\n"
 	.string "any town you've visited.$"
 
-LittlerootTown_Text_ManagerNoWorker:
-	.string "We've got nobody working here,\n"
-	.string "boss!\p"
-	.string "Want to put someone to work?$"
-
-LittlerootTown_Text_ManagerWhoShouldWork:
+LittlerootTown_Text_TerminalWhoShouldWork:
 	.string "Who should work here?$"
 
-LittlerootTown_Text_ManagerNewWorker:
+LittlerootTown_Text_TerminalNewWorker:
 	.string "{STR_VAR_1} is on the job now!\n"
 	.string "It works at {STR_VAR_3}x speed.$"
 
-LittlerootTown_Text_ManagerWorkerReturned:
-	.string "Here's {STR_VAR_1} back.\p"
-	.string "Without a worker, we can't earn\n"
-	.string "anything, boss.$"
+LittlerootTown_Text_TerminalWorkerReturned:
+	.string "{STR_VAR_1} returned to your party.\p"
+	.string "Without a worker, the business\n"
+	.string "can't make anything.$"
 
-LittlerootTown_Text_ManagerPartyFull:
-	.string "Your party is full, boss.\n"
+LittlerootTown_Text_TerminalNoWorkerToTakeBack:
+	.string "There's no worker to take back.$"
+
+LittlerootTown_Text_TerminalPartyFull:
+	.string "Your party is full.\n"
 	.string "Make some room first!$"
 
-LittlerootTown_Text_ManagerCantUseEgg:
+LittlerootTown_Text_TerminalCantUseEgg:
 	.string "An EGG can't work here!$"
 
-LittlerootTown_Text_ManagerCantUseLastMon:
-	.string "That's your last POKéMON, boss!\n"
+LittlerootTown_Text_TerminalCantUseLastMon:
+	.string "That's your last POKéMON!\n"
 	.string "You'll need it on your journey.$"

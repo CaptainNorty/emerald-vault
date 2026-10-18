@@ -22,6 +22,14 @@
 #define TOWN_ASSIGN_EGG         2
 #define TOWN_ASSIGN_LAST_MON    3
 
+// Most kinds of item one business can stock
+#define TOWN_ITEM_KINDS 8
+
+// VAR_RESULT from Town_CollectNextItem
+#define TOWN_ITEMS_DONE         0
+#define TOWN_ITEM_COLLECTED     1
+#define TOWN_ITEM_NO_ROOM       2
+
 // VAR_RESULT from Town_ShowBuilderMenu, besides a building
 #define TOWN_MENU_CANCELLED     0xFF
 #define TOWN_MENU_EMPTY         0xFE

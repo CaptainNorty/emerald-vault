@@ -143,8 +143,8 @@
       "flag": "0"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_DELIVERY_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_MAN_2",
+      "local_id": "LOCALID_LITTLEROOT_DELIVERY_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 28,
       "y": 9,
       "elevation": 3,
@@ -153,12 +153,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_DeliveryManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_DELIVERY_MANAGER"
+      "script": "LittlerootTown_EventScript_DeliveryTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_DELIVERY_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_GREENHOUSE_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_WOMAN_2",
+      "local_id": "LOCALID_LITTLEROOT_GREENHOUSE_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 55,
       "y": 10,
       "elevation": 3,
@@ -167,12 +167,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_GreenhouseManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_GREENHOUSE_MANAGER"
+      "script": "LittlerootTown_EventScript_GreenhouseTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_GREENHOUSE_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_QUARRY_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_HIKER",
+      "local_id": "LOCALID_LITTLEROOT_QUARRY_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 55,
       "y": 34,
       "elevation": 3,
@@ -181,12 +181,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_QuarryManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_QUARRY_MANAGER"
+      "script": "LittlerootTown_EventScript_QuarryTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_QUARRY_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_FISHERY_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_FISHERMAN",
+      "local_id": "LOCALID_LITTLEROOT_FISHERY_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 29,
       "y": 34,
       "elevation": 3,
@@ -195,12 +195,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_FisheryManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_FISHERY_MANAGER"
+      "script": "LittlerootTown_EventScript_FisheryTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_FISHERY_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_GENERATOR_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_SCIENTIST_1",
+      "local_id": "LOCALID_LITTLEROOT_GENERATOR_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 54,
       "y": 21,
       "elevation": 3,
@@ -209,12 +209,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_GeneratorManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_GENERATOR_MANAGER"
+      "script": "LittlerootTown_EventScript_GeneratorTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_GENERATOR_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_FORGE_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_MAN_3",
+      "local_id": "LOCALID_LITTLEROOT_FORGE_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 42,
       "y": 10,
       "elevation": 3,
@@ -223,12 +223,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_ForgeManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_FORGE_MANAGER"
+      "script": "LittlerootTown_EventScript_ForgeTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_FORGE_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_SPIRIT_SANCTUM_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_HEX_MANIAC",
+      "local_id": "LOCALID_LITTLEROOT_SPIRIT_SANCTUM_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 42,
       "y": 34,
       "elevation": 3,
@@ -237,12 +237,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_SpiritSanctumManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_MANAGER"
+      "script": "LittlerootTown_EventScript_SpiritSanctumTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_TERMINAL"
     },
     {
-      "local_id": "LOCALID_LITTLEROOT_ICE_DOME_MANAGER",
-      "graphics_id": "OBJ_EVENT_GFX_EXPERT_M",
+      "local_id": "LOCALID_LITTLEROOT_ICE_DOME_TERMINAL",
+      "graphics_id": "OBJ_EVENT_GFX_FARM_PC",
       "x": 29,
       "y": 22,
       "elevation": 3,
@@ -251,8 +251,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "LittlerootTown_EventScript_IceDomeManager",
-      "flag": "FLAG_HIDE_LITTLEROOT_ICE_DOME_MANAGER"
+      "script": "LittlerootTown_EventScript_IceDomeTerminal",
+      "flag": "FLAG_HIDE_LITTLEROOT_ICE_DOME_TERMINAL"
     },
     {
       "local_id": "LOCALID_LITTLEROOT_FARM_PC",

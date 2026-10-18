@@ -122,19 +122,21 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
-#define MULTI_DELIVERY_SERVICE             114 // Emerald Vault
-#define MULTI_TOWN_MANAGER                 115 // Emerald Vault
+#define MULTI_DELIVERY_TERMINAL            114 // Emerald Vault
+#define MULTI_TOWN_TERMINAL                115 // Emerald Vault
 
-// Emerald Vault: Delivery Service manager selections
-#define DELIVERY_SERVICE_FLY            0
-#define DELIVERY_SERVICE_CHANGE_WORKER  1
-#define DELIVERY_SERVICE_TAKE_BACK      2
-#define DELIVERY_SERVICE_EXIT           3
+// Emerald Vault: Delivery Service terminal selections
+#define DELIVERY_TERMINAL_COLLECT       0
+#define DELIVERY_TERMINAL_FLY           1
+#define DELIVERY_TERMINAL_CHANGE_WORKER 2
+#define DELIVERY_TERMINAL_TAKE_BACK     3
+#define DELIVERY_TERMINAL_LOG_OFF       4
 
-// Emerald Vault: other business managers' selections
-#define TOWN_MANAGER_CHANGE_WORKER      0
-#define TOWN_MANAGER_TAKE_BACK          1
-#define TOWN_MANAGER_EXIT               2
+// Emerald Vault: other business terminals' selections
+#define TOWN_TERMINAL_COLLECT           0
+#define TOWN_TERMINAL_CHANGE_WORKER     1
+#define TOWN_TERMINAL_TAKE_BACK         2
+#define TOWN_TERMINAL_LOG_OFF           3
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

@@ -1,14 +1,16 @@
 // Emerald Vault: businesses on the Littleroot Town farm.
 //
 // The Builder rebuilds ruined plots into businesses. Each business earns money
-// as the player walks. Earnings are worked out lazily from GAME_STAT_STEPS
-// whenever the player talks to its manager, scaled by how well suited its
-// assigned worker is (type, level and species).
+// and stocks items as the player walks, and its worker gains EXP. Everything is
+// worked out lazily from GAME_STAT_STEPS whenever the player uses its terminal,
+// scaled by how well suited its assigned worker is (type, level and species).
 #include "global.h"
 #include "vault_town.h"
 #include "event_data.h"
 #include "field_effect.h"
 #include "fieldmap.h"
+#include "item.h"
+#include "random.h"
 #include "international_string_util.h"
 #include "list_menu.h"
 #include "main.h"
@@ -32,6 +34,7 @@
 #include "constants/characters.h"
 #include "constants/flags.h"
 #include "constants/game_stat.h"
+#include "constants/items.h"
 #include "constants/map_event_ids.h"
 #include "constants/map_groups.h"
 #include "constants/party_menu.h"
@@ -41,6 +44,15 @@
 
 #define STEPS_PER_SALE 20  // Steps per sale for a worker at 1.0x efficiency
 #define STOCKROOM_SIZE 100 // Uncollected sales stop at this many
+#define ITEM_STOCKROOM_SIZE 30 // Uncollected items stop at this many
+#define WORKER_EXP_PER_STEP 1  // Like the Day Care
+
+// One kind of item a business stocks, and how often it comes up.
+struct TownItem
+{
+    u16 item;
+    u8 weight;
+};
 
 struct Business
 {
@@ -50,10 +62,12 @@ struct Business
     const u8 *product;
     u32 cost;
     u16 price;             // Money per sale
+    u16 itemSteps;         // Steps per item for a worker at 1.0x efficiency
+    const struct TownItem *items; // Up to TOWN_ITEM_KINDS, ending with ITEM_NONE
     u16 builtFlag;
     u16 unlockFlag;        // Needed besides money and a worker; 0 for none
-    u16 managerHideFlag;
-    u16 managerLocalId;
+    u16 terminalHideFlag;
+    u16 terminalLocalId;
     u8 types[3];           // Worker types: 2x efficiency; the first worker must have one
     u8 bonusType;          // 1.5x efficiency
     u16 specialists[2];    // Species that double their efficiency
@@ -99,6 +113,100 @@ static const u8 sText_PokeBalls[] = _("POKé BALLS");
 static const u8 sText_Charms[] = _("CHARMS");
 static const u8 sText_IceBlocks[] = _("ICE BLOCKS");
 
+// Items each business stocks. Tier 1 for now; upgrades will add better ones.
+static const struct TownItem sDeliveryServiceItems[] =
+{
+    {ITEM_POTION, 35},
+    {ITEM_POKE_BALL, 30},
+    {ITEM_ANTIDOTE, 15},
+    {ITEM_REPEL, 12},
+    {ITEM_ESCAPE_ROPE, 8},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sGreenhouseItems[] =
+{
+    {ITEM_ORAN_BERRY, 30},
+    {ITEM_PECHA_BERRY, 15},
+    {ITEM_CHERI_BERRY, 15},
+    {ITEM_RAWST_BERRY, 10},
+    {ITEM_CHESTO_BERRY, 10},
+    {ITEM_ASPEAR_BERRY, 10},
+    {ITEM_PERSIM_BERRY, 5},
+    {ITEM_SITRUS_BERRY, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sQuarryItems[] =
+{
+    {ITEM_STARDUST, 30},
+    {ITEM_HARD_STONE, 15},
+    {ITEM_EVERSTONE, 15},
+    {ITEM_SOFT_SAND, 15},
+    {ITEM_FIRE_STONE, 5},
+    {ITEM_WATER_STONE, 5},
+    {ITEM_THUNDER_STONE, 5},
+    {ITEM_LEAF_STONE, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sFisheryItems[] =
+{
+    {ITEM_PEARL, 30},
+    {ITEM_SHOAL_SALT, 20},
+    {ITEM_SHOAL_SHELL, 15},
+    {ITEM_HEART_SCALE, 15},
+    {ITEM_NET_BALL, 10},
+    {ITEM_DIVE_BALL, 5},
+    {ITEM_BIG_PEARL, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sGeneratorItems[] =
+{
+    {ITEM_SUPER_POTION, 30},
+    {ITEM_SUPER_REPEL, 25},
+    {ITEM_PARALYZE_HEAL, 20},
+    {ITEM_AWAKENING, 15},
+    {ITEM_MAGNET, 5},
+    {ITEM_THUNDER_STONE, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sForgeItems[] =
+{
+    {ITEM_GREAT_BALL, 40},
+    {ITEM_ULTRA_BALL, 15},
+    {ITEM_TIMER_BALL, 10},
+    {ITEM_NEST_BALL, 10},
+    {ITEM_REPEAT_BALL, 10},
+    {ITEM_BURN_HEAL, 10},
+    {ITEM_CHARCOAL, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sSpiritSanctumItems[] =
+{
+    {ITEM_REVIVE, 30},
+    {ITEM_FULL_HEAL, 25},
+    {ITEM_HYPER_POTION, 20},
+    {ITEM_CLEANSE_TAG, 10},
+    {ITEM_SPELL_TAG, 10},
+    {ITEM_MAX_REVIVE, 5},
+    {ITEM_NONE},
+};
+
+static const struct TownItem sIceDomeItems[] =
+{
+    {ITEM_MAX_POTION, 25},
+    {ITEM_MAX_REPEL, 20},
+    {ITEM_ICE_HEAL, 20},
+    {ITEM_FULL_RESTORE, 15},
+    {ITEM_ULTRA_BALL, 15},
+    {ITEM_NEVER_MELT_ICE, 5},
+    {ITEM_NONE},
+};
+
 // Money per sale scales with each building's cost; the Greenhouse earns twice
 // the Delivery Service's rate. The Weather Stabilizer isn't for sale yet.
 static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
@@ -111,9 +219,11 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_Deliveries,
         .cost = 0, // The Builder's free first building
         .price = 12,
+        .itemSteps = 50,
+        .items = sDeliveryServiceItems,
         .builtFlag = FLAG_DELIVERY_SERVICE_BUILT,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_DELIVERY_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_DELIVERY_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_DELIVERY_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_DELIVERY_TERMINAL,
         .types = {TYPE_FLYING, TYPE_NONE, TYPE_NONE},
         .bonusType = TYPE_NORMAL,
         .specialists = {SPECIES_SWELLOW, SPECIES_NONE},
@@ -126,9 +236,11 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_Berries,
         .cost = 5000,
         .price = 24,
+        .itemSteps = 50,
+        .items = sGreenhouseItems,
         .builtFlag = FLAG_GREENHOUSE_BUILT,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_GREENHOUSE_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_GREENHOUSE_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_GREENHOUSE_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_GREENHOUSE_TERMINAL,
         .types = {TYPE_GRASS, TYPE_BUG, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_LUDICOLO, SPECIES_NONE},
@@ -141,10 +253,12 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_EvolutionStones,
         .cost = 15000,
         .price = 72,
+        .itemSteps = 50,
+        .items = sQuarryItems,
         .builtFlag = FLAG_QUARRY_BUILT,
         .unlockFlag = FLAG_BADGE01_GET,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_QUARRY_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_QUARRY_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_QUARRY_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_QUARRY_TERMINAL,
         .types = {TYPE_ROCK, TYPE_GROUND, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_GOLEM, SPECIES_NONE},
@@ -157,10 +271,12 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_Pokemon,
         .cost = 45000,
         .price = 216,
+        .itemSteps = 50,
+        .items = sFisheryItems,
         .builtFlag = FLAG_FISHERY_BUILT,
         .unlockFlag = FLAG_RECEIVED_OLD_ROD,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_FISHERY_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_FISHERY_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_FISHERY_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_FISHERY_TERMINAL,
         .types = {TYPE_WATER, TYPE_DARK, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_SHARPEDO, SPECIES_NONE},
@@ -173,10 +289,12 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_PowerCells,
         .cost = 80000,
         .price = 384,
+        .itemSteps = 50,
+        .items = sGeneratorItems,
         .builtFlag = FLAG_GENERATOR_BUILT,
         .unlockFlag = FLAG_BADGE03_GET,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_GENERATOR_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_GENERATOR_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_GENERATOR_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_GENERATOR_TERMINAL,
         .types = {TYPE_ELECTRIC, TYPE_STEEL, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_MAGNETON, SPECIES_NONE},
@@ -189,10 +307,12 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_PokeBalls,
         .cost = 250000,
         .price = 1200,
+        .itemSteps = 50,
+        .items = sForgeItems,
         .builtFlag = FLAG_FORGE_BUILT,
         .unlockFlag = FLAG_BADGE04_GET,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_FORGE_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_FORGE_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_FORGE_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_FORGE_TERMINAL,
         .types = {TYPE_FIRE, TYPE_FIGHTING, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_BLAZIKEN, SPECIES_NONE},
@@ -205,10 +325,12 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_Charms,
         .cost = 750000,
         .price = 3600,
+        .itemSteps = 50,
+        .items = sSpiritSanctumItems,
         .builtFlag = FLAG_SPIRIT_SANCTUM_BUILT,
         .unlockFlag = FLAG_VISITED_MT_PYRE,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_SPIRIT_SANCTUM_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_SPIRIT_SANCTUM_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_SPIRIT_SANCTUM_TERMINAL,
         .types = {TYPE_GHOST, TYPE_PSYCHIC, TYPE_POISON},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_DUSCLOPS, SPECIES_CLAYDOL},
@@ -221,9 +343,11 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
         .product = sText_IceBlocks,
         .cost = 1500000,
         .price = 7200,
+        .itemSteps = 50,
+        .items = sIceDomeItems,
         .builtFlag = FLAG_ICE_DOME_BUILT,
-        .managerHideFlag = FLAG_HIDE_LITTLEROOT_ICE_DOME_MANAGER,
-        .managerLocalId = LOCALID_LITTLEROOT_ICE_DOME_MANAGER,
+        .terminalHideFlag = FLAG_HIDE_LITTLEROOT_ICE_DOME_TERMINAL,
+        .terminalLocalId = LOCALID_LITTLEROOT_ICE_DOME_TERMINAL,
         .types = {TYPE_ICE, TYPE_NONE, TYPE_NONE},
         .bonusType = TYPE_NONE,
         .specialists = {SPECIES_GLALIE, SPECIES_NONE},
@@ -238,6 +362,11 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
 static struct TownBuilding *GetBuilding(u8 building)
 {
     return &gPokemonStoragePtr->town.buildings[building];
+}
+
+static struct TownStock *GetStock(u8 building)
+{
+    return &gPokemonStoragePtr->town.stock[building];
 }
 
 static bool8 IsBusiness(u16 building)
@@ -315,23 +444,84 @@ static u32 GetWorkerEfficiency(u8 building)
     return efficiency;
 }
 
-// Credit the business for the steps walked since it was last settled.
+static u32 CountStockedItems(struct TownStock *stock)
+{
+    u32 i, count = 0;
+
+    for (i = 0; i < TOWN_ITEM_KINDS; i++)
+        count += stock->itemCounts[i];
+    return count;
+}
+
+// Picks an entry of the business's item table, weighted.
+static u8 RollItem(u8 building)
+{
+    const struct TownItem *items = sBusinesses[building].items;
+    u32 i, total = 0, roll;
+
+    for (i = 0; i < TOWN_ITEM_KINDS && items[i].item != ITEM_NONE; i++)
+        total += items[i].weight;
+    roll = Random() % total;
+    for (i = 0; roll >= items[i].weight; i++)
+        roll -= items[i].weight;
+    return i;
+}
+
+static void SettleItems(u8 building, u32 steps, u32 efficiency)
+{
+    struct TownStock *stock = GetStock(building);
+    u32 threshold = sBusinesses[building].itemSteps * 100;
+    u32 stocked = CountStockedItems(stock);
+
+    if (sBusinesses[building].items == NULL)
+        return;
+    stock->itemProgress += steps * efficiency;
+    while (stock->itemProgress >= threshold && stocked < ITEM_STOCKROOM_SIZE)
+    {
+        stock->itemProgress -= threshold;
+        stock->itemCounts[RollItem(building)]++;
+        stocked++;
+    }
+    if (stocked >= ITEM_STOCKROOM_SIZE)
+        stock->itemProgress = 0;
+}
+
+// Working earns the worker EXP, like the Day Care (but no new moves).
+static void GiveWorkerExp(struct BoxPokemon *worker, u32 steps)
+{
+    u16 species = GetBoxMonData(worker, MON_DATA_SPECIES);
+    u32 exp = GetBoxMonData(worker, MON_DATA_EXP) + steps * WORKER_EXP_PER_STEP;
+    u32 maxExp = gExperienceTables[gSpeciesInfo[species].growthRate][MAX_LEVEL];
+
+    if (exp > maxExp)
+        exp = maxExp;
+    SetBoxMonData(worker, MON_DATA_EXP, &exp);
+}
+
+// Credit the business for the steps walked since it was last settled: sales,
+// items, and EXP for the worker.
 static void SettleBuilding(u8 building)
 {
     struct TownBuilding *town = GetBuilding(building);
     u32 now = GetGameStat(GAME_STAT_STEPS);
     u32 steps = now - town->lastSteps;
     u32 threshold = STEPS_PER_SALE * 100;
-    u32 sales;
+    u32 sales, efficiency;
 
     town->lastSteps = now;
-    if (!town->hasWorker || town->pendingSales >= STOCKROOM_SIZE)
+    if (!town->hasWorker)
         return;
 
-    // Cap to avoid overflow; the stockroom fills long before this many steps.
+    // Cap to avoid overflow; the stockrooms fill long before this many steps.
     if (steps > 0xFFFF)
         steps = 0xFFFF;
-    town->progress += steps * GetWorkerEfficiency(building);
+    efficiency = GetWorkerEfficiency(building);
+    GiveWorkerExp(&town->worker, steps);
+    SettleItems(building, steps, efficiency);
+    if (town->pendingSales >= STOCKROOM_SIZE)
+        return;
+
+    town->progress += steps * efficiency;
     sales = town->progress / threshold;
     town->progress %= threshold;
     if (town->pendingSales + sales >= STOCKROOM_SIZE)
@@ -364,7 +554,7 @@ void Town_DrawBuildings(void)
 
 // Show the managers of rebuilt businesses. Called from Littleroot's
 // ON_TRANSITION map script, before objects are spawned.
-void Town_UpdateManagers(void)
+void Town_UpdateTerminals(void)
 {
     u8 building;
 
@@ -373,9 +563,9 @@ void Town_UpdateManagers(void)
         if (!IsBusiness(building))
             continue;
         if (IsBuilt(building))
-            FlagClear(sBusinesses[building].managerHideFlag);
+            FlagClear(sBusinesses[building].terminalHideFlag);
         else
-            FlagSet(sBusinesses[building].managerHideFlag);
+            FlagSet(sBusinesses[building].terminalHideFlag);
     }
 }
 
@@ -415,8 +605,8 @@ void Town_BuyBuilding(void)
     business = &sBusinesses[gSpecialVar_0x8006];
     RemoveMoney(&gSaveBlock1Ptr->money, business->cost);
     FlagSet(business->builtFlag);
-    FlagClear(business->managerHideFlag);
-    gSpecialVar_0x8007 = business->managerLocalId;
+    FlagClear(business->terminalHideFlag);
+    gSpecialVar_0x8007 = business->terminalLocalId;
 }
 
 // VAR_RESULT: whether party slot VAR_0x8004 holds a non-egg Pokémon suited to
@@ -497,6 +687,66 @@ void Town_CollectEarnings(void)
         town->pendingSales = 0;
         town->pendingMoney = 0;
         gSpecialVar_Result = TRUE;
+    }
+}
+
+// For the terminal's status line: settles business VAR_0x8006, then buffers
+// STR_VAR_1 the uncollected money and STR_VAR_2 the number of uncollected
+// items. VAR_0x8008: the worker's species, for showmonpic. VAR_RESULT: whether
+// there's anything to collect.
+void Town_BufferStock(void)
+{
+    struct TownBuilding *town;
+    u32 items;
+
+    gSpecialVar_Result = FALSE;
+    gSpecialVar_0x8008 = SPECIES_NONE;
+    if (!IsBusiness(gSpecialVar_0x8006))
+        return;
+    town = GetBuilding(gSpecialVar_0x8006);
+    SettleBuilding(gSpecialVar_0x8006);
+    items = CountStockedItems(GetStock(gSpecialVar_0x8006));
+    ConvertIntToDecimalStringN(gStringVar1, town->pendingMoney, STR_CONV_MODE_LEFT_ALIGN, 10);
+    ConvertIntToDecimalStringN(gStringVar2, items, STR_CONV_MODE_LEFT_ALIGN, 3);
+    if (town->hasWorker)
+        gSpecialVar_0x8008 = GetBoxMonData(&town->worker, MON_DATA_SPECIES);
+    gSpecialVar_Result = (town->pendingMoney != 0 || items != 0);
+}
+
+// Moves the next kind of stocked item from business VAR_0x8006 into the bag,
+// starting from item table entry VAR_0x8009 (set it to 0 first). Buffers
+// STR_VAR_1 the item name and STR_VAR_2 how many. VAR_RESULT: a TOWN_ITEM_*
+// result; items that don't fit in the bag stay in stock.
+void Town_CollectNextItem(void)
+{
+    const struct TownItem *items;
+    struct TownStock *stock;
+    u16 i;
+
+    gSpecialVar_Result = TOWN_ITEMS_DONE;
+    if (!IsBusiness(gSpecialVar_0x8006) || sBusinesses[gSpecialVar_0x8006].items == NULL)
+        return;
+    items = sBusinesses[gSpecialVar_0x8006].items;
+    stock = GetStock(gSpecialVar_0x8006);
+    for (i = gSpecialVar_0x8009; i < TOWN_ITEM_KINDS && items[i].item != ITEM_NONE; i++)
+    {
+        u8 count = stock->itemCounts[i];
+        if (count == 0)
+            continue;
+
+        gSpecialVar_0x8009 = i + 1;
+        CopyItemNameHandlePlural(items[i].item, gStringVar1, count);
+        ConvertIntToDecimalStringN(gStringVar2, count, STR_CONV_MODE_LEFT_ALIGN, 3);
+        if (AddBagItem(items[i].item, count))
+        {
+            stock->itemCounts[i] = 0;
+            gSpecialVar_Result = TOWN_ITEM_COLLECTED;
+        }
+        else
+        {
+            gSpecialVar_Result = TOWN_ITEM_NO_ROOM;
+        }
+        return;
     }
 }
 
