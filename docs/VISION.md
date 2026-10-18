@@ -171,7 +171,7 @@ causes extreme weather around Sootopolis, and the player calls Rayquaza from Sky
 Pillar to calm them. The Weather Stabilizer could replace or support that
 ending. To be decided later.
 
-## Tying the farm to the adventure (next)
+## Tying the farm to the adventure (built)
 
 The first playtest (about an hour) found that the farm and the adventure felt
 like **two disconnected gameplay loops**. The farm only produced money, money
@@ -208,10 +208,18 @@ Marts, worker EXP, upgrades and the FARM box are built.
   | Forge | Great Ball, Ultra Ball, Timer/Nest/Repeat Balls, Burn Heal, Charcoal |
   | Spirit Sanctum | Revive, Full Heal, Hyper Potion, Cleanse Tag, Spell Tag, Max Revive |
   | Ice Dome | Max Potion, Max Repel, Ice Heal, Full Restore, Ultra Ball, Never-Melt Ice |
-- **Marts are closed (built).** The `pokemart` script command now jumps to
-  `EventScript_MartClosed` (`data/scripts/marts_closed.inc`), so every item
-  shop's clerk says the shelves are empty and points to the farm in Littleroot.
-  Decoration shops still work. They may be replaced with something else later.
+- **Marts sell nothing, but buy (built).** The `pokemart` script command now
+  jumps to `EventScript_MartClosed` (`data/scripts/marts_closed.inc`): every
+  item shop's clerk says the shelves are empty, points to the farm in
+  Littleroot, and opens a SELL / QUIT menu (`CreateSellOnlyMartMenu` in
+  `src/shop.c`) at the usual half price. Decoration shops still work. They may
+  be replaced with something else later.
+- **Littleroot's Poké Mart (built).** When the Devon Goods are returned, Mr.
+  Stone thanks the player for bringing goods back to Hoenn and places a buyer in
+  Littleroot (`FLAG_LITTLEROOT_MART_OFFERED`; saves already past him count the
+  PokéNav instead). The Builder then offers a POKé MART for ₽3,000 on a 4x4
+  plot south of Birch's Lab (`TOWN_MART`, a plot but not a business: no workers
+  or terminal). Inside (`MAP_LITTLEROOT_TOWN_MART`), Devon's buyer only buys.
 - **Upgrades (built).** The Builder sells upgrades to Lv. 2 (2x the building's
   price) and Lv. 3 (6x); the free Delivery Service is priced as ₽2,500, so
   ₽5,000 and ₽15,000. His menu lists new buildings first, then upgrades, each
@@ -255,7 +263,76 @@ Marts, worker EXP, upgrades and the FARM box are built.
 2. Terminals with the worker's sprite. Done.
 3. Items: buildings stock items, Marts close, workers gain EXP. Done.
 4. Upgrades: the FARM box, extra worker slots, higher item tiers. Done.
-5. Later: requests, money gates, building art.
+5. Building art: the Delivery Service is drawn and in the game (see
+   `art/building_kit/README.md`); eight to go.
+6. Next: rebalance the farm (below).
+
+## Rebalancing: make the farm a game (next)
+
+The second playtest (about 20 minutes) found the farm **far too generous and
+almost thoughtless**:
+
+- By the end, items were piling up faster than they could be used. Evolution
+  stones and berries came especially fast.
+- With Marts closed, there was nowhere to sell evolution stones, so they just
+  stacked up in the bag.
+- One or two laps around the farm filled the Delivery Service, Greenhouse and
+  Quarry to their 100-sale caps, with thousands in uncollected money. Running
+  in circles would pay for every upgrade and fill the bag.
+- The Greenhouse and Quarry upgrades were affordable in under five minutes.
+
+**Why:** worker speed grows in step with level, so a Lv. 20 worker of a suited
+type runs at 4x. That's a sale every 5 steps and an item every 12–13 steps, each
+item a random roll from the whole table. Production runs on any step, including
+laps of the farm itself.
+
+**The goal is Stardew Valley's "Hmm."** What should I plant, how will it get
+watered, what do I do while it grows, and do I sell it or turn it into jam?
+Even on a smaller scale, the farm should ask for decisions and patience. More
+broadly: the game is too easy, and the farm is the main lever for fixing that.
+
+### The plan
+
+1. **Buildings make items, never money.** Marts reopen **for selling only**
+   (buying stays closed; built, along with Littleroot's own Mart), so money
+   comes only from what you choose to sell.
+   Every item becomes "use it or sell it?", and evolution stones have value (a
+   Fire Stone sells for ₽1,050). Upgrade prices start to mean something again.
+2. **Steps on the farm don't count.** Production only moves forward on steps
+   taken **outside Littleroot**, so running laps does nothing: you start
+   something, go adventure, and come back. (Alternative to consider: count
+   battles won or new places visited, which ties the pace to the story.)
+   Production also becomes much slower overall. Want more Poké Balls? Bring a
+   higher-level worker and go do something while you wait. Want an evolution
+   stone? Those are valuable; bring a great worker and get busy.
+3. **Work orders.** At the terminal you choose what the building makes next,
+   for example "5 Super Potions" or "1 Fire Stone". It makes that order, then
+   stops and waits for you. Each product has a step cost (roughly: Potion 100,
+   Super Potion 400, Fire Stone 3,000), which worker speed shortens. Upgrades
+   unlock better products and possibly bigger orders. The decision becomes:
+   what will I need by the time I'm back?
+4. **Story trades.** Farm goods change hands at story moments:
+   - **Steven in Granite Cave** collects stones. He asks for something from the
+     Quarry and in return unlocks the Quarry's evolution-stone orders, or gives
+     a Beldum that's a Quarry specialist.
+   - **Captain Stern**, after he's rescued from Team Aqua, hands over something
+     for the Fishery: a sonar upgrade that unlocks better catches, or a rod.
+   These are the first of the "the world needs what the farm makes" requests.
+   Later, townspeople could pay more than the Mart for specific goods, adding
+   "who do I sell to?".
+5. **Processing (later): the "jam or sell?" choice.** One building turns
+   another's output into something worth more: berries into Berry Juice or
+   Pokéblock ingredients, Hard Stone plus Stardust into an evolution stone at
+   the Forge, and so on.
+
+### Order
+
+1. Items only, Marts reopened for selling (done, plus a Mart in Littleroot),
+   steps count only outside Littleroot, slower production. Small changes that fix most of the
+   generosity. Playtest again before going further.
+2. Work orders.
+3. The Steven and Captain Stern trades.
+4. Processing and townspeople requests.
 
 ## Progression gated by money
 

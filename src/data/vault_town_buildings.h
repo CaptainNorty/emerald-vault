@@ -1,5 +1,5 @@
-// Tiles for each rebuilt business on the Littleroot farm: full map grid
-// entries (metatile, collision and elevation). Hand-drawn buildings come from
+// Tiles for each rebuilt plot on the Littleroot farm: full map grid entries
+// (metatile, collision and elevation). Hand-drawn buildings come from
 // art/buildings/ via tools/art/import_building.py; the rest are placeholders
 // that reuse existing house, Lab, Pokémon Center and Mart tiles.
 
@@ -85,7 +85,17 @@ static const u16 sQuarryTiles[] =
     0x3001, 0x0521, 0x0521, 0x0521, 0x0521, 0x0521, 0x3001,
 };
 
-static const struct BuildingTiles sBuildingTiles[TOWN_BUILDING_COUNT] =
+// The real Poké Mart, as in Oldale. Its door (0x041) warps to
+// MAP_LITTLEROOT_TOWN_MART.
+static const u16 sMartTiles[] =
+{
+    0x3028, 0x3029, 0x3029, 0x302B,
+    0x0430, 0x0431, 0x0432, 0x0433,
+    0x0438, 0x0439, 0x043A, 0x043B,
+    0x0460, 0x0441, 0x0442, 0x0443,
+};
+
+static const struct BuildingTiles sBuildingTiles[TOWN_PLOT_COUNT] =
 {
     [TOWN_DELIVERY_SERVICE] = {sDeliveryServiceTiles, 24, 4, 6, 6},
     [TOWN_FORGE] = {sForgeTiles, 36, 4, 7, 6},
@@ -95,4 +105,5 @@ static const struct BuildingTiles sBuildingTiles[TOWN_BUILDING_COUNT] =
     [TOWN_FISHERY] = {sFisheryTiles, 23, 27, 7, 7},
     [TOWN_SPIRIT_SANCTUM] = {sSpiritSanctumTiles, 36, 28, 7, 6},
     [TOWN_QUARRY] = {sQuarryTiles, 49, 27, 7, 7},
+    [TOWN_MART] = {sMartTiles, 8, 20, 4, 4},
 };

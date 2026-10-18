@@ -56,6 +56,9 @@ RustboroCity_DevonCorp_3F_EventScript_MeetPresident::
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneExplainPokenavRestUp, MSGBOX_DEFAULT
 	closemessage
 	call Common_EventScript_OutOfCenterPartyHeal
+	@ Emerald Vault: Mr. Stone offers a buyer for the farm's goods.
+	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneFarmBuyer, MSGBOX_DEFAULT
+	setflag FLAG_LITTLEROOT_MART_OFFERED
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneGoWithCautionAndCare, MSGBOX_DEFAULT
 	setflag FLAG_HIDE_ROUTE_116_WANDAS_BOYFRIEND
 	clearflag FLAG_HIDE_RUSTURF_TUNNEL_WANDAS_BOYFRIEND
@@ -229,6 +232,22 @@ RustboroCity_DevonCorp_3F_Text_MrStoneExplainPokenavRestUp:
 	.string "have been making trouble far and wide.\p"
 	.string "I think it would be best if you rested\n"
 	.string "up before you go on your way.$"
+
+RustboroCity_DevonCorp_3F_Text_MrStoneFarmBuyer:
+	.string "MR. STONE: Oh, and one more thing!\p"
+	.string "Word travels fast. I hear you're the\n"
+	.string "one bringing goods back to HOENN\l"
+	.string "from that farm in LITTLEROOT.\p"
+	.string "I truly appreciate it. Nobody has\n"
+	.string "made much of anything for ages.\p"
+	.string "But hauling your goods out to every\n"
+	.string "POKéMART must be tiring work.\p"
+	.string "So DEVON will aid you in your\n"
+	.string "distribution. I'm placing a buyer\l"
+	.string "for your goods in LITTLEROOT!\p"
+	.string "Have your BUILDER put up a\n"
+	.string "POKéMART, and my buyer will take\l"
+	.string "it from there.$"
 
 RustboroCity_DevonCorp_3F_Text_MrStoneGoWithCautionAndCare:
 	.string "MR. STONE: Well, then, {PLAYER}{KUN},\n"

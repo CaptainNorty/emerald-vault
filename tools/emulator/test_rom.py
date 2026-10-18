@@ -281,6 +281,11 @@ class Emulator:
                     items[value & 0xFFFF] = items.get(value & 0xFFFF, 0) + ((value >> 16) ^ key)
         return items
 
+    def flag(self, flag):
+        # gSaveBlock1Ptr->flags (+0x1270), one bit per flag.
+        save1 = self.read(self.symbols["gSaveBlock1Ptr"])
+        return bool(self.read(save1 + 0x1270 + flag // 8, 8) >> (flag % 8) & 1)
+
     def party_level(self, slot):
         # struct Pokemon is 100 bytes; the level is at +0x54.
         return self.read(self.symbols["gPlayerParty"] + slot * 100 + 0x54, 8)
@@ -607,6 +612,13 @@ def main():
                     raise AssertionError(f"Gained {total} items; expected {low} to {high if high is not None else 'any'}")
                 result["checks"].append({"items_gained": gained, "frame": emulator.frame})
                 print(f"PASS: gained {total} items {gained}", flush=True)
+            elif action == "assert_flag":
+                value = constants.resolve([step["flag"]])[step["flag"]]
+                expected = step.get("set", True)
+                if emulator.flag(value) != expected:
+                    raise AssertionError(f"{step['flag']} is {'clear' if expected else 'set'}")
+                result["checks"].append({"flag": step["flag"], "set": expected, "frame": emulator.frame})
+                print(f"PASS: {step['flag']} is {'set' if expected else 'clear'}", flush=True)
             elif action == "assert_party_level":
                 level = emulator.party_level(step["slot"])
                 if level < step.get("min", 1) or level > step.get("max", 100):

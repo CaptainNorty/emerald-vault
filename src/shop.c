@@ -69,6 +69,7 @@ enum {
     MART_TYPE_NORMAL,
     MART_TYPE_DECOR,
     MART_TYPE_DECOR2,
+    MART_TYPE_SELL_ONLY, // Emerald Vault: Marts buy the farm's goods but sell nothing
 };
 
 // shop view window NPC info enum
@@ -172,6 +173,12 @@ static const struct MenuAction sShopMenuActions_BuySellQuit[] =
 static const struct MenuAction sShopMenuActions_BuyQuit[] =
 {
     { gText_ShopBuy, {.void_u8=Task_HandleShopMenuBuy} },
+    { gText_ShopQuit, {.void_u8=Task_HandleShopMenuQuit} }
+};
+
+static const struct MenuAction sShopMenuActions_SellQuit[] =
+{
+    { gText_ShopSell, {.void_u8=Task_HandleShopMenuSell} },
     { gText_ShopQuit, {.void_u8=Task_HandleShopMenuQuit} }
 };
 
@@ -351,6 +358,15 @@ static u8 CreateShopMenu(u8 martType)
         sMartInfo.windowId = AddWindow(&winTemplate);
         sMartInfo.menuActions = sShopMenuActions_BuySellQuit;
         numMenuItems = ARRAY_COUNT(sShopMenuActions_BuySellQuit);
+    }
+    else if (martType == MART_TYPE_SELL_ONLY)
+    {
+        // Same size as the decoration shops' two-item window
+        struct WindowTemplate winTemplate = sShopMenuWindowTemplates[WIN_BUY_QUIT];
+        winTemplate.width = GetMaxWidthInMenuTable(sShopMenuActions_SellQuit, ARRAY_COUNT(sShopMenuActions_SellQuit));
+        sMartInfo.windowId = AddWindow(&winTemplate);
+        sMartInfo.menuActions = sShopMenuActions_SellQuit;
+        numMenuItems = ARRAY_COUNT(sShopMenuActions_SellQuit);
     }
     else
     {
@@ -1250,6 +1266,18 @@ void CreatePokemartMenu(const u16 *itemsForSale)
 {
     CreateShopMenu(MART_TYPE_NORMAL);
     SetShopItemsForSale(itemsForSale);
+    ClearItemPurchases();
+    SetShopMenuCallback(ScriptContext_Enable);
+}
+
+// Emerald Vault: a Mart with nothing for sale, which still buys the player's
+// items. Used with waitstate.
+void CreateSellOnlyMartMenu(void)
+{
+    static const u16 sNothingForSale[] = {ITEM_NONE};
+
+    CreateShopMenu(MART_TYPE_SELL_ONLY);
+    SetShopItemsForSale(sNothingForSale);
     ClearItemPurchases();
     SetShopMenuCallback(ScriptContext_Enable);
 }

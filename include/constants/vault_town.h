@@ -13,6 +13,11 @@
 #define TOWN_QUARRY              8
 #define TOWN_BUILDING_COUNT      9
 
+// The Poké Mart is a plot the Builder can build too, but not a business: no
+// workers, no save data besides its built flag.
+#define TOWN_MART                TOWN_BUILDING_COUNT
+#define TOWN_PLOT_COUNT          (TOWN_BUILDING_COUNT + 1)
+
 // Town specials take the building in VAR_0x8006, a party slot in VAR_0x8004
 // (as set by ChoosePartyMon), a level in VAR_0x8005 (Builder) and a worker
 // slot in VAR_0x800A.

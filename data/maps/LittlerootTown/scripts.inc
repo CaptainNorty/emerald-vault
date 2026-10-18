@@ -406,6 +406,15 @@ LittlerootTown_EventScript_DeliveryServiceSign::
 	msgbox LittlerootTown_Text_DeliveryServiceSign, MSGBOX_SIGN
 	end
 
+LittlerootTown_EventScript_RuinsSign_Mart::
+	goto_if_set FLAG_LITTLEROOT_MART_BUILT, LittlerootTown_EventScript_MartSign
+	msgbox LittlerootTown_Text_RuinsSign_Mart, MSGBOX_SIGN
+	end
+
+LittlerootTown_EventScript_MartSign::
+	msgbox LittlerootTown_Text_MartSign, MSGBOX_SIGN
+	end
+
 LittlerootTown_EventScript_RuinsSign_Forge::
 	goto_if_set FLAG_FORGE_BUILT, LittlerootTown_EventScript_ForgeSign
 	msgbox LittlerootTown_Text_RuinsSign_Forge, MSGBOX_SIGN
@@ -1058,6 +1067,14 @@ LittlerootTown_Text_RuinsSign_DeliveryService:
 	.string "DELIVERY SERVICE (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
 
+LittlerootTown_Text_RuinsSign_Mart:
+	.string "POKé MART (RUINS)\n"
+	.string "Maybe it can be rebuilt someday.$"
+
+LittlerootTown_Text_MartSign:
+	.string "POKé MART\n"
+	.string "Now buying farm goods!$"
+
 LittlerootTown_Text_RuinsSign_Forge:
 	.string "FORGE (RUINS)\n"
 	.string "Maybe it can be rebuilt someday.$"
@@ -1141,6 +1158,7 @@ LittlerootTown_EventScript_Builder::
 	goto_if_eq VAR_RESULT, TOWN_MENU_EMPTY, LittlerootTown_EventScript_BuilderNothingToBuild
 	goto_if_eq VAR_RESULT, TOWN_MENU_CANCELLED, LittlerootTown_EventScript_BuilderGoodbye
 	copyvar VAR_0x8006, VAR_RESULT
+	goto_if_eq VAR_0x8006, TOWN_MART, LittlerootTown_EventScript_BuilderMart
 	special Town_BufferBuildingInfo
 	special Town_CanAffordBuilding
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_BuilderCantAfford
@@ -1195,6 +1213,34 @@ LittlerootTown_EventScript_BuilderUpgrade::
 	special Town_BufferBuildingInfo
 	buffernumberstring STR_VAR_3, VAR_0x8005
 	msgbox LittlerootTown_Text_BuilderUpgraded, MSGBOX_DEFAULT
+	release
+	end
+
+@ The Poké Mart has no workers or terminal: just pay and build.
+LittlerootTown_EventScript_BuilderMart::
+	special Town_BufferBuildingInfo
+	special Town_CanAffordBuilding
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_BuilderCantAfford
+	showmoneybox 0, 0
+	@ Drawing money boxes reuses STR_VAR_1, so buffer the building again.
+	special Town_BufferBuildingInfo
+	msgbox LittlerootTown_Text_BuilderConfirmMart, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_EventScript_BuilderDeclined
+	special Town_BuyBuilding
+	updatemoneybox
+	playse SE_SHOP
+	waitse
+	hidemoneybox
+	msgbox LittlerootTown_Text_BuilderStandBack, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	playse SE_M_STRENGTH
+	special Town_DrawBuildings
+	special DrawWholeMapView
+	waitse
+	delay 30
+	fadescreen FADE_FROM_BLACK
+	msgbox LittlerootTown_Text_BuilderBuiltMart, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1536,6 +1582,16 @@ LittlerootTown_Text_BuilderBuilt:
 	.string "for business!\p"
 	.string "Use its terminal to put a\n"
 	.string "{STR_VAR_3}-type POKéMON to work.$"
+
+LittlerootTown_Text_BuilderConfirmMart:
+	.string "MR. STONE's buyer needs a shop?\n"
+	.string "Build the POKé MART for ¥{STR_VAR_2}?$"
+
+LittlerootTown_Text_BuilderBuiltMart:
+	.string "Ta-da! The POKé MART is open!\p"
+	.string "DEVON's buyer will take any goods\n"
+	.string "you want to sell, right here in\l"
+	.string "LITTLEROOT.$"
 
 LittlerootTown_Text_DeliveryServiceSign:
 	.string "DELIVERY SERVICE\n"

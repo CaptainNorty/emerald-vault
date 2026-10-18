@@ -1885,8 +1885,8 @@ bool8 ScrCmd_dowildbattle(struct ScriptContext *ctx)
     return TRUE;
 }
 
-// Emerald Vault: every item shop is closed; goods come from the farm. The
-// clerk explains instead of opening the shop.
+// Emerald Vault: every item shop's shelves are empty; goods come from the
+// farm. The clerk explains, then offers to buy the player's items.
 bool8 ScrCmd_pokemart(struct ScriptContext *ctx)
 {
     ScriptReadWord(ctx); // The shop's item list

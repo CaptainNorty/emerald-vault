@@ -1,0 +1,33 @@
+{
+  "name": "Meeting Mr. Stone after returning the Devon Goods: he offers a buyer for farm goods in Littleroot",
+  "build": "test_start",
+  "setup": {"base": "after_pokedex", "location": {"map": "MAP_RUSTBORO_CITY_DEVON_CORP_3F", "x": 2, "y": 2}},
+  "steps": [
+    {"action": "run", "frames": 60},
+    {"action": "assert_flag", "flag": "FLAG_LITTLEROOT_MART_OFFERED", "set": false},
+    {"action": "next_message", "times": 85},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "01-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "02-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "03-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "04-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "05-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "06-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "07-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "08-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "09-mr-stone"},
+    {"action": "next_message", "wait": 90},
+    {"action": "screenshot", "name": "10-mr-stone"},
+    {"action": "dismiss_text"},
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "assert_flag", "flag": "FLAG_LITTLEROOT_MART_OFFERED"}
+  ]
+}

@@ -86,6 +86,7 @@ struct BuildingTiles
 #include "data/vault_town_buildings.h"
 
 static const u8 sText_DeliveryService[] = _("DELIVERY SERVICE");
+static const u8 sText_PokeMart[] = _("POKé MART");
 static const u8 sText_Greenhouse[] = _("GREENHOUSE");
 static const u8 sText_Quarry[] = _("QUARRY");
 static const u8 sText_Fishery[] = _("FISHERY");
@@ -566,6 +567,10 @@ static const struct Business sBusinesses[TOWN_BUILDING_COUNT] =
 // free Delivery Service is priced as if it cost this much.
 #define FREE_BUILDING_UPGRADE_BASE 2500
 
+// The Poké Mart buys the player's goods. Mr. Stone offers it after the Devon
+// Goods are returned (FLAG_LITTLEROOT_MART_OFFERED).
+#define MART_COST 3000
+
 static const u8 sText_FarmBoxName[] = _("FARM");
 static const u8 sText_Of[] = _(" of ");
 
@@ -589,6 +594,31 @@ static bool8 IsBuilt(u8 building)
     return IsBusiness(building) && FlagGet(sBusinesses[building].builtFlag);
 }
 
+// Plots are the businesses plus the Poké Mart.
+static bool8 IsPlot(u16 plot)
+{
+    return plot == TOWN_MART || IsBusiness(plot);
+}
+
+static bool8 IsPlotBuilt(u8 plot)
+{
+    if (plot == TOWN_MART)
+        return FlagGet(FLAG_LITTLEROOT_MART_BUILT);
+    return IsBuilt(plot);
+}
+
+// Mr. Stone offers the Mart when he hands over the PokéNav, so saves from
+// before the offer count it too.
+static bool8 IsMartOffered(void)
+{
+    return FlagGet(FLAG_LITTLEROOT_MART_OFFERED) || FlagGet(FLAG_RECEIVED_POKENAV);
+}
+
+static const u8 *GetPlotName(u8 plot)
+{
+    return plot == TOWN_MART ? sText_PokeMart : sBusinesses[plot].name;
+}
+
 // A business's level, 1 to TOWN_MAX_LEVEL. It has that many worker slots.
 static u8 GetLevel(u8 building)
 {
@@ -597,11 +627,14 @@ static u8 GetLevel(u8 building)
     return level == 0 ? 1 : level;
 }
 
-// What it costs to build a business (level 1) or upgrade it to a level.
+// What it costs to build a plot (level 1) or upgrade a business to a level.
 static u32 GetCost(u8 building, u8 level)
 {
-    u32 base = sBusinesses[building].cost;
+    u32 base;
 
+    if (building == TOWN_MART)
+        return MART_COST;
+    base = sBusinesses[building].cost;
     if (level <= 1)
         return base;
     if (base == 0)
@@ -901,7 +934,7 @@ static void ConvertEfficiencyToString(u8 *dest, u32 efficiency)
     ConvertIntToDecimalStringN(dest, (efficiency % 100) / 10, STR_CONV_MODE_LEFT_ALIGN, 1);
 }
 
-// Draw every rebuilt business over its ruined plot. Called from Littleroot's
+// Draw every rebuilt business, and the Poké Mart, over its ruined plot. Called from Littleroot's
 // ON_LOAD map script, and right after a business is rebuilt.
 void Town_DrawBuildings(void)
 {
@@ -909,10 +942,10 @@ void Town_DrawBuildings(void)
     s32 x, y;
 
     Town_InitFarmBox();
-    for (building = 0; building < TOWN_BUILDING_COUNT; building++)
+    for (building = 0; building < TOWN_PLOT_COUNT; building++)
     {
         const struct BuildingTiles *art = &sBuildingTiles[building];
-        if (!IsBuilt(building) || art->tiles == NULL)
+        if (!IsPlotBuilt(building) || art->tiles == NULL)
             continue;
         for (y = 0; y < art->height; y++)
             for (x = 0; x < art->width; x++)
@@ -939,24 +972,22 @@ void Town_UpdateTerminals(void)
     }
 }
 
-// Buffers business VAR_0x8006 at level VAR_0x8005 (0 or 1 to build it):
-// STR_VAR_1 name, STR_VAR_2 cost, STR_VAR_3 worker types.
+// Buffers plot VAR_0x8006 at level VAR_0x8005 (0 or 1 to build it):
+// STR_VAR_1 name, STR_VAR_2 cost, STR_VAR_3 worker types (businesses only).
 void Town_BufferBuildingInfo(void)
 {
-    const struct Business *business;
-
-    if (!IsBusiness(gSpecialVar_0x8006))
+    if (!IsPlot(gSpecialVar_0x8006))
         return;
-    business = &sBusinesses[gSpecialVar_0x8006];
-    StringCopy(gStringVar1, business->name);
+    StringCopy(gStringVar1, GetPlotName(gSpecialVar_0x8006));
     ConvertIntToDecimalStringN(gStringVar2, GetCost(gSpecialVar_0x8006, gSpecialVar_0x8005), STR_CONV_MODE_LEFT_ALIGN, 7);
-    StringCopy(gStringVar3, business->workerTypes);
+    if (IsBusiness(gSpecialVar_0x8006))
+        StringCopy(gStringVar3, sBusinesses[gSpecialVar_0x8006].workerTypes);
 }
 
-// VAR_RESULT: whether the player can pay for business VAR_0x8006 at level VAR_0x8005.
+// VAR_RESULT: whether the player can pay for plot VAR_0x8006 at level VAR_0x8005.
 void Town_CanAffordBuilding(void)
 {
-    gSpecialVar_Result = IsBusiness(gSpecialVar_0x8006)
+    gSpecialVar_Result = IsPlot(gSpecialVar_0x8006)
                       && IsEnoughMoney(&gSaveBlock1Ptr->money, GetCost(gSpecialVar_0x8006, gSpecialVar_0x8005));
 }
 
@@ -966,12 +997,18 @@ void Town_CheckPartyForWorker(void)
     gSpecialVar_Result = IsBusiness(gSpecialVar_0x8006) && PartyHasSuitedWorker(gSpecialVar_0x8006);
 }
 
-// Pays for business VAR_0x8006 at level VAR_0x8005: rebuilds it (level 0 or 1)
-// or upgrades it. VAR_0x8007: its terminal's local ID.
+// Pays for plot VAR_0x8006 at level VAR_0x8005: rebuilds it (level 0 or 1)
+// or upgrades it. VAR_0x8007: a business's terminal's local ID.
 void Town_BuyBuilding(void)
 {
     const struct Business *business;
 
+    if (gSpecialVar_0x8006 == TOWN_MART)
+    {
+        RemoveMoney(&gSaveBlock1Ptr->money, MART_COST);
+        FlagSet(FLAG_LITTLEROOT_MART_BUILT);
+        return;
+    }
     if (!IsBusiness(gSpecialVar_0x8006))
         return;
     business = &sBusinesses[gSpecialVar_0x8006];
@@ -1289,8 +1326,10 @@ void Town_OpenFlyMap(void)
 #define LIST_MENU_ROWS     4
 #define LIST_LABEL_LENGTH  24
 
-// A Builder offer's list ID: building + TOWN_BUILDING_COUNT * (level - 1).
-#define OFFER_ID(building, level) ((building) + TOWN_BUILDING_COUNT * ((level) - 1))
+// A Builder offer's list ID: plot + TOWN_PLOT_COUNT * (level - 1).
+#define OFFER_ID(plot, level) ((plot) + TOWN_PLOT_COUNT * ((level) - 1))
+#define OFFER_PLOT(id)  ((id) % TOWN_PLOT_COUNT)
+#define OFFER_LEVEL(id) ((id) / TOWN_PLOT_COUNT + 1)
 
 #define tListTaskId data[0]
 #define tWindowId   data[1]
@@ -1303,8 +1342,8 @@ enum {
 
 struct TownListMenu
 {
-    struct ListMenuItem items[TOWN_BUILDING_COUNT * TOWN_MAX_LEVEL + 1];
-    u8 labels[TOWN_BUILDING_COUNT * TOWN_MAX_LEVEL + 1][LIST_LABEL_LENGTH];
+    struct ListMenuItem items[TOWN_PLOT_COUNT * TOWN_MAX_LEVEL + 1];
+    u8 labels[TOWN_PLOT_COUNT * TOWN_MAX_LEVEL + 1][LIST_LABEL_LENGTH];
     u8 width;
 };
 
@@ -1318,10 +1357,13 @@ static const u8 sText_SpeedSuffix[] = _("x");
 // The level a building could be bought or upgraded to next, or 0 if none.
 static u8 GetBuilderOfferLevel(u8 building)
 {
-    const struct Business *business = &sBusinesses[building];
+    const struct Business *business;
 
+    if (building == TOWN_MART)
+        return IsMartOffered() && !FlagGet(FLAG_LITTLEROOT_MART_BUILT) ? 1 : 0;
     if (!IsBusiness(building))
         return 0;
+    business = &sBusinesses[building];
     if (IsBuilt(building))
         return GetLevel(building) < TOWN_MAX_LEVEL ? GetLevel(building) + 1 : 0;
     if (business->cost == 0)
@@ -1339,7 +1381,7 @@ void Town_HasBuilderOffers(void)
     u8 building;
 
     gSpecialVar_Result = FALSE;
-    for (building = 0; building < TOWN_BUILDING_COUNT; building++)
+    for (building = 0; building < TOWN_PLOT_COUNT; building++)
     {
         if (GetBuilderOfferLevel(building) != 0)
         {
@@ -1365,7 +1407,7 @@ static void TownListMenu_PrintRight(u8 windowId, u32 itemId, u8 y)
     label = gStringVar4;
     if (sTownListMenu->width == BUILDER_MENU_WIDTH)
     {
-        ConvertIntToDecimalStringN(gStringVar1, GetCost(itemId % TOWN_BUILDING_COUNT, itemId / TOWN_BUILDING_COUNT + 1),
+        ConvertIntToDecimalStringN(gStringVar1, GetCost(OFFER_PLOT(itemId), OFFER_LEVEL(itemId)),
                                    STR_CONV_MODE_LEFT_ALIGN, 7);
         StringExpandPlaceholders(label, gText_PokedollarVar1);
     }
@@ -1405,8 +1447,8 @@ static void Task_TownListMenu(u8 taskId)
         }
         else
         {
-            gSpecialVar_Result = input % TOWN_BUILDING_COUNT;
-            gSpecialVar_0x8005 = input / TOWN_BUILDING_COUNT + 1;
+            gSpecialVar_Result = OFFER_PLOT(input);
+            gSpecialVar_0x8005 = OFFER_LEVEL(input);
         }
     }
     else
@@ -1473,8 +1515,8 @@ static void ShowTownListMenu(u8 kind, u8 count)
 
 static u32 GetOfferSortKey(u32 id)
 {
-    u8 level = id / TOWN_BUILDING_COUNT + 1;
-    u32 cost = GetCost(id % TOWN_BUILDING_COUNT, level);
+    u8 level = OFFER_LEVEL(id);
+    u32 cost = GetCost(OFFER_PLOT(id), level);
 
     // Costs stay under 2^24 (MAX_MONEY), so the top bit marks upgrades.
     return level > 1 ? cost | (1u << 31) : cost;
@@ -1483,7 +1525,7 @@ static u32 GetOfferSortKey(u32 id)
 // Lists what the Builder can build or upgrade now, with costs: new buildings
 // first, then upgrades, each cheapest first.
 // Used with waitstate; check Town_HasBuilderOffers first. VAR_RESULT: the
-// chosen business (VAR_0x8005: the level, 1 to build it), TOWN_MENU_CANCELLED,
+// chosen plot (VAR_0x8005: the level, 1 to build it), TOWN_MENU_CANCELLED,
 // or TOWN_MENU_EMPTY if there's nothing to offer.
 void Town_ShowBuilderMenu(void)
 {
@@ -1491,13 +1533,13 @@ void Town_ShowBuilderMenu(void)
 
     sTownListMenu = AllocZeroed(sizeof(*sTownListMenu));
     sTownListMenu->width = BUILDER_MENU_WIDTH;
-    for (building = 0; building < TOWN_BUILDING_COUNT; building++)
+    for (building = 0; building < TOWN_PLOT_COUNT; building++)
     {
         u8 *label = sTownListMenu->labels[count];
         level = GetBuilderOfferLevel(building);
         if (level == 0)
             continue;
-        label = StringCopy(label, sBusinesses[building].name);
+        label = StringCopy(label, GetPlotName(building));
         if (level > 1)
         {
             label = StringCopy(label, sText_LevelPrefix);

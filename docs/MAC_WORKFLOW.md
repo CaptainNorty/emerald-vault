@@ -199,8 +199,12 @@ Builder tests (each starts with the Delivery Service running):
 
 Playtest fixes:
 
-- `marts_closed.json`: the Oldale Mart clerk says the shelves are empty and
-  points to the farm; no money or items change hands.
+- `marts_sell_only.json`: the Oldale Mart clerk says the shelves are empty,
+  then offers SELL / QUIT; selling a Potion pays ₽150.
+- `devon_mart_offer.json`: Mr. Stone's scene in Devon Corp ends with his offer
+  of a buyer in Littleroot and sets `FLAG_LITTLEROOT_MART_OFFERED`.
+- `littleroot_mart.json`: after that offer, the Builder builds the POKé MART
+  for ₽3,000; the player walks in and sells a Potion to Devon's buyer.
 - `quick_wins.json`: the farm PC by the Builder opens the storage system, the
   Start menu shows money (hidden while saving, back after the party menu), and
   screenshots of the fixed tree tops.
@@ -235,6 +239,7 @@ Actions currently supported:
 | `assert_money_gained` | optional `min` (default 1), `max` | Fail unless money rose by that much since `remember_money`. |
 | `remember_bag` | | Record every item in the bag. |
 | `assert_items_gained` | `items` (names like `POTION`), optional `min` (default 1), `max` | Fail unless the bag gained that many items in total since `remember_bag`, all of them from `items`. |
+| `assert_flag` | `flag`, optional `set` (default true) | Fail unless the flag is set (or clear, with `"set": false`). |
 | `assert_party_level` | `slot`, optional `min`, `max` | Fail unless the party Pokémon in that slot is within those levels. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons
