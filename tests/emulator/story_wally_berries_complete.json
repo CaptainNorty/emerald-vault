@@ -1,0 +1,140 @@
+{
+  "name": "Wally's father takes Sitrus first, then Lum Berries, and gives HM Surf at 30",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_PETALBURG_CITY_WALLYS_HOUSE",
+      "x": 2,
+      "y": 4
+    },
+    "vars": {
+      "VAR_PETALBURG_CITY_STATE": 5,
+      "VAR_WALLY_BERRIES_DELIVERED": 5
+    },
+    "items": [
+      [
+        "SITRUS_BERRY",
+        20
+      ],
+      [
+        "LUM_BERRY",
+        15
+      ]
+    ]
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "RIGHT"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "wait_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "a-hand-over-25"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "b-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-03"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-04"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-05"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_WALLY_BERRIES_DELIVERED",
+      "equals": 30
+    },
+    {
+      "action": "assert_flag",
+      "flag": "FLAG_RECEIVED_HM_SURF"
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "SITRUS_BERRY",
+      "min": -20,
+      "max": -20
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "LUM_BERRY",
+      "min": -5,
+      "max": -5
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "HM03",
+      "min": 1,
+      "max": 1
+    }
+  ]
+}

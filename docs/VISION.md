@@ -497,6 +497,43 @@ Lv. 3 (`sStockroomSizes`).
   which Pokémon for each building (today's speed specialists are Swellow,
   Ludicolo, Golem, Sharpedo, Magneton, Blaziken, Dusclops/Claydol, Glalie).
 
+### Story deliveries (built)
+
+Key story moments now need a pile of farm goods. Each one takes whatever you
+have in as many trips as it takes ("Just 8 more to go."), asks before taking
+anything, and remembers what's delivered in a variable. One shared script
+(`FarmDelivery_EventScript_Offer` in `data/scripts/farm_deliveries.inc`, with
+`Town_CountDeliveryItems` and `Town_TakeDeliveryItems` in `src/vault_town.c`)
+does the counting, so a new request is a few lines. Amounts are in
+`include/constants/vault_town.h`. Saves already past these points aren't
+affected.
+
+| Event | Needs | Farm source | What waits on it |
+|---|---|---|---|
+| Devon Goods (Rustboro) | 20 Poké Balls, for the crate the thief smashed | Delivery Service | Mr. Briney won't sail to Dewford |
+| Meteorite (Mt. Chimney) | 10 Fire Stones, to open the heat seal on Maxie's machine | Quarry | The Meteorite (and Cozmo's TM) |
+| Wally (Petalburg, after Badge 5) | 30 Sitrus or Lum Berries, any mix, sent to Wally in Verdanturf | Greenhouse Lv. 2 | HM Surf |
+| Weather Institute (Route 119) | 50 Power Cells or Thunder Stones, any mix, for the radar Aqua drained | Generator or Quarry | Castform, and the bridge east (Institute staff stand where Aqua's grunts did) |
+
+Ideas for later requests, from the same story pass:
+
+- **The President, part 2** (after Badge 3): 30 Power Cells for the PokéNav
+  factory; the Exp. Share moves here.
+- **Steven (Granite Cave):** 10 Everstones or 3 Star Pieces for a better gift.
+- **Wattson / New Mauville:** 20 Power Cells of backup power for Thunderbolt.
+- **Devon Scope (Route 120):** 10 Steel Ingots. Risky as a gate, since the
+  Forge costs ₽250,000; give it a second option or make it a reward.
+- **Mossdeep Space Center:** 50 Steel Ingots to rebuild the launch pad.
+- **Weather Stabilizer:** 100 each of Power Cells, Steel Ingots, Spirit Orbs
+  and Ice Crystals. The Sootopolis crisis comes before the Rain Badge, so
+  either make it postgame or let it replace the Sky Pillar trip.
+- **Postgame:** the S.S. Tidal's hull (50 Steel Ingots or Big Pearls), and
+  Spirit Orb offerings at Mt. Pyre that get the Institute tracking Groudon and
+  Kyogre.
+
+Rule of thumb: a hard gate should only need buildings the player is sure to
+have, or accept either of two items.
+
 ### Order
 
 1. Pricing pass, plus the Power Cell (done; the Power Cell needs an icon).
@@ -505,8 +542,10 @@ Lv. 3 (`sStockroomSizes`).
    Playtest these.
 3. Donations (the flags), Machop for the Builder, and specialists that sell
    the overflow. Meowth for the Mart is still an option.
-4. Bulk deliveries: the Weather Institute, then the Weather Stabilizer.
-5. The grass patch.
+4. Bulk deliveries (the first four are done; see "Story deliveries"), then
+   the Weather Stabilizer.
+5. The grass patch (built: one table of Kanto and Johto Pokémon per badge
+   count, `gLittlerootTownGrass0` to `8` in `src/data/wild_encounters.json`).
 6. A healing spot unlocked by a donation.
 7. Then the Steven and Captain Stern trades, processing and townspeople
    requests (from the rebalancing plan).

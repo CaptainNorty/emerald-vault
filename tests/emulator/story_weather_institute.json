@@ -1,0 +1,143 @@
+{
+  "name": "Weather Institute: the scientist needs 50 Power Cells or Thunder Stones before giving Castform",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_ROUTE119_WEATHER_INSTITUTE_2F",
+      "x": 18,
+      "y": 7
+    },
+    "flags": [
+      "FLAG_HIDE_ROUTE_119_TEAM_AQUA",
+      "FLAG_HIDE_WEATHER_INSTITUTE_2F_AQUA_GRUNT_M"
+    ],
+    "vars": {
+      "VAR_WEATHER_INSTITUTE_STATE": 2,
+      "VAR_INSTITUTE_POWER_DELIVERED": 10
+    },
+    "items": [
+      [
+        "POWER_CELL",
+        25
+      ],
+      [
+        "THUNDER_STONE",
+        30
+      ]
+    ]
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "UP"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "a-hand-over-40"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "b-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-03"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "b-04"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "screenshot",
+      "name": "c-nickname"
+    },
+    {
+      "action": "press",
+      "key": "B",
+      "wait": 20
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_INSTITUTE_POWER_DELIVERED",
+      "equals": 50
+    },
+    {
+      "action": "assert_flag",
+      "flag": "FLAG_RECEIVED_CASTFORM"
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "POWER_CELL",
+      "min": -25,
+      "max": -25
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "THUNDER_STONE",
+      "min": -15,
+      "max": -15
+    }
+  ]
+}

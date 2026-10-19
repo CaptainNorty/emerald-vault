@@ -565,3 +565,5 @@ gSpecials::
 	def_special CreateSellOnlyMartMenu, waitstate=1
 	def_special Town_ChooseOrderItem, waitstate=1
 	def_special Town_SetOrder
+	def_special Town_CountDeliveryItems
+	def_special Town_TakeDeliveryItems

@@ -1,0 +1,182 @@
+{
+  "name": "Mt. Chimney: the Meteorite is heat-sealed until the machine gets 10 Fire Stones",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_MT_CHIMNEY",
+      "x": 14,
+      "y": 7
+    },
+    "flags": [
+      "FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY",
+      "FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA",
+      "FLAG_HIDE_MT_CHIMNEY_TEAM_AQUA"
+    ],
+    "items": [
+      [
+        "FIRE_STONE",
+        14
+      ]
+    ],
+    "vars": {
+      "VAR_METEORITE_FIRE_STONES_DELIVERED": 4
+    }
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "UP"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "a-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-03"
+    },
+    {
+      "action": "next_message"
+    },
+    {
+      "action": "screenshot",
+      "name": "a-04"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "b-hand-over"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "c-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "c-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "c-03"
+    },
+    {
+      "action": "press_until_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "d-remove"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "e-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "e-02"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_flag",
+      "flag": "FLAG_RECEIVED_METEORITE"
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_METEORITE_FIRE_STONES_DELIVERED",
+      "equals": 10
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "FIRE_STONE",
+      "min": -6,
+      "max": -6
+    },
+    {
+      "action": "assert_item_gained",
+      "item": "METEORITE",
+      "min": 1,
+      "max": 1
+    }
+  ]
+}

@@ -72,6 +72,34 @@ Route119_WeatherInstitute_2F_EventScript_ShellyDefeated::
 	fadescreen FADE_FROM_BLACK
 	applywaitmovement LOCALID_WEATHER_INSTITUTE_2F_SCIENTIST, Route119_WeatherInstitute_2F_Movement_ScientistApproachPlayer
 	copyobjectxytoperm LOCALID_WEATHER_INSTITUTE_2F_SCIENTIST
+	@ Emerald Vault: Aqua drained the Institute's power. Castform and the bridge
+	@ wait until it's back.
+	msgbox Route119_WeatherInstitute_2F_Text_AquaDrainedOurPower, MSGBOX_DEFAULT
+	goto Route119_WeatherInstitute_2F_EventScript_CollectPower
+	end
+
+@ Takes Power Cells and Thunder Stones for the radar, and gives Castform once
+@ it's running again.
+Route119_WeatherInstitute_2F_EventScript_CollectPower::
+	copyvar VAR_0x8007, VAR_INSTITUTE_POWER_DELIVERED
+	setvar VAR_0x8004, ITEM_POWER_CELL
+	setvar VAR_0x8005, ITEM_THUNDER_STONE
+	setvar VAR_0x8006, INSTITUTE_POWER_NEEDED
+	call FarmDelivery_EventScript_Offer
+	copyvar VAR_INSTITUTE_POWER_DELIVERED, VAR_0x8007
+	goto_if_ge VAR_INSTITUTE_POWER_DELIVERED, INSTITUTE_POWER_NEEDED, Route119_WeatherInstitute_2F_EventScript_PowerRestored
+	goto_if_eq VAR_RESULT, TRUE, Route119_WeatherInstitute_2F_EventScript_PowerPartway
+	msgbox Route119_WeatherInstitute_2F_Text_BringPower, MSGBOX_DEFAULT
+	release
+	end
+
+Route119_WeatherInstitute_2F_EventScript_PowerPartway::
+	msgbox Route119_WeatherInstitute_2F_Text_PowerPartway, MSGBOX_DEFAULT
+	release
+	end
+
+Route119_WeatherInstitute_2F_EventScript_PowerRestored::
+	msgbox Route119_WeatherInstitute_2F_Text_RadarBackUp, MSGBOX_DEFAULT
 	goto Route119_WeatherInstitute_2F_EventScript_ReceiveCastform
 	end
 
@@ -196,6 +224,7 @@ Route119_WeatherInstitute_2F_EventScript_WeatherScientist::
 	lock
 	faceplayer
 	goto_if_set FLAG_RECEIVED_CASTFORM, Route119_WeatherInstitute_2F_EventScript_ScientistMentionWeather
+	goto_if_lt VAR_INSTITUTE_POWER_DELIVERED, INSTITUTE_POWER_NEEDED, Route119_WeatherInstitute_2F_EventScript_CollectPower
 	goto Route119_WeatherInstitute_2F_EventScript_ReceiveCastform
 	end
 
@@ -273,9 +302,38 @@ Route119_WeatherInstitute_2F_Text_WeHaveToHurryToMtPyre:
 	.string "Ahahahaha!\n"
 	.string "TEAM MAGMA, just you wait!$"
 
-Route119_WeatherInstitute_2F_Text_ThanksPleaseTakePokemon:
+Route119_WeatherInstitute_2F_Text_AquaDrainedOurPower:
 	.string "Thanks!\n"
 	.string "Thanks to you, we're safe!\p"
+	.string "But TEAM AQUA drained every last\n"
+	.string "battery in the INSTITUTE.\p"
+	.string "Without power, our weather radar is\n"
+	.string "down. We can't forecast the floods on\l"
+	.string "ROUTE 119!\p"
+	.string "My staff have closed the bridge.\n"
+	.string "It's too dangerous to cross blind.\p"
+	.string "We need 50 POWER CELLS to get the\n"
+	.string "radar running again.\p"
+	.string "THUNDER STONES work too, in a pinch.\n"
+	.string "Any mix of the two will do.$"
+
+Route119_WeatherInstitute_2F_Text_BringPower:
+	.string "We still need {STR_VAR_2} POWER CELLS\n"
+	.string "or THUNDER STONES for the radar.\p"
+	.string "I hear the farm in LITTLEROOT makes\n"
+	.string "both: POWER CELLS at its GENERATOR,\l"
+	.string "and THUNDER STONES at its QUARRY.$"
+
+Route119_WeatherInstitute_2F_Text_PowerPartway:
+	.string "The radar's flickering!\n"
+	.string "Just {STR_VAR_2} more to go.$"
+
+Route119_WeatherInstitute_2F_Text_RadarBackUp:
+	.string "The radar's back up and running!\p"
+	.string "I'll tell my staff to reopen the\n"
+	.string "bridge right away.$"
+
+Route119_WeatherInstitute_2F_Text_ThanksPleaseTakePokemon:
 	.string "It might be an odd way of thanking you,\n"
 	.string "but take this POKéMON.$"
 

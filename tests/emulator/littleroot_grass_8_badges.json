@@ -1,0 +1,58 @@
+{
+  "name": "With 8 badges, the grass below Littleroot's Mart has tier-8 Kanto and Johto Pokémon",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "flags": [
+      "FLAG_BADGE01_GET",
+      "FLAG_BADGE02_GET",
+      "FLAG_BADGE03_GET",
+      "FLAG_BADGE04_GET",
+      "FLAG_BADGE05_GET",
+      "FLAG_BADGE06_GET",
+      "FLAG_BADGE07_GET",
+      "FLAG_BADGE08_GET"
+    ],
+    "vars": {
+      "VAR_REPEL_STEP_COUNT": 0
+    },
+    "location": {
+      "map": "MAP_LITTLEROOT_TOWN",
+      "x": 10,
+      "y": 27
+    }
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "screenshot",
+      "name": "01-grass-patch"
+    },
+    {
+      "action": "pace_until_wild_battle",
+      "species": [
+        "ARCANINE",
+        "BLISSEY",
+        "DRAGONITE",
+        "ESPEON",
+        "HAUNTER",
+        "NIDOKING",
+        "NIDOQUEEN",
+        "PIDGEOT",
+        "STEELIX",
+        "TYRANITAR",
+        "UMBREON",
+        "VENOMOTH"
+      ],
+      "min_level": 38,
+      "max_level": 45
+    },
+    {
+      "action": "screenshot",
+      "name": "02-wild-battle"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "name": "Route 119: Weather Institute staff keep the bridge closed until the Institute has its power",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_ROUTE119",
+      "x": 11,
+      "y": 33
+    },
+    "flags": [
+      "FLAG_HIDE_ROUTE_119_TEAM_AQUA"
+    ],
+    "vars": {
+      "VAR_WEATHER_INSTITUTE_STATE": 2
+    }
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "walk",
+      "path": [
+        "RIGHT 1"
+      ]
+    },
+    {
+      "action": "assert_blocked",
+      "direction": "RIGHT"
+    },
+    {
+      "action": "screenshot",
+      "name": "01-workers-on-bridge"
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "02-closed"
+    },
+    {
+      "action": "next_message"
+    },
+    {
+      "action": "screenshot",
+      "name": "03-closed"
+    },
+    {
+      "action": "next_message"
+    },
+    {
+      "action": "screenshot",
+      "name": "04-closed"
+    },
+    {
+      "action": "next_message"
+    },
+    {
+      "action": "screenshot",
+      "name": "05-closed"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_position",
+      "x": 12,
+      "y": 33,
+      "map": "MAP_ROUTE119"
+    }
+  ]
+}

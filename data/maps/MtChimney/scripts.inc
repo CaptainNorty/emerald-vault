@@ -428,6 +428,9 @@ MtChimney_EventScript_MeteoriteMachine::
 	lockall
 	goto_if_unset FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY, MtChimney_EventScript_MachineOn
 	goto_if_set FLAG_RECEIVED_METEORITE, MtChimney_EventScript_MachineOff
+	@ Emerald Vault: a heat seal holds the Meteorite until it's fed Fire Stones.
+	goto_if_lt VAR_METEORITE_FIRE_STONES_DELIVERED, METEORITE_FIRE_STONES_NEEDED, MtChimney_EventScript_HeatSeal
+MtChimney_EventScript_AskRemoveMeteorite::
 	msgbox MtChimney_Text_RemoveTheMeteorite, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MtChimney_EventScript_LeaveMeteoriteAlone
 	msgbox MtChimney_Text_PlayerRemovedMeteorite, MSGBOX_DEFAULT
@@ -435,6 +438,31 @@ MtChimney_EventScript_MeteoriteMachine::
 	setflag FLAG_RECEIVED_METEORITE
 	releaseall
 	end
+
+MtChimney_EventScript_HeatSeal::
+	copyvar VAR_0x8007, VAR_METEORITE_FIRE_STONES_DELIVERED
+	setvar VAR_0x8004, ITEM_FIRE_STONE
+	setvar VAR_0x8005, ITEM_NONE
+	setvar VAR_0x8006, METEORITE_FIRE_STONES_NEEDED
+	special Town_CountDeliveryItems
+	msgbox MtChimney_Text_MeteoriteHeatSealed, MSGBOX_DEFAULT
+	call FarmDelivery_EventScript_Offer
+	copyvar VAR_METEORITE_FIRE_STONES_DELIVERED, VAR_0x8007
+	goto_if_ge VAR_METEORITE_FIRE_STONES_DELIVERED, METEORITE_FIRE_STONES_NEEDED, MtChimney_EventScript_HeatSealOpens
+	goto_if_eq VAR_RESULT, TRUE, MtChimney_EventScript_HeatSealWarmer
+	msgbox MtChimney_Text_NeedFireStones, MSGBOX_DEFAULT
+	releaseall
+	end
+
+MtChimney_EventScript_HeatSealWarmer::
+	msgbox MtChimney_Text_HeatSealWarmer, MSGBOX_DEFAULT
+	releaseall
+	end
+
+MtChimney_EventScript_HeatSealOpens::
+	playse SE_M_FLAME_WHEEL
+	msgbox MtChimney_Text_HeatSealOpens, MSGBOX_DEFAULT
+	goto MtChimney_EventScript_AskRemoveMeteorite
 
 MtChimney_EventScript_LeaveMeteoriteAlone::
 	msgbox MtChimney_Text_PlayerLeftMeteorite, MSGBOX_DEFAULT
@@ -707,6 +735,28 @@ MtChimney_Text_MeteoriteFittedOnMachine:
 	.string "machine…\p"
 	.string "The machine seems to be storing\n"
 	.string "energy in the METEORITE.$"
+
+MtChimney_Text_MeteoriteHeatSealed:
+	.string "A METEORITE is fitted on a mysterious\n"
+	.string "machine…\p"
+	.string "MAXIE's machine has locked it in place\n"
+	.string "with a heat seal.\p"
+	.string "There's a slot on the side, marked\n"
+	.string "“FIRE STONE,” and a gauge that reads:\p"
+	.string "{STR_VAR_2} MORE TO OPEN.$"
+
+MtChimney_Text_NeedFireStones:
+	.string "The QUARRY in LITTLEROOT digs up\n"
+	.string "FIRE STONES…$"
+
+MtChimney_Text_HeatSealWarmer:
+	.string "The machine grew warmer…\n"
+	.string "The gauge reads: {STR_VAR_2} more to open.$"
+
+MtChimney_Text_HeatSealOpens:
+	.string "The machine glowed red-hot…\p"
+	.string "With a hiss, the heat seal\n"
+	.string "opened!$"
 
 MtChimney_Text_RemoveTheMeteorite:
 	.string "A METEORITE is fitted on a mysterious\n"

@@ -1,0 +1,94 @@
+{
+  "name": "Mt. Chimney: with no Fire Stones, the heat seal says how many it needs",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_MT_CHIMNEY",
+      "x": 14,
+      "y": 7
+    },
+    "flags": [
+      "FLAG_DEFEATED_EVIL_TEAM_MT_CHIMNEY",
+      "FLAG_HIDE_MT_CHIMNEY_TEAM_MAGMA",
+      "FLAG_HIDE_MT_CHIMNEY_TEAM_AQUA"
+    ]
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "UP"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "a-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-03"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-04"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-05"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_flag",
+      "flag": "FLAG_RECEIVED_METEORITE",
+      "set": false
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_METEORITE_FIRE_STONES_DELIVERED",
+      "equals": 0
+    }
+  ]
+}

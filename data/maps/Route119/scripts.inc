@@ -17,7 +17,22 @@ Route119_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Common_EventScript_SetupRivalOnBikeGfxId
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 1, Route119_EventScript_MoveInstituteWorkersDownstairs
+	call Route119_EventScript_SetBridgeWorkers
 	special SetRoute119Weather
+	end
+
+@ Emerald Vault: after TEAM AQUA leaves, the Weather Institute's staff keep the
+@ bridge closed until the Institute's power is back.
+Route119_EventScript_SetBridgeWorkers::
+	setflag FLAG_HIDE_ROUTE_119_BRIDGE_WORKERS
+	goto_if_eq VAR_WEATHER_INSTITUTE_STATE, 0, Common_EventScript_NopReturn
+	goto_if_set FLAG_RECEIVED_CASTFORM, Common_EventScript_NopReturn
+	goto_if_ge VAR_INSTITUTE_POWER_DELIVERED, INSTITUTE_POWER_NEEDED, Common_EventScript_NopReturn
+	clearflag FLAG_HIDE_ROUTE_119_BRIDGE_WORKERS
+	return
+
+Route119_EventScript_BridgeWorker::
+	msgbox Route119_Text_BridgeClosed, MSGBOX_NPC
 	end
 
 Route119_EventScript_MoveInstituteWorkersDownstairs::
@@ -600,3 +615,12 @@ Route119_Text_TrainerTipsDecoration:
 	.string "Pick your favorite items and create\n"
 	.string "your very own SECRET BASE exactly the\l"
 	.string "way you want.$"
+
+Route119_Text_BridgeClosed:
+	.string "Sorry, the bridge is closed.\p"
+	.string "TEAM AQUA drained the WEATHER\n"
+	.string "INSTITUTE's power. Our radar is down.\p"
+	.string "Without it, we can't forecast flash\n"
+	.string "floods. It's too dangerous to cross.\p"
+	.string "Talk to the scientist upstairs in the\n"
+	.string "INSTITUTE if you can help.$"

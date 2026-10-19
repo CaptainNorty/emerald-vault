@@ -1056,6 +1056,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/trainer_hill.inc"
 	.include "data/scripts/test_signpost.inc"
 	.include "data/scripts/marts_closed.inc"
+	.include "data/scripts/farm_deliveries.inc"
 	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"

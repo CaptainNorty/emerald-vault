@@ -1,0 +1,41 @@
+{
+  "name": "Route 119: the bridge reopens once the Weather Institute has 50 Power Cells or Thunder Stones",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_ROUTE119",
+      "x": 11,
+      "y": 33
+    },
+    "flags": [
+      "FLAG_HIDE_ROUTE_119_TEAM_AQUA"
+    ],
+    "vars": {
+      "VAR_WEATHER_INSTITUTE_STATE": 2,
+      "VAR_INSTITUTE_POWER_DELIVERED": 50
+    }
+  },
+  "steps": [
+    {
+      "action": "wait_overworld",
+      "timeout_frames": 3000
+    },
+    {
+      "action": "walk",
+      "path": [
+        "RIGHT 4"
+      ]
+    },
+    {
+      "action": "screenshot",
+      "name": "01-bridge-open"
+    },
+    {
+      "action": "assert_position",
+      "x": 15,
+      "y": 33,
+      "map": "MAP_ROUTE119"
+    }
+  ]
+}

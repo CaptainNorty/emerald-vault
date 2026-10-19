@@ -1751,3 +1751,72 @@ void Town_ChooseOrderItem(void)
 #undef tListTaskId
 #undef tWindowId
 #undef tMenuKind
+
+// Story deliveries: people in the story who need a pile of farm goods, handed
+// over in as many trips as it takes. VAR_0x8004 and VAR_0x8005: the items they
+// take (VAR_0x8005 can be ITEM_NONE), the first one first; VAR_0x8006: how
+// many they need; VAR_0x8007: how many were delivered so far.
+
+static const u8 sText_Items[] = _("items");
+
+static u16 GetDeliveryItemsOwed(void)
+{
+    if (gSpecialVar_0x8007 >= gSpecialVar_0x8006)
+        return 0;
+    return gSpecialVar_0x8006 - gSpecialVar_0x8007;
+}
+
+static u16 CountDeliveryItemInBag(u16 item)
+{
+    if (item == ITEM_NONE)
+        return 0;
+    return CountTotalItemQuantityInBag(item);
+}
+
+// How many of each item a delivery would take from the bag now.
+static void GetDeliveryAmounts(u16 *first, u16 *second)
+{
+    u16 owed = GetDeliveryItemsOwed();
+
+    *first = min(CountDeliveryItemInBag(gSpecialVar_0x8004), owed);
+    *second = min(CountDeliveryItemInBag(gSpecialVar_0x8005), owed - *first);
+}
+
+// STR_VAR_1: how many are handed over; STR_VAR_2: how many are still needed;
+// STR_VAR_3: what they are.
+static void BufferDeliveryStrings(u16 first, u16 second)
+{
+    ConvertIntToDecimalStringN(gStringVar1, first + second, STR_CONV_MODE_LEFT_ALIGN, 3);
+    ConvertIntToDecimalStringN(gStringVar2, GetDeliveryItemsOwed(), STR_CONV_MODE_LEFT_ALIGN, 3);
+    if (first != 0 && second != 0)
+        StringCopy(gStringVar3, sText_Items);
+    else if (second != 0)
+        CopyFarmItemName(gSpecialVar_0x8005, gStringVar3, second);
+    else
+        CopyFarmItemName(gSpecialVar_0x8004, gStringVar3, first);
+}
+
+// VAR_RESULT: how many could be handed over now, with the strings above.
+void Town_CountDeliveryItems(void)
+{
+    u16 first, second;
+
+    GetDeliveryAmounts(&first, &second);
+    BufferDeliveryStrings(first, second);
+    gSpecialVar_Result = first + second;
+}
+
+// Hands them over and adds them to VAR_0x8007, with the strings above
+// (STR_VAR_2 is now what's still needed after this delivery).
+void Town_TakeDeliveryItems(void)
+{
+    u16 first, second;
+
+    GetDeliveryAmounts(&first, &second);
+    if (first != 0)
+        RemoveBagItem(gSpecialVar_0x8004, first);
+    if (second != 0)
+        RemoveBagItem(gSpecialVar_0x8005, second);
+    gSpecialVar_0x8007 += first + second;
+    BufferDeliveryStrings(first, second);
+}

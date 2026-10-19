@@ -22,10 +22,20 @@ Route104_MrBrineysHouse_EventScript_SetBrineyPeekoPos::
 Route104_MrBrineysHouse_EventScript_Briney::
 	lock
 	faceplayer
+	@ Emerald Vault: he won't sail until the Devon Goods have their Poké Balls.
+	goto_if_set FLAG_DELIVERED_STEVEN_LETTER, Route104_MrBrineysHouse_EventScript_ReadyToSail
+	goto_if_set FLAG_DELIVERED_DEVON_GOODS, Route104_MrBrineysHouse_EventScript_ReadyToSail
+	goto_if_lt VAR_DEVON_POKE_BALLS_DELIVERED, DEVON_POKE_BALLS_NEEDED, Route104_MrBrineysHouse_EventScript_ShipmentNotReady
+Route104_MrBrineysHouse_EventScript_ReadyToSail::
 	call_if_unset FLAG_MR_BRINEY_SAILING_INTRO, Route104_MrBrineysHouse_EventScript_SailingIntro
 	goto_if_unset FLAG_DELIVERED_STEVEN_LETTER, Route104_MrBrineysHouse_EventScript_SailBothDeliveries
 	goto_if_unset FLAG_DELIVERED_DEVON_GOODS, Route104_MrBrineysHouse_EventScript_SailDeliverPackage
 	goto Route104_MrBrineysHouse_EventScript_WhereAreWeBound
+	end
+
+Route104_MrBrineysHouse_EventScript_ShipmentNotReady::
+	msgbox Route104_MrBrineysHouse_Text_ShipmentNotReady, MSGBOX_DEFAULT
+	release
 	end
 
 Route104_MrBrineysHouse_EventScript_SailingIntro::
@@ -112,6 +122,16 @@ Route104_MrBrineysHouse_Text_ItsYouLetsSailToDewford:
 	.string "no problem at all.\p"
 	.string "You've come to the right man!\n"
 	.string "We'll set sail for DEWFORD.$"
+
+Route104_MrBrineysHouse_Text_ShipmentNotReady:
+	.string "MR. BRINEY: Ahoy, {PLAYER}{KUN}!\n"
+	.string "You saved my darling PEEKO!\p"
+	.string "I'd sail you anywhere, but MR. STONE\n"
+	.string "rang me up from DEVON.\p"
+	.string "His DEVON GOODS are still short\n"
+	.string "some POKé BALLS, he says.\p"
+	.string "Bring them to him in RUSTBORO, and\n"
+	.string "then we'll set sail!$"
 
 Route104_MrBrineysHouse_Text_SetSailForDewford:
 	.string "MR. BRINEY: DEWFORD it is, then!\p"

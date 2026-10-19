@@ -1,0 +1,23 @@
+{
+  "name": "Mr. Briney won't sail for Dewford until the Devon Goods have their Poke Balls",
+  "build": "test_start",
+  "setup": {"base": "after_pokedex", "location": {"map": "MAP_ROUTE104_MR_BRINEYS_HOUSE", "x": 5, "y": 4},
+            "flags": ["FLAG_RECEIVED_POKENAV", "FLAG_SYS_POKENAV_GET"],
+            "clear_flags": ["FLAG_HIDE_BRINEYS_HOUSE_MR_BRINEY", "FLAG_HIDE_BRINEYS_HOUSE_PEEKO"],
+            "vars": {"VAR_BRINEY_LOCATION": 1, "VAR_DEVON_POKE_BALLS_DELIVERED": 12}},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "run", "frames": 2, "keys": ["UP"]},
+    {"action": "run", "frames": 20},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "next_message", "times": 0},
+    {"action": "screenshot", "name": "01-briney"},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "02-briney"},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "03-briney"},
+    {"action": "dismiss_text"},
+    {"action": "assert_position", "x": 5, "y": 4, "map": "MAP_ROUTE104_MR_BRINEYS_HOUSE"},
+    {"action": "assert_flag", "flag": "FLAG_MR_BRINEY_SAILING_INTRO", "set": false}
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "name": "Wally's father asks for 30 Sitrus or Lum Berries, takes some, and gives HM Surf once he has all 30",
+  "build": "test_start",
+  "setup": {
+    "base": "after_pokedex",
+    "location": {
+      "map": "MAP_PETALBURG_CITY_WALLYS_HOUSE",
+      "x": 2,
+      "y": 4
+    },
+    "vars": {
+      "VAR_PETALBURG_CITY_STATE": 4
+    },
+    "items": [
+      [
+        "SITRUS_BERRY",
+        5
+      ]
+    ]
+  },
+  "steps": [
+    {
+      "action": "run",
+      "frames": 60
+    },
+    {
+      "action": "remember_bag"
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "a-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-02"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-03"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-04"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-05"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-06"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-07"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-08"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-09"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-10"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-11"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-12"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-13"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "a-14"
+    },
+    {
+      "action": "wait_task",
+      "task": "Task_HandleYesNoInput"
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "screenshot",
+      "name": "b-hand-over-5"
+    },
+    {
+      "action": "press",
+      "key": "A",
+      "wait": 10
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "c-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "c-02"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_WALLY_BERRIES_DELIVERED",
+      "equals": 5
+    },
+    {
+      "action": "assert_flag",
+      "flag": "FLAG_RECEIVED_HM_SURF",
+      "set": false
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "RIGHT"
+      ]
+    },
+    {
+      "action": "run",
+      "frames": 20
+    },
+    {
+      "action": "run",
+      "frames": 2,
+      "keys": [
+        "A"
+      ]
+    },
+    {
+      "action": "next_message",
+      "times": 0
+    },
+    {
+      "action": "screenshot",
+      "name": "d-01"
+    },
+    {
+      "action": "next_message",
+      "times": 1
+    },
+    {
+      "action": "screenshot",
+      "name": "d-02"
+    },
+    {
+      "action": "dismiss_text"
+    },
+    {
+      "action": "assert_var",
+      "var": "VAR_PETALBURG_CITY_STATE",
+      "equals": 5
+    }
+  ]
+}

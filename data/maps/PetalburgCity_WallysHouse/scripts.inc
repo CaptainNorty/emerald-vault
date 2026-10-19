@@ -19,11 +19,40 @@ PetalburgCity_WallysHouse_OnFrame:
 PetalburgCity_WallysHouse_EventScript_GiveHMSurf::
 	lockall
 	msgbox PetalburgCity_WallysHouse_Text_PleaseExcuseUs, MSGBOX_DEFAULT
+	@ Emerald Vault: Surf is his thanks for berries to keep Wally healthy.
+	msgbox PetalburgCity_WallysHouse_Text_BerriesForWally, MSGBOX_DEFAULT
+	setvar VAR_PETALBURG_CITY_STATE, 5
+	call PetalburgCity_WallysHouse_EventScript_CollectBerries
+	releaseall
+	end
+
+@ Takes Sitrus and Lum Berries for Wally, and gives HM Surf once he has them all.
+PetalburgCity_WallysHouse_EventScript_CollectBerries::
+	copyvar VAR_0x8007, VAR_WALLY_BERRIES_DELIVERED
+	setvar VAR_0x8004, ITEM_SITRUS_BERRY
+	setvar VAR_0x8005, ITEM_LUM_BERRY
+	setvar VAR_0x8006, WALLY_BERRIES_NEEDED
+	call FarmDelivery_EventScript_Offer
+	copyvar VAR_WALLY_BERRIES_DELIVERED, VAR_0x8007
+	goto_if_ge VAR_WALLY_BERRIES_DELIVERED, WALLY_BERRIES_NEEDED, PetalburgCity_WallysHouse_EventScript_BerriesComplete
+	goto_if_eq VAR_RESULT, TRUE, PetalburgCity_WallysHouse_EventScript_BerriesPartway
+	msgbox PetalburgCity_WallysHouse_Text_BringBerries, MSGBOX_DEFAULT
+	return
+
+PetalburgCity_WallysHouse_EventScript_BerriesPartway::
+	msgbox PetalburgCity_WallysHouse_Text_BerriesPartway, MSGBOX_DEFAULT
+	return
+
+PetalburgCity_WallysHouse_EventScript_BerriesComplete::
+	msgbox PetalburgCity_WallysHouse_Text_BerriesComplete, MSGBOX_DEFAULT
 	giveitem ITEM_HM_SURF
 	setflag FLAG_RECEIVED_HM_SURF
 	msgbox PetalburgCity_WallysHouse_Text_SurfGoAllSortsOfPlaces, MSGBOX_DEFAULT
-	setvar VAR_PETALBURG_CITY_STATE, 5
-	releaseall
+	return
+
+PetalburgCity_WallysHouse_EventScript_AskForBerries::
+	call PetalburgCity_WallysHouse_EventScript_CollectBerries
+	release
 	end
 
 PetalburgCity_WallysHouse_EventScript_WallysDad::
@@ -31,6 +60,7 @@ PetalburgCity_WallysHouse_EventScript_WallysDad::
 	faceplayer
 	goto_if_set FLAG_DEFEATED_WALLY_VICTORY_ROAD, PetalburgCity_WallysHouse_EventScript_DefeatedWallyInVictoryRoad
 	goto_if_set FLAG_RECEIVED_HM_SURF, PetalburgCity_WallysHouse_EventScript_ReceievedHMSurf
+	goto_if_ge VAR_PETALBURG_CITY_STATE, 5, PetalburgCity_WallysHouse_EventScript_AskForBerries
 	goto_if_set FLAG_THANKED_FOR_PLAYING_WITH_WALLY, PetalburgCity_WallysHouse_EventScript_PlayedWithWally
 	msgbox PetalburgCity_WallysHouse_Text_ThanksForPlayingWithWally, MSGBOX_DEFAULT
 	setflag FLAG_THANKED_FOR_PLAYING_WITH_WALLY
@@ -56,7 +86,13 @@ PetalburgCity_WallysHouse_EventScript_WallysMom::
 	lock
 	faceplayer
 	goto_if_set FLAG_RECEIVED_HM_SURF, PetalburgCity_WallysHouse_EventScript_ReceivedHMSurf
+	goto_if_ge VAR_PETALBURG_CITY_STATE, 5, PetalburgCity_WallysHouse_EventScript_MomBerries
 	msgbox PetalburgCity_WallysHouse_Text_WallyWasReallyHappy, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_WallysHouse_EventScript_MomBerries::
+	msgbox PetalburgCity_WallysHouse_Text_MomBerries, MSGBOX_DEFAULT
 	release
 	end
 
@@ -97,9 +133,40 @@ PetalburgCity_WallysHouse_Text_PleaseExcuseUs:
 	.string "Actually, not just WALLY.\n"
 	.string "It made me, his father, happy too.\p"
 	.string "Happy that he's gained such a great\n"
-	.string "friend as you.\p"
+	.string "friend as you.$"
+
+PetalburgCity_WallysHouse_Text_BerriesForWally:
+	.string "But I have one more favor to ask.\p"
+	.string "WALLY's doctor says SITRUS and LUM\n"
+	.string "BERRIES keep him strong.\p"
+	.string "Nobody grows them anymore, and his\n"
+	.string "supply in VERDANTURF is running out.\p"
+	.string "I hear the GREENHOUSE on your farm\n"
+	.string "grows them, once it's been upgraded.\p"
+	.string "Could you bring me 30 of them?\n"
+	.string "SITRUS or LUM, any mix will do.\p"
+	.string "I'll send them on to WALLY. And I have\n"
+	.string "something to thank you with, too.$"
+
+PetalburgCity_WallysHouse_Text_BringBerries:
+	.string "WALLY still needs {STR_VAR_2} more\n"
+	.string "SITRUS or LUM BERRIES.\p"
+	.string "The GREENHOUSE in LITTLEROOT grows\n"
+	.string "them once it's upgraded to LV. 2.$"
+
+PetalburgCity_WallysHouse_Text_BerriesPartway:
+	.string "Thank you! Just {STR_VAR_2} more,\n"
+	.string "and WALLY's set for the season.$"
+
+PetalburgCity_WallysHouse_Text_BerriesComplete:
+	.string "That's all 30! I'll send them to\n"
+	.string "VERDANTURF right away.\p"
 	.string "This isn't a bribe or anything, but\n"
 	.string "I'd really like you to have this.$"
+
+PetalburgCity_WallysHouse_Text_MomBerries:
+	.string "Those berries will do WALLY a world\n"
+	.string "of good. Thank you for your help.$"
 
 PetalburgCity_WallysHouse_Text_SurfGoAllSortsOfPlaces:
 	.string "If your POKéMON can SURF, you'll be\n"

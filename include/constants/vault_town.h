@@ -56,4 +56,10 @@
 #define TOWN_MENU_CANCELLED     0xFF
 #define TOWN_MENU_EMPTY         0xFE
 
+// Story deliveries: how many farm goods each one needs
+#define DEVON_POKE_BALLS_NEEDED         20
+#define METEORITE_FIRE_STONES_NEEDED    10
+#define WALLY_BERRIES_NEEDED            30
+#define INSTITUTE_POWER_NEEDED          50
+
 #endif // GUARD_CONSTANTS_VAULT_TOWN_H

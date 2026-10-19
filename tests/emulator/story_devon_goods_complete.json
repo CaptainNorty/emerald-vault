@@ -1,0 +1,27 @@
+{
+  "name": "Devon Goods: bringing Mr. Stone the last 8 Poke Balls completes the shipment",
+  "build": "test_start",
+  "setup": {"base": "after_pokedex", "location": {"map": "MAP_RUSTBORO_CITY_DEVON_CORP_3F", "x": 16, "y": 5},
+            "flags": ["FLAG_RECEIVED_POKENAV", "FLAG_SYS_POKENAV_GET"],
+            "vars": {"VAR_DEVON_CORP_3F_STATE": 1, "VAR_DEVON_POKE_BALLS_DELIVERED": 12},
+            "items": [["POKE_BALL", 30]]},
+  "steps": [
+    {"action": "wait_overworld", "timeout_frames": 3000},
+    {"action": "remember_bag"},
+    {"action": "run", "frames": 2, "keys": ["RIGHT"]},
+    {"action": "run", "frames": 20},
+    {"action": "run", "frames": 2, "keys": ["A"]},
+    {"action": "wait_task", "task": "Task_HandleYesNoInput"},
+    {"action": "run", "frames": 20},
+    {"action": "screenshot", "name": "01-hand-over-8"},
+    {"action": "press", "key": "A", "wait": 10},
+    {"action": "next_message", "times": 0},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "02-all-20"},
+    {"action": "next_message"},
+    {"action": "screenshot", "name": "03-briney-can-sail"},
+    {"action": "dismiss_text"},
+    {"action": "assert_var", "var": "VAR_DEVON_POKE_BALLS_DELIVERED", "equals": 20},
+    {"action": "assert_item_gained", "item": "POKE_BALL", "min": -8, "max": -8}
+  ]
+}

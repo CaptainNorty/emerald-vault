@@ -286,6 +286,11 @@ class Emulator:
         save1 = self.read(self.symbols["gSaveBlock1Ptr"])
         return bool(self.read(save1 + 0x1270 + flag // 8, 8) >> (flag % 8) & 1)
 
+    def var(self, var):
+        # gSaveBlock1Ptr->vars (+0x139C), from VARS_START (0x4000).
+        save1 = self.read(self.symbols["gSaveBlock1Ptr"])
+        return self.read(save1 + 0x139C + (var - 0x4000) * 2, 16)
+
     def party_level(self, slot):
         # struct Pokemon is 100 bytes; the level is at +0x54.
         return self.read(self.symbols["gPlayerParty"] + slot * 100 + 0x54, 8)
@@ -596,6 +601,34 @@ def main():
                     waited += 20
                 result["checks"].append({"overworld": True, "frame": emulator.frame})
                 print(f"PASS: back on the overworld at frame {emulator.frame}", flush=True)
+            elif action == "pace_until_wild_battle":
+                # Walk back and forth (LEFT/RIGHT) until a battle starts, then check
+                # the wild Pokémon in gBattleMons[1] (0x58 bytes each; species at +0,
+                # level at +0x2A) against "species" and "min_level"/"max_level".
+                limit, waited = step.get("timeout_frames", 6000), 0
+                start_x, direction = emulator.player_position()[0], "LEFT"
+                while emulator.read(emulator.symbols["gMain"] + 4) & ~1 != emulator.symbols["BattleMainCB2"] & ~1:
+                    if waited >= limit:
+                        raise AssertionError(f"No wild battle within {limit} frames")
+                    x = emulator.player_position()[0]
+                    if x < start_x:
+                        direction = "RIGHT"
+                    elif x > start_x:
+                        direction = "LEFT"
+                    emulator.run(2, [direction] if emulator.overworld_ready() else [])
+                    waited += 2
+                emulator.run(step.get("wait", 240))
+                enemy = emulator.symbols["gBattleMons"] + 0x58
+                species, level = emulator.read(enemy, 16), emulator.read(enemy + 0x2A, 8)
+                names = ["SPECIES_" + name for name in step["species"]]
+                allowed = constants.resolve(names)
+                found = next((name for name, value in allowed.items() if value == species), None)
+                if found is None:
+                    raise AssertionError(f"Wild species {species} is not one of {step['species']}")
+                if not step.get("min_level", 1) <= level <= step.get("max_level", 100):
+                    raise AssertionError(f"Wild {found} is level {level}")
+                result["checks"].append({"wild": found, "level": level, "frame": emulator.frame})
+                print(f"PASS: wild {found} at level {level}", flush=True)
             elif action == "remember_money":
                 saved_money = emulator.money()
                 result["checks"].append({"money": saved_money, "frame": emulator.frame})
@@ -645,6 +678,12 @@ def main():
                     raise AssertionError(f"{step['flag']} is {'clear' if expected else 'set'}")
                 result["checks"].append({"flag": step["flag"], "set": expected, "frame": emulator.frame})
                 print(f"PASS: {step['flag']} is {'set' if expected else 'clear'}", flush=True)
+            elif action == "assert_var":
+                value = emulator.var(constants.resolve([step["var"]])[step["var"]])
+                if value != step["equals"]:
+                    raise AssertionError(f"{step['var']} is {value}, expected {step['equals']}")
+                result["checks"].append({"var": step["var"], "value": value, "frame": emulator.frame})
+                print(f"PASS: {step['var']} is {value}", flush=True)
             elif action == "assert_party_level":
                 level = emulator.party_level(step["slot"])
                 if level < step.get("min", 1) or level > step.get("max", 100):

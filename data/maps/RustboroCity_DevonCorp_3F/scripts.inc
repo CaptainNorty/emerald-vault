@@ -59,6 +59,9 @@ RustboroCity_DevonCorp_3F_EventScript_MeetPresident::
 	@ Emerald Vault: Mr. Stone offers a buyer for the farm's goods.
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneFarmBuyer, MSGBOX_DEFAULT
 	setflag FLAG_LITTLEROOT_MART_OFFERED
+	@ Emerald Vault: the thief smashed the Poké Balls packed with the Devon Goods.
+	msgbox RustboroCity_DevonCorp_3F_Text_MrStonePokeBallsSmashed, MSGBOX_DEFAULT
+	call RustboroCity_DevonCorp_3F_EventScript_CollectPokeBalls
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneGoWithCautionAndCare, MSGBOX_DEFAULT
 	setflag FLAG_HIDE_ROUTE_116_WANDAS_BOYFRIEND
 	clearflag FLAG_HIDE_RUSTURF_TUNNEL_WANDAS_BOYFRIEND
@@ -152,11 +155,42 @@ RustboroCity_DevonCorp_3F_EventScript_MrStone::
 	faceplayer
 	goto_if_set FLAG_RECEIVED_EXP_SHARE, RustboroCity_DevonCorp_3F_EventScript_MrStoneAfterFavor
 	goto_if_set FLAG_DELIVERED_STEVEN_LETTER, RustboroCity_DevonCorp_3F_EventScript_GiveExpShare
+	goto_if_set FLAG_DELIVERED_DEVON_GOODS, RustboroCity_DevonCorp_3F_EventScript_CountingOnYou
+	goto_if_lt VAR_DEVON_POKE_BALLS_DELIVERED, DEVON_POKE_BALLS_NEEDED, RustboroCity_DevonCorp_3F_EventScript_AskForPokeBalls
+RustboroCity_DevonCorp_3F_EventScript_CountingOnYou::
 	msgbox RustboroCity_DevonCorp_3F_Text_CountingOnYou, MSGBOX_DEFAULT
 	closemessage
 	applywaitmovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	release
 	end
+
+RustboroCity_DevonCorp_3F_EventScript_AskForPokeBalls::
+	call RustboroCity_DevonCorp_3F_EventScript_CollectPokeBalls
+	closemessage
+	applywaitmovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	release
+	end
+
+@ Takes Poké Balls for the Devon Goods, then says how many are still needed.
+RustboroCity_DevonCorp_3F_EventScript_CollectPokeBalls::
+	copyvar VAR_0x8007, VAR_DEVON_POKE_BALLS_DELIVERED
+	setvar VAR_0x8004, ITEM_POKE_BALL
+	setvar VAR_0x8005, ITEM_NONE
+	setvar VAR_0x8006, DEVON_POKE_BALLS_NEEDED
+	call FarmDelivery_EventScript_Offer
+	copyvar VAR_DEVON_POKE_BALLS_DELIVERED, VAR_0x8007
+	goto_if_ge VAR_DEVON_POKE_BALLS_DELIVERED, DEVON_POKE_BALLS_NEEDED, RustboroCity_DevonCorp_3F_EventScript_PokeBallsComplete
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_DevonCorp_3F_EventScript_PokeBallsPartway
+	msgbox RustboroCity_DevonCorp_3F_Text_BringPokeBalls, MSGBOX_DEFAULT
+	return
+
+RustboroCity_DevonCorp_3F_EventScript_PokeBallsPartway::
+	msgbox RustboroCity_DevonCorp_3F_Text_PokeBallsPartway, MSGBOX_DEFAULT
+	return
+
+RustboroCity_DevonCorp_3F_EventScript_PokeBallsComplete::
+	msgbox RustboroCity_DevonCorp_3F_Text_PokeBallsComplete, MSGBOX_DEFAULT
+	return
 
 RustboroCity_DevonCorp_3F_EventScript_GiveExpShare::
 	msgbox RustboroCity_DevonCorp_3F_Text_ThankYouForDeliveringLetter, MSGBOX_DEFAULT
@@ -248,6 +282,39 @@ RustboroCity_DevonCorp_3F_Text_MrStoneFarmBuyer:
 	.string "Have your BUILDER put up a\n"
 	.string "POKéMART, and my buyer will take\l"
 	.string "it from there.$"
+
+RustboroCity_DevonCorp_3F_Text_MrStonePokeBallsSmashed:
+	.string "MR. STONE: Ah, but there is one\n"
+	.string "problem with the DEVON GOODS.\p"
+	.string "CAPT. STERN ordered a crate of\n"
+	.string "20 POKé BALLS along with the parts.\p"
+	.string "That thief smashed every last one\n"
+	.string "of them while running off!\p"
+	.string "And our factory can't make more.\n"
+	.string "We're short on everything these days.\p"
+	.string "But your farm's DELIVERY SERVICE\n"
+	.string "brings in POKé BALLS, doesn't it?\p"
+	.string "Put in a WORK ORDER for them at its\n"
+	.string "terminal, and they'll pile up quickly.$"
+
+RustboroCity_DevonCorp_3F_Text_BringPokeBalls:
+	.string "MR. STONE: Please bring me\n"
+	.string "{STR_VAR_2} POKé BALLS for the shipment.\p"
+	.string "I've asked MR. BRINEY not to set sail\n"
+	.string "until the DEVON GOODS are complete.$"
+
+RustboroCity_DevonCorp_3F_Text_PokeBallsPartway:
+	.string "MR. STONE: Splendid!\n"
+	.string "Just {STR_VAR_2} more to go.\p"
+	.string "MR. BRINEY will sail once the\n"
+	.string "DEVON GOODS are complete.$"
+
+RustboroCity_DevonCorp_3F_Text_PokeBallsComplete:
+	.string "MR. STONE: That makes all 20!\n"
+	.string "The DEVON GOODS are complete.\p"
+	.string "MR. BRINEY can set sail whenever\n"
+	.string "you're ready. Please take them to\l"
+	.string "CAPT. STERN in SLATEPORT!$"
 
 RustboroCity_DevonCorp_3F_Text_MrStoneGoWithCautionAndCare:
 	.string "MR. STONE: Well, then, {PLAYER}{KUN},\n"

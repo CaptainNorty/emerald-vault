@@ -68,7 +68,7 @@
 #define FLAG_LITTLEROOT_MART_BUILT             0x36 // Emerald Vault
 #define FLAG_LITTLEROOT_MART_OFFERED           0x37 // Emerald Vault: Mr. Stone offered a buyer in Littleroot
 #define FLAG_FARM_STEPS_READY                  0x38 // Emerald Vault: businesses count GAME_STAT_FARM_STEPS
-#define FLAG_UNUSED_0x039    0x39 // Unused Flag
+#define FLAG_HIDE_ROUTE_119_BRIDGE_WORKERS     0x39 // Emerald Vault: Weather Institute staff closing the bridge
 #define FLAG_UNUSED_0x03A    0x3A // Unused Flag
 #define FLAG_UNUSED_0x03B    0x3B // Unused Flag
 #define FLAG_UNUSED_0x03C    0x3C // Unused Flag

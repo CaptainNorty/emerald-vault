@@ -324,6 +324,27 @@ static u16 GetCurrentMapWildMonHeaderId(void)
 
                 i += alteringCaveId;
             }
+            else if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LITTLEROOT_TOWN) &&
+                     gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LITTLEROOT_TOWN))
+            {
+                // The grass patch below the Mart: one table of Kanto and
+                // Johto Pokémon per badge, so it grows with the player.
+                u16 flag;
+                u16 badgeCount = 0;
+
+                if (!FlagGet(FLAG_SYS_POKEMON_GET))
+                    return HEADER_NONE;
+
+                for (flag = FLAG_BADGE01_GET; flag < FLAG_BADGE01_GET + NUM_BADGES; flag++)
+                {
+                    if (FlagGet(flag))
+                        badgeCount++;
+                }
+                if (badgeCount >= NUM_LITTLEROOT_GRASS_TABLES)
+                    badgeCount = NUM_LITTLEROOT_GRASS_TABLES - 1;
+
+                i += badgeCount;
+            }
 
             return i;
         }

@@ -4,6 +4,7 @@
 {{ doNotModifyHeader }}
 
 #define NUM_ALTERING_CAVE_TABLES 9
+#define NUM_LITTLEROOT_GRASS_TABLES 9
 
 ## for wild_encounter_group in wild_encounter_groups
 {% if wild_encounter_group.for_maps %}

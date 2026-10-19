@@ -223,6 +223,22 @@ Playtest fixes:
   of a buyer in Littleroot and sets `FLAG_LITTLEROOT_MART_OFFERED`.
 - `littleroot_mart.json`: after that offer, the Builder builds the POKé MART
   for ₽3,000; the player walks in and sells a Potion to Devon's buyer.
+- `story_devon_goods.json`, `story_devon_goods_complete.json`: Mr. Stone asks
+  for 20 Poké Balls, takes 12, says 8 more, then takes the last 8.
+- `story_briney_waits.json`: Mr. Briney won't sail while the Poké Balls are
+  short.
+- `story_meteorite_sealed.json`, `story_meteorite.json`: the Meteorite's heat
+  seal asks for Fire Stones, opens at 10, and the Meteorite can be removed.
+- `story_wally_berries.json`, `story_wally_berries_complete.json`: Wally's
+  father asks for 30 Sitrus or Lum Berries, takes Sitrus first, and gives HM
+  Surf at 30.
+- `story_weather_institute.json`: the scientist takes Power Cells, then
+  Thunder Stones, up to 50, and gives Castform.
+- `story_route119_bridge_closed.json`, `story_route119_bridge_open.json`:
+  Institute staff block the bridge until it has its power.
+- `littleroot_grass_0_badges.json`, `_4_badges.json`, `_8_badges.json`: the
+  grass below Littleroot's Mart has that badge count's Kanto and Johto
+  Pokémon at the right levels.
 - `quick_wins.json`: the farm PC by the Builder opens the storage system, the
   Start menu shows money (hidden while saving, back after the party menu), and
   screenshots of the fixed tree tops.
@@ -259,6 +275,8 @@ Actions currently supported:
 | `remember_bag` | | Record every item in the bag. |
 | `assert_items_gained` | `items` (names like `POTION`), optional `min` (default 1), `max` | Fail unless the bag gained that many items in total since `remember_bag`, all of them from `items`. |
 | `assert_flag` | `flag`, optional `set` (default true) | Fail unless the flag is set (or clear, with `"set": false`). |
+| `pace_until_wild_battle` | `species`, optional `min_level`, `max_level`, `timeout_frames` | Walk left and right until a wild battle starts, and fail unless the wild Pokémon is one of those species, in that level range. |
+| `assert_var` | `var`, `equals` | Fail unless the save variable (e.g. `VAR_DEVON_POKE_BALLS_DELIVERED`) has that value. |
 | `assert_party_level` | `slot`, optional `min`, `max` | Fail unless the party Pokémon in that slot is within those levels. |
 
 Button names: A, B, SELECT, START, RIGHT, LEFT, UP, DOWN, R, L. Release buttons
